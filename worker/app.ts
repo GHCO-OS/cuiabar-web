@@ -2383,7 +2383,7 @@ export const createApp = () => {
     authUrl.searchParams.set('client_id', c.env.GOOGLE_BUSINESS_CLIENT_ID);
     authUrl.searchParams.set('redirect_uri', redirectUri);
     authUrl.searchParams.set('response_type', 'code');
-    authUrl.searchParams.set('scope', 'openid email profile https://www.googleapis.com/auth/business.manage');
+    authUrl.searchParams.set('scope', 'profile email https://www.googleapis.com/auth/business.manage');
     authUrl.searchParams.set('access_type', 'offline');
     authUrl.searchParams.set('prompt', 'consent');
     authUrl.searchParams.set('include_granted_scopes', 'true');
@@ -2446,6 +2446,7 @@ export const createApp = () => {
     });
 
     const tokenPayload = (await tokenResponse.json()) as {
+      access_token?: string;
       refresh_token?: string;
       id_token?: string;
       scope?: string;
@@ -2457,12 +2458,38 @@ export const createApp = () => {
       throw new HttpError(400, 'Google recusou a troca do codigo OAuth do Business Profile.', tokenPayload);
     }
 
-    if (!tokenPayload.id_token) {
-      throw new HttpError(400, 'O Google nao retornou um id_token para validar a conta autorizada.');
+    let authorizedEmail = '';
+
+    if (tokenPayload.id_token) {
+      const identity = await verifyGoogleIdToken(c.env, tokenPayload.id_token, c.env.GOOGLE_BUSINESS_CLIENT_ID);
+      authorizedEmail = identity.email.toLowerCase();
+    } else if (tokenPayload.access_token) {
+      const userinfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+          authorization: `Bearer ${tokenPayload.access_token}`,
+        },
+      });
+
+      const userinfoPayload = (await userinfoResponse.json()) as {
+        email?: string;
+        error?: {
+          message?: string;
+        };
+      };
+
+      if (!userinfoResponse.ok || !userinfoPayload.email) {
+        throw new HttpError(
+          400,
+          'O Google nao retornou dados suficientes para validar a conta autorizada.',
+          userinfoPayload,
+        );
+      }
+
+      authorizedEmail = userinfoPayload.email.toLowerCase();
+    } else {
+      throw new HttpError(400, 'O Google nao retornou tokens suficientes para validar a conta autorizada.');
     }
 
-    const identity = await verifyGoogleIdToken(c.env, tokenPayload.id_token, c.env.GOOGLE_BUSINESS_CLIENT_ID);
-    const authorizedEmail = identity.email.toLowerCase();
     const allowedBusinessEmails = parseEmailSet(c.env.GOOGLE_MANAGER_EMAILS || c.env.GOOGLE_ALLOWED_EMAILS);
     if (allowedBusinessEmails.size > 0 && !allowedBusinessEmails.has(authorizedEmail)) {
       throw new HttpError(403, `A autorizacao precisa ser feita com uma conta gestora do Cuiabar. Conta atual: ${authorizedEmail}.`);
