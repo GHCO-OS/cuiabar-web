@@ -359,7 +359,7 @@ const googleBusinessOauthSetupHtml = (env: Env) => `<!doctype html>
       <span class="pill">google business profile</span>
       <h1>Autorizar o Perfil da Empresa</h1>
       <p>Use a conta Google que já gerencia o perfil do Cuiabar. O fluxo vai solicitar permissão e gravar o <code>refresh token</code> no CRM para futuras automações.</p>
-      <p><strong>Redirect URI configurada no Google Cloud:</strong> <code>${env.APP_BASE_URL.replace('crm.', '')}/api/google/business/callback</code></p>
+      <p><strong>Redirect URI configurada no Google Cloud:</strong> <code>${env.APP_BASE_URL}/api/google/business/callback</code></p>
       <p class="muted">Se esta URI não for a mesma cadastrada no OAuth Client, o Google recusará a autorização.</p>
       <a class="button" href="/oauth/google-business/start">Autorizar Google Business Profile</a>
     </main>
@@ -2367,8 +2367,7 @@ export const createApp = () => {
 
     const requestOrigin = new URL(c.req.url).origin;
     const requestHost = new URL(c.req.url).hostname;
-    const publicOrigin = requestOrigin.replace('://crm.', '://');
-    const redirectUri = `${publicOrigin}/api/google/business/callback`;
+    const redirectUri = `${requestOrigin}/api/google/business/callback`;
     const state = randomToken(24);
     const secure = new URL(c.req.url).protocol === 'https:';
     const cookieDomain = requestHost.endsWith('.cuiabar.com') ? '.cuiabar.com' : undefined;
