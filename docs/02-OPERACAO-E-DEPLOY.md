@@ -1,6 +1,6 @@
 # Operação e deploy
 
-Atualizado em: 2026-04-10
+Atualizado em: 2026-04-13
 
 ## Comandos principais
 
@@ -83,6 +83,8 @@ Este projeto concentra múltiplos módulos em uma base só. Portanto:
 A partir desta organização:
 
 - o repositório GitHub privado é a fonte principal de código e documentação versionada
+- o único remoto oficial do projeto é `https://github.com/cuiabar/cuiabar-web.git`
+- o repositório `https://github.com/cuiabar/web.git` não deve ser usado como destino operacional
 - o Drive deve ser tratado apenas como backup complementar e acervo de apoio
 - segredos não devem ser mantidos em GitHub nem em documentação aberta do Drive
 

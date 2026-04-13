@@ -1,6 +1,6 @@
 # Migração para operação via Codex Web
 
-Atualizado em: 2026-04-11
+Atualizado em: 2026-04-13
 
 ## Objetivo
 
@@ -10,6 +10,7 @@ Tornar o projeto tratável prioritariamente via GitHub/Codex Web, reduzindo depe
 
 - repositório privado criado no GitHub
 - `main` publicada como base oficial do projeto
+- remoto oficial consolidado em `origin -> https://github.com/cuiabar/cuiabar-web.git`
 - documentação central movida para `docs/`
 - governança para novas IAs criada em `AGENTS.md`
 - root organizada para onboarding rápido
@@ -61,6 +62,7 @@ O projeto já pode ser tratado como web-first.
 Na prática:
 
 - GitHub é a fonte principal
+- existe um único repositório oficial para código e documentação: `cuiabar/cuiabar-web`
 - Codex Web pode operar código e documentação
 - a publicação do site continua preservada
 - o único ajuste externo que falta para fechar o ciclo remoto é configurar o secret do Cloudflare no GitHub

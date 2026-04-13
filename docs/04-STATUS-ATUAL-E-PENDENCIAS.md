@@ -22,6 +22,7 @@ O projeto está funcional como base única para:
 - artefatos de debug e QA saíram da raiz para `ops-artifacts/`
 - arquivos gerados do Worker passaram a ser tratados como não editáveis
 - GitHub privado adotado como base principal do repositório e da documentação técnica
+- remoto oficial consolidado em `https://github.com/cuiabar/cuiabar-web.git`; `https://github.com/cuiabar/web.git` não deve ser usado
 - migração para operação web-first iniciada e documentada em `docs/11-CODEX-WEB-MIGRACAO.md`
 - secret `CLOUDFLARE_API_TOKEN` configurado no GitHub e workflow remoto validado com sucesso
 - Search Console confirmado por API com acesso à propriedade `sc-domain:cuiabar.com`

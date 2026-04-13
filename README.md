@@ -44,20 +44,17 @@ npm run build
 npm run preview
 ```
 
-## Pronto para subir no GitHub (passo a passo)
+## Repositório oficial
 
-1. Crie um repositório vazio no GitHub (ex.: `cuiabar-site`).
-2. Configure o remote local:
-```bash
-git remote add origin https://github.com/SEU_USUARIO/cuiabar-site.git
-```
-3. Envie a branch atual:
-```bash
-git push -u origin HEAD
-```
-4. (Opcional) Defina branch padrão como `main` no GitHub.
+Este projeto já possui um único repositório oficial no GitHub:
 
-> Este projeto já inclui CI em `.github/workflows/ci.yml` para validar `npm ci`, `npm run lint` e `npm run build` a cada push/PR.
+- `https://github.com/cuiabar/cuiabar-web.git`
+
+Regras:
+
+- use apenas esse remoto como origem oficial
+- não manter espelho operacional paralelo em outro repositório
+- referências a `https://github.com/cuiabar/web.git` devem ser tratadas como legadas/inválidas, salvo decisão explícita futura
 
 ## Deploy no Cloudflare Pages
 
