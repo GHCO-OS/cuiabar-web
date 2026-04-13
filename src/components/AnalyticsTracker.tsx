@@ -18,16 +18,8 @@ const getAnchor = (target: EventTarget | null) => {
   return target.closest('a');
 };
 
-const getNormalizedHost = () =>
-  typeof window === 'undefined' ? '' : window.location.hostname.replace(/^www\./, '').toLowerCase();
-
 const classifyInternalPath = (pathname: string) => {
   const normalizedPath = pathname.replace(/\/+$/, '') || '/';
-  const normalizedHost = getNormalizedHost();
-
-  if (normalizedHost === 'burger.cuiabar.com' && normalizedPath === '/') {
-    return { eventName: 'open_burguer_page' };
-  }
 
   if (normalizedPath === '/agenda' || normalizedPath.startsWith('/agenda/')) {
     return { eventName: normalizedPath === '/agenda' ? 'open_agenda_page' : 'open_agenda_event_page' };
@@ -61,11 +53,6 @@ const normalizePathname = (pathname: string) => pathname.replace(/\/+$/, '') || 
 
 const getContentName = (pathname: string) => {
   const normalizedPath = normalizePathname(pathname);
-  const normalizedHost = getNormalizedHost();
-
-  if (normalizedHost === 'burger.cuiabar.com' && normalizedPath === '/') {
-    return 'burguer_cuiabar';
-  }
 
   if (normalizedPath === '/agenda' || normalizedPath.startsWith('/agenda/')) {
     return 'agenda_musica_ao_vivo';
@@ -90,7 +77,6 @@ const getContentName = (pathname: string) => {
 export const AnalyticsTracker = () => {
   const location = useLocation();
   const normalizedPath = normalizePathname(location.pathname);
-  const normalizedHost = getNormalizedHost();
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -120,11 +106,6 @@ export const AnalyticsTracker = () => {
         trackViewContent('prorefeicao', { content_category: 'corporativo' });
         break;
       default:
-        if (normalizedHost === 'burger.cuiabar.com' && normalizedPath === '/') {
-          trackViewContent('burguer_cuiabar', { content_category: 'burguer' });
-          break;
-        }
-
         if (normalizedPath.startsWith('/agenda/')) {
           trackViewContent('agenda_event_page', { content_category: 'agenda_event' });
           break;
@@ -135,7 +116,7 @@ export const AnalyticsTracker = () => {
         }
         break;
     }
-  }, [normalizedHost, normalizedPath]);
+  }, [normalizedPath]);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {

@@ -1,0 +1,22 @@
+cookie_count=21
+.cloudflare.com	_ga	/	~FOs<<qHKϖi?9NcmGA1.1.44fd4ee6-b4c9-41f0-b516-c298bfa3a873
+.cloudflare.com	kndctr_8AD56F28618A50850A495FB6_AdobeOrg_identity	/	~FOs<<qHKϖi?9NcmCiYyOTcxMzY5OTUyMDEyOTAwNTU3Mjc3NDYyNjg3NzQwNjg1NzM2NlIOCJ_NtNbNMyoDVkE2MALwAZ_NtNbNMw==
+.dash.cloudflare.com	edgesessions_enabled	/	ɬ7J}?%"^Zrollout
+dash.cloudflare.com	curr-account	/b174b77b3f222f4b36461064267baea3/pages/view	\%޽{2S~xc>|[߱hs{"a024117df6b3e75eaf8ffad68a06fee6":"b174b77b3f222f4b36461064267baea3"}
+.cloudflare.com	CF_VERIFIED_DEVICE_bb6e1665044d4e82abc5f5ed0b171141478e2dc15449b7ee6894c8ff734dee06	/	~FOs<<qHKϖi?9Ncm1774320957
+.cloudflare.com	__cf_logged_in	/	~FOs<<qHKϖi?9Ncm1
+.dash.cloudflare.com	vses2	/	ɬ7J}?%"^Zcfes-a024117df6-cac8753d1d8b6601636dfe3aa63a5f2c0dd05b14f0ce58034cbfbdea1a1f345b-g74kjqh6p1heilq22035o5g5dm9be72i
+.dash.cloudflare.com	OptanonConsent	/	ɬ7J}?%"^ZisGpcEnabled=0&datestamp=Tue+Mar+24+2026+13%3A42%3A15+GMT-0300+(Hor%C3%A1rio+Padr%C3%A3o+de+Bras%C3%ADlia)&version=202510.2.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=12bcf223-c104-49da-a52a-18c23e9a6e8d&interactionCount=1&isAnonUser=1&landingPath=NotLandingPage&groups=C0001%3A1%2CC0003%3A1%2CC0002%3A1%2CC0004%3A1&AwaitingReconsent=false
+dash.cloudflare.com	__cflb	/	\%޽{2S~xc>|[߱hs0H28upHR6WxXGRqfrsmVntTd5vuFAcim9L5WNVQEHBB
+.dash.cloudflare.com	_cfuvid	/	ɬ7J}?%"^ZUpDfeEGKmIWPMtGvpeCu0pFCa0ANuN9.dmUHA_1t1yQ-1774370536.0426662-1.0.1.1-QHxTC2y5CnYdhMrbBuUar0L6VcmuaKYjVO8nnOQefVU
+dash.cloudflare.com	cf_v	/	\%޽{2S~xc>|[߱hs51de7388
+dash.cloudflare.com	dark-mode	/	\%޽{2S~xc>|[߱hsoff
+.cloudflare.com	sparrow_id	/	~FOs<<qHKϖi?9Ncm%7B%22deviceId%22%3A%22498ec336-e4ba-48d4-adcd-aaf260dfcb86%22%2C%22userId%22%3A%22a024117df6b3e75eaf8ffad68a06fee6%22%7D
+.dash.cloudflare.com	cf_clearance	/	ɬ7J}?%"^ZEl2V4XlmlgJYbPpE3YMMPVUWaYnlNhtALfJZYsd7uHs-1774370537-1.2.1.1-mYuRnDu_xczvwezsTVnWO_i6WbtYPCzzK9pibQwos5E_McYEjQwb1PsZRILnxeanV0jLmV9DR8pPGoruJre.pkPPj91UrnQ.igtz4LWUVC9X462QQjqDnEuTnAxRJiaAUW7mzt90EcTmRtVQ2X3hKTO1Eojb_doY81oh1oVdDvNZtwIm1m8pT9B5sc5yGK722afA5LhKYno.NfXskhjwDxcbBejj0tHYb9JzHZDBEX4
+.dash.cloudflare.com	__cf_bm	/	ɬ7J}?%"^Z_t44ZYQWQg.Do13Dl6dw6xFOgApV9XeD8jOWcNsDx14-1774371436.4423003-1.0.1.1-BrZsvj.NGOKKjxZUBu.IffqHnapEV_pqZQ1UOoQcUeLD9HIkaAsJQjwNHhNXXidORQ61Ky8ML4XQlV.3C6sS0x_ScLXHNWAu0eiADoVQ0TWOUG3_EUbddKFWbLHCawHX
+dash.cloudflare.com	cf-locale	/	\%޽{2S~xc>|[߱hspt-BR
+.cloudflare.com	cfz_adobe	/	~FOs<<qHKϖi?9Ncm%7B%22MsVJ_ecid%22%3A%7B%22v%22%3A%22CiYyOTcxMzY5OTUyMDEyOTAwNTU3Mjc3NDYyNjg3NzQwNjg1NzM2NlIOCJ_NtNbNMyoDVkE2MALwAZ_NtNbNMw%22%2C%22e%22%3A1807462006544%7D%7D
+.cloudflare.com	cfz_facebook-pixel	/	~FOs<<qHKϖi?9Ncm%7B%22dzQR_fb-pixel%22%3A%7B%22v%22%3A%22fb.2.1773197407720.371440296%22%2C%22e%22%3A1804733407720%7D%7D
+.cloudflare.com	cfz_google-analytics_v4	/	~FOs<<qHKϖi?9Ncm%7B%22nzcr_ga4%22%3A%7B%22v%22%3A%2244fd4ee6-b4c9-41f0-b516-c298bfa3a873%22%2C%22e%22%3A1805907427500%7D%2C%22nzcr_engagementDuration%22%3A%7B%22v%22%3A%220%22%2C%22e%22%3A1805907427500%7D%2C%22nzcr_engagementStart%22%3A%7B%22v%22%3A1774371434298%2C%22e%22%3A1805907436415%7D%2C%22nzcr_counter%22%3A%7B%22v%22%3A%2255%22%2C%22e%22%3A1805907427500%7D%2C%22nzcr_session_counter%22%3A%7B%22v%22%3A%2212%22%2C%22e%22%3A1805907427500%7D%2C%22nzcr__z_ga_audiences%22%3A%7B%22v%22%3A%2244fd4ee6-b4c9-41f0-b516-c298bfa3a873%22%2C%22e%22%3A1804733733707%7D%2C%22nzcr_let%22%3A%7B%22v%22%3A%221774371427500%22%2C%22e%22%3A1805907427500%7D%2C%22nzcr_ga4sid%22%3A%7B%22v%22%3A%221892377467%22%2C%22e%22%3A1774373227500%7D%7D
+.cloudflare.com	cfzs_google-analytics_v4	/	~FOs<<qHKϖi?9Ncm%7B%22nzcr_pageviewCounter%22%3A%7B%22v%22%3A%223%22%7D%7D
+dash.cloudflare.com	curr-account	/	\%޽{2S~xc>|[߱hs{"a024117df6b3e75eaf8ffad68a06fee6":"b174b77b3f222f4b36461064267baea3"}

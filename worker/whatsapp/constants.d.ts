@@ -1,0 +1,12 @@
+import type { BusinessContext, WhatsAppIntent } from './types';
+export declare const DEFAULT_WHATSAPP_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+export declare const SESSION_TTL_SECONDS: number;
+export declare const CLASSIFICATION_CACHE_TTL_SECONDS: number;
+export declare const CHANNEL_INVITE_COOLDOWN_MS: number;
+export declare const LARGE_PARTY_GUEST_THRESHOLD = 12;
+export declare const HUMAN_HANDOFF_FALLBACK_THRESHOLD = 2;
+export declare const ALLOWED_INTENTS: WhatsAppIntent[];
+export declare const DEFAULT_BUSINESS_CONTEXT: BusinessContext;
+export declare const INTENT_KEYWORDS: Record<WhatsAppIntent, string[]>;
+export declare const HUMAN_HANDOFF_KEYWORDS: Set<string>;
+export declare const COMPLAINT_KEYWORDS: Set<string>;

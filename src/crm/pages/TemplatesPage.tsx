@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { crmRequest } from '../api';
-import { Badge, Button, Field, InputClassName, MetricCard, PageHeader, Panel } from '../components';
+import { ConfirmModal, Panel } from '../components';
 import { useCrm } from '../context';
 import { defaultEmailTemplatePreset, emailTemplatePresets } from '../emailPresets';
 import type { Template } from '../types';
@@ -82,6 +82,13 @@ const previewDateFormatter = new Intl.DateTimeFormat('pt-BR', {
   timeStyle: 'short',
 });
 
+const normalizeForSearch = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
 const extractMergeVariables = (source: string) => {
   const names = new Set<string>();
 
@@ -98,7 +105,14 @@ const applyMergeTags = (source: string, context: Record<string, string>) =>
   source.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, rawName: string) => context[rawName] ?? '');
 
 const toPreviewDocument = (html: string, context: Record<string, string>) => {
-  const merged = applyMergeTags(html, context);
+  let merged = applyMergeTags(html, context);
+
+  if (typeof window !== 'undefined') {
+    const previewOrigin = window.location.origin.replace(/\/$/, '');
+    merged = merged
+      .replace(/https:\/\/www\.cuiabar\.com\//gi, `${previewOrigin}/`)
+      .replace(/https:\/\/cuiabar\.com\//gi, `${previewOrigin}/`);
+  }
 
   if (/<html[\s>]/i.test(merged)) {
     return merged;
@@ -141,13 +155,88 @@ const duplicateTemplateDraft = (template: Template): TemplateFormState => ({
 
 const feedbackClassName = (tone: FeedbackTone) =>
   tone === 'success'
-    ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-200'
+    ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
     : tone === 'danger'
-      ? 'border-rose-500/25 bg-rose-500/10 text-rose-200'
-      : 'border-white/10 bg-white/5 text-slate-200';
+      ? 'border-rose-200 bg-rose-50 text-rose-700'
+      : 'border-slate-200 bg-slate-50 text-slate-700';
+
+const LightPanel = ({ children, className = '' }: React.PropsWithChildren<{ className?: string }>) => (
+  <Panel className={`border-slate-200 bg-white text-slate-900 shadow-[0_24px_70px_-48px_rgba(15,23,42,0.35)] ${className}`}>{children}</Panel>
+);
+
+const LightPageHeader = ({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) => (
+  <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 className="text-2xl font-semibold tracking-tight text-slate-950">{title}</h1>
+      {description ? <p className="mt-2 max-w-3xl text-sm text-slate-600">{description}</p> : null}
+    </div>
+    {action ? <div className="flex-shrink-0">{action}</div> : null}
+  </div>
+);
+
+const LightBadge = ({ children, tone = 'neutral' }: React.PropsWithChildren<{ tone?: 'neutral' | 'success' | 'warning' | 'danger' }>) => {
+  const styles =
+    tone === 'success'
+      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+      : tone === 'warning'
+        ? 'border-amber-200 bg-amber-50 text-amber-700'
+        : tone === 'danger'
+          ? 'border-rose-200 bg-rose-50 text-rose-700'
+          : 'border-slate-200 bg-slate-100 text-slate-600';
+
+  return <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${styles}`}>{children}</span>;
+};
+
+const LightButton = ({
+  children,
+  type = 'button',
+  variant = 'primary',
+  ...props
+}: React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'ghost' | 'danger' }>) => {
+  const styles =
+    variant === 'primary'
+      ? 'border border-sky-600 bg-sky-600 text-white hover:bg-sky-700'
+      : variant === 'danger'
+        ? 'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100'
+        : 'border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50';
+
+  return (
+    <button
+      type={type}
+      className={`rounded-2xl px-4 py-2.5 text-sm font-semibold transition ${styles} disabled:cursor-not-allowed disabled:opacity-50`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+const LightField = ({
+  label,
+  children,
+  hint,
+}: React.PropsWithChildren<{ label: string; hint?: string }>) => (
+  <label className="flex flex-col gap-2 text-sm text-slate-700">
+    <span className="font-medium text-slate-900">{label}</span>
+    {children}
+    {hint ? <span className="text-xs text-slate-500">{hint}</span> : null}
+  </label>
+);
+
+const LightInputClassName =
+  'w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-500';
+
+const LightMetricCard = ({ label, value, note }: { label: string; value: string | number; note?: string }) => (
+  <LightPanel className="border border-slate-200 bg-white">
+    <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{label}</p>
+    <p className="mt-3 text-3xl font-semibold text-slate-950">{value}</p>
+    {note ? <p className="mt-2 text-xs text-slate-500">{note}</p> : null}
+  </LightPanel>
+);
 
 export const TemplatesPage = () => {
   const { csrfToken } = useCrm();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [form, setForm] = useState<TemplateFormState>(() => createFormFromPreset());
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
@@ -157,6 +246,8 @@ export const TemplatesPage = () => {
   const [feedback, setFeedback] = useState<FeedbackState>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [sendingTemplateId, setSendingTemplateId] = useState<string | null>(null);
+  const [deletingTemplateId, setDeletingTemplateId] = useState<string | null>(null);
+  const [librarySearch, setLibrarySearch] = useState('');
 
   const load = async () => {
     const response = await crmRequest<{ ok: true; templates: Template[] }>('/api/templates', {}, csrfToken);
@@ -198,11 +289,29 @@ export const TemplatesPage = () => {
   const previewDocument = useMemo(() => toPreviewDocument(form.html, previewContext), [form.html, previewContext]);
   const previewText = useMemo(() => applyMergeTags(form.text, previewContext), [form.text, previewContext]);
 
+  const normalizedSearch = normalizeForSearch(librarySearch);
+
+  const filteredPresets = useMemo(() => {
+    if (!normalizedSearch) return emailTemplatePresets;
+
+    return emailTemplatePresets.filter((preset) =>
+      normalizeForSearch([preset.name, preset.category, preset.summary, preset.idealFor, preset.tags.join(' ')].join(' ')).includes(normalizedSearch),
+    );
+  }, [normalizedSearch]);
+
+  const filteredTemplates = useMemo(() => {
+    if (!normalizedSearch) return templates;
+
+    return templates.filter((template) =>
+      normalizeForSearch([template.name, template.subject, template.preheader, template.variables.join(' ')].join(' ')).includes(normalizedSearch),
+    );
+  }, [normalizedSearch, templates]);
+
   const startBlankDraft = () => {
     setSelectedTemplateId(null);
     setActivePresetId(null);
     setForm(createBlankForm());
-    setFeedback({ tone: 'neutral', message: 'Rascunho em branco carregado no editor.' });
+    setFeedback({ tone: 'neutral', message: 'Editor limpo para um novo rascunho.' });
   };
 
   const applyPreset = (presetId: string) => {
@@ -212,7 +321,7 @@ export const TemplatesPage = () => {
     setSelectedTemplateId(null);
     setActivePresetId(preset.id);
     setForm(createFormFromPreset(preset));
-    setFeedback({ tone: 'neutral', message: `Preset "${preset.name}" carregado no editor.` });
+    setFeedback({ tone: 'success', message: `Preset "${preset.name}" carregado no editor.` });
   };
 
   const editSavedTemplate = (template: Template) => {
@@ -226,7 +335,30 @@ export const TemplatesPage = () => {
     setSelectedTemplateId(null);
     setActivePresetId(null);
     setForm(duplicateTemplateDraft(template));
-    setFeedback({ tone: 'neutral', message: `Conteudo de "${template.name}" duplicado como novo rascunho.` });
+    setFeedback({ tone: 'neutral', message: `Template "${template.name}" clonado para um novo rascunho.` });
+  };
+
+  const importHtmlFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) return;
+
+    try {
+      const html = await file.text();
+      const inferredName = file.name.replace(/\.[^.]+$/, '');
+      setSelectedTemplateId(null);
+      setActivePresetId(null);
+      setForm((current) => ({
+        ...current,
+        name: current.name || inferredName,
+        subject: current.subject || inferredName,
+        html,
+      }));
+      setFeedback({ tone: 'success', message: `HTML importado de "${file.name}" para o editor.` });
+    } catch {
+      setFeedback({ tone: 'danger', message: 'Nao foi possivel importar o arquivo HTML.' });
+    }
   };
 
   const saveTemplate = async (event: React.FormEvent) => {
@@ -304,277 +436,271 @@ export const TemplatesPage = () => {
     }
   };
 
+  const deleteTemplate = async (templateId: string) => {
+    try {
+      await crmRequest(`/api/templates/${templateId}`, { method: 'DELETE' }, csrfToken);
+      if (selectedTemplateId === templateId) {
+        setSelectedTemplateId(null);
+        setForm(createBlankForm());
+      }
+      setDeletingTemplateId(null);
+      await load();
+      setFeedback({ tone: 'success', message: 'Template excluido com sucesso.' });
+    } catch (error) {
+      setDeletingTemplateId(null);
+      setFeedback({ tone: 'danger', message: error instanceof Error ? error.message : 'Nao foi possivel excluir o template.' });
+    }
+  };
+
   const editorLabel = selectedTemplate
-    ? `Editando template salvo: ${selectedTemplate.name}`
+    ? `Editando: ${selectedTemplate.name}`
     : activePreset
-      ? `Rascunho a partir do preset: ${activePreset.name}`
-      : 'Novo rascunho no editor';
+      ? `Preset carregado: ${activePreset.name}`
+      : 'Novo rascunho';
 
   return (
     <div className="space-y-6">
-      <PageHeader
+      <LightPageHeader
         title="Templates"
-        description="Biblioteca com presets de email marketing, editor com preview realista e fluxo para transformar rascunhos em templates salvos do CRM."
+        description="Biblioteca mais objetiva para escolher um preset, importar HTML, abrir um template salvo e editar tudo no mesmo lugar."
         action={
-          <Button type="button" variant="ghost" onClick={startBlankDraft}>
-            Novo rascunho
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <LightButton type="button" variant="ghost" onClick={() => fileInputRef.current?.click()}>
+              Importar HTML
+            </LightButton>
+            <LightButton type="button" variant="ghost" onClick={startBlankDraft}>
+              Novo rascunho
+            </LightButton>
+          </div>
         }
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <MetricCard label="Presets prontos" value={emailTemplatePresets.length} note="Base inicial para newsletter, cardapio, delivery e B2B." />
-        <MetricCard label="Templates salvos" value={templates.length} note="Qualquer template salvo fica disponivel para campanhas e testes." />
-        <MetricCard label="Variaveis detectadas" value={currentVariables.length} note="Merge tags extraidas do HTML e do plain text atual." />
+      <input ref={fileInputRef} type="file" accept=".html,.htm,text/html" className="hidden" onChange={importHtmlFile} />
+
+      <div className="grid gap-4 md:grid-cols-4">
+        <LightMetricCard label="Biblioteca" value={emailTemplatePresets.length} note="Presets prontos para importar no editor." />
+        <LightMetricCard label="Templates salvos" value={templates.length} note="Base atual do CRM para reaproveitar e ajustar." />
+        <LightMetricCard label="Variaveis" value={currentVariables.length} note="Merge tags detectadas no rascunho atual." />
+        <LightMetricCard label="Fluxo rapido" value="3 passos" note="Escolher ou importar, revisar, salvar." />
       </div>
 
-      {feedback ? (
-        <div className={`rounded-3xl border px-4 py-3 text-sm ${feedbackClassName(feedback.tone)}`}>{feedback.message}</div>
-      ) : null}
+      {feedback ? <div className={`rounded-3xl border px-4 py-3 text-sm ${feedbackClassName(feedback.tone)}`}>{feedback.message}</div> : null}
 
-      <div className="grid gap-6 xl:grid-cols-[0.92fr,1.08fr]">
+      <div className="grid gap-6 xl:grid-cols-[0.88fr,1.12fr]">
         <div className="space-y-6">
-          <Panel className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
+          <LightPanel className="space-y-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-white">Biblioteca de presets</h2>
-                <p className="mt-1 text-sm text-slate-400">Layouts ja montados com cara de marca para acelerar a producao do marketing.</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Biblioteca</p>
+                <h2 className="mt-2 text-xl font-semibold text-slate-900">Presets e templates salvos</h2>
+                <p className="mt-2 text-sm text-slate-500">Encontre um preset, importe um HTML ou puxe um template salvo para o editor.</p>
               </div>
-              <Badge tone="warning">Pronto para editar</Badge>
+              <div className="w-full max-w-md">
+                <input
+                  className={LightInputClassName}
+                  placeholder="Buscar por nome, categoria, assunto ou tag"
+                  value={librarySearch}
+                  onChange={(event) => setLibrarySearch(event.target.value)}
+                />
+              </div>
             </div>
 
-            <div className="grid gap-4">
-              {emailTemplatePresets.map((preset) => {
-                const isActive = activePresetId === preset.id;
+            <div className="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600">
+              <strong className="text-slate-900">Fluxo sugerido:</strong> escolha um preset da biblioteca, importe um HTML pronto ou abra um template salvo. Depois revise assunto, preheader e HTML no editor ao lado.
+            </div>
 
-                return (
-                  <article
-                    key={preset.id}
-                    className={`overflow-hidden rounded-[28px] border transition ${isActive ? 'border-amber-300/50 bg-white/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}
-                  >
-                    <div
-                      className="flex items-center justify-between gap-4 px-5 py-4"
-                      style={{
-                        background: `linear-gradient(135deg, ${preset.palettePreview[0]}, ${preset.palettePreview[1]})`,
-                      }}
-                    >
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.22em] text-white/70">{preset.category}</p>
-                        <h3 className="mt-1 text-lg font-semibold text-white">{preset.name}</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Presets</h3>
+                <LightBadge tone="success">{filteredPresets.length} encontrado(s)</LightBadge>
+              </div>
+
+              <div className="grid gap-3">
+                {filteredPresets.map((preset) => {
+                  const isActive = activePresetId === preset.id;
+
+                  return (
+                    <article key={preset.id} className={`rounded-[24px] border p-4 transition ${isActive ? 'border-sky-300 bg-sky-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex flex-wrap gap-2">
+                            <LightBadge tone={preset.id === 'prorefeicao-leonardo-comercial' ? 'warning' : 'neutral'}>{preset.category}</LightBadge>
+                            {preset.id === 'prorefeicao-leonardo-comercial' ? <LightBadge tone="success">Novo preset</LightBadge> : null}
+                          </div>
+                          <h4 className="mt-3 text-base font-semibold text-slate-900">{preset.name}</h4>
+                          <p className="mt-2 text-sm leading-relaxed text-slate-600">{preset.summary}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          {preset.palettePreview.map((color) => (
+                            <span key={color} className="h-4 w-4 rounded-full border border-white shadow-sm" style={{ backgroundColor: color }} />
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        {preset.palettePreview.map((color) => (
-                          <span key={color} className="h-4 w-4 rounded-full border border-white/30" style={{ backgroundColor: color }} />
-                        ))}
-                      </div>
-                    </div>
 
-                    <div className="space-y-4 px-5 py-5">
-                      <p className="text-sm leading-relaxed text-slate-300">{preset.summary}</p>
-                      <p className="text-xs leading-relaxed text-slate-400">{preset.idealFor}</p>
-
-                      <div className="flex flex-wrap gap-2">
+                      <div className="mt-3 flex flex-wrap gap-2">
                         {preset.tags.map((tag) => (
-                          <Badge key={tag}>{tag}</Badge>
+                          <LightBadge key={tag}>{tag}</LightBadge>
                         ))}
                       </div>
 
-                      <div className="flex flex-wrap gap-3">
-                        <Button type="button" onClick={() => applyPreset(preset.id)} disabled={isActive}>
-                          {isActive ? 'Carregado' : 'Usar no editor'}
-                        </Button>
-                        <Button type="button" variant="ghost" onClick={() => setPreviewMode('desktop')}>
-                          Preview amplo
-                        </Button>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        <LightButton type="button" onClick={() => applyPreset(preset.id)} disabled={isActive}>
+                          {isActive ? 'Carregado' : 'Abrir no editor'}
+                        </LightButton>
+                        <LightButton type="button" variant="ghost" onClick={() => setPreviewMode('desktop')}>
+                          Ver preview
+                        </LightButton>
                       </div>
-                    </div>
-                  </article>
-                );
-              })}
+                    </article>
+                  );
+                })}
+
+                {!filteredPresets.length ? (
+                  <div className="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-5 py-6 text-sm text-slate-500">
+                    Nenhum preset bateu com a busca atual.
+                  </div>
+                ) : null}
+              </div>
             </div>
-          </Panel>
 
-          <Panel className="space-y-4">
-            <div>
-              <h2 className="text-lg font-semibold text-white">Templates salvos</h2>
-              <p className="mt-1 text-sm text-slate-400">Use o campo abaixo para enviar testes rapidamente a partir de qualquer template ja salvo.</p>
-            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Templates salvos</h3>
+                <LightBadge>{filteredTemplates.length} encontrado(s)</LightBadge>
+              </div>
 
-            <Field label="Destinatarios de teste" hint="Separe por virgula, por exemplo: teste@empresa.com, time@cuiabar.com">
-              <input className={InputClassName} value={testEmails} onChange={(event) => setTestEmails(event.target.value)} />
-            </Field>
+              <LightField label="Destinatarios de teste" hint="Use esta lista para disparar testes rapidos a partir de qualquer template salvo.">
+                <input className={LightInputClassName} value={testEmails} onChange={(event) => setTestEmails(event.target.value)} placeholder="teste@empresa.com, time@cuiabar.com" />
+              </LightField>
 
-            <div className="grid gap-3">
-              {templates.length ? (
-                templates.map((template) => (
-                  <article key={template.id} className="rounded-[24px] border border-white/10 bg-slate-900/60 p-4">
+              <div className="grid gap-3">
+                {filteredTemplates.map((template) => (
+                  <article key={template.id} className="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <h3 className="text-base font-semibold text-white">{template.name}</h3>
-                        <p className="mt-1 text-sm text-slate-300">{template.subject}</p>
+                        <h4 className="text-base font-semibold text-slate-900">{template.name}</h4>
+                        <p className="mt-1 text-sm text-slate-600">{template.subject}</p>
                         <p className="mt-2 text-xs text-slate-500">Atualizado em {previewDateFormatter.format(new Date(template.updatedAt))}</p>
                       </div>
-                      <Badge tone={selectedTemplateId === template.id ? 'success' : 'neutral'}>
-                        {selectedTemplateId === template.id ? 'No editor' : 'Salvo'}
-                      </Badge>
+                      <LightBadge tone={selectedTemplateId === template.id ? 'success' : 'neutral'}>{selectedTemplateId === template.id ? 'No editor' : 'Salvo'}</LightBadge>
                     </div>
 
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {template.variables.slice(0, 6).map((variable) => (
-                        <Badge key={variable}>{variable}</Badge>
+                      {template.variables.slice(0, 5).map((variable) => (
+                        <LightBadge key={variable}>{variable}</LightBadge>
                       ))}
-                      {template.variables.length > 6 ? <Badge>+{template.variables.length - 6}</Badge> : null}
+                      {template.variables.length > 5 ? <LightBadge>+{template.variables.length - 5}</LightBadge> : null}
                     </div>
 
                     <div className="mt-4 flex flex-wrap gap-3">
-                      <Button type="button" onClick={() => editSavedTemplate(template)}>
-                        Editar
-                      </Button>
-                      <Button type="button" variant="ghost" onClick={() => duplicateSavedTemplate(template)}>
-                        Duplicar
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        disabled={sendingTemplateId === template.id}
-                        onClick={() => sendTest(template.id)}
-                      >
+                      <LightButton type="button" onClick={() => editSavedTemplate(template)}>
+                        Abrir no editor
+                      </LightButton>
+                      <LightButton type="button" variant="ghost" onClick={() => duplicateSavedTemplate(template)}>
+                        Clonar
+                      </LightButton>
+                      <LightButton type="button" variant="ghost" disabled={sendingTemplateId === template.id} onClick={() => sendTest(template.id)}>
                         {sendingTemplateId === template.id ? 'Enviando...' : 'Enviar teste'}
-                      </Button>
+                      </LightButton>
+                      <LightButton type="button" variant="danger" onClick={() => setDeletingTemplateId(template.id)}>
+                        Excluir
+                      </LightButton>
                     </div>
                   </article>
-                ))
-              ) : (
-                <div className="rounded-[24px] border border-dashed border-white/15 bg-white/5 px-5 py-6 text-sm text-slate-400">
-                  Ainda nao ha templates salvos. Escolha um preset, ajuste o conteudo e salve o primeiro.
-                </div>
-              )}
-            </div>
-          </Panel>
+                ))}
 
-          <Panel className="space-y-4">
-            <div>
-              <h2 className="text-lg font-semibold text-white">Guia rapido</h2>
-              <p className="mt-1 text-sm text-slate-400">Boas praticas para o email ficar bonito no CRM e menos fragil no inbox.</p>
-            </div>
-
-            <div className="grid gap-3">
-              <div className="rounded-[22px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                Prefira tabelas, estilos inline e imagens com URL absoluta como `https://cuiabar.com/...`.
-              </div>
-              <div className="rounded-[22px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                Mantenha o texto simples coerente com o HTML para preservar legibilidade em clientes mais restritivos.
-              </div>
-              <div className="rounded-[22px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                Sempre deixe um CTA principal muito claro e um descadastro funcional via <code>{'{{unsubscribe_url}}'}</code>.
+                {!filteredTemplates.length ? (
+                  <div className="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-5 py-6 text-sm text-slate-500">
+                    Nenhum template salvo bateu com a busca atual.
+                  </div>
+                ) : null}
               </div>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              {RESERVED_VARIABLES.map((variable) => (
-                <Badge key={variable}>{variable}</Badge>
-              ))}
-            </div>
-          </Panel>
+          </LightPanel>
         </div>
 
         <div className="space-y-6">
-          <Panel className="space-y-5">
-            <div className="flex flex-col gap-4 border-b border-white/10 pb-5 lg:flex-row lg:items-start lg:justify-between">
+          <LightPanel className="space-y-5">
+            <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-amber-300">Editor</p>
-                <h2 className="mt-2 text-xl font-semibold text-white">{editorLabel}</h2>
-                <p className="mt-2 max-w-3xl text-sm text-slate-400">Salve como novo template ou atualize um existente sem sair da tela.</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Editor</p>
+                <h2 className="mt-2 text-xl font-semibold text-slate-900">{editorLabel}</h2>
+                <p className="mt-2 text-sm text-slate-500">Edite HTML, plain text, assunto e preheader no mesmo fluxo.</p>
               </div>
-              {selectedTemplate ? (
-                <Button type="button" variant="ghost" onClick={() => duplicateSavedTemplate(selectedTemplate)}>
-                  Duplicar como novo
-                </Button>
-              ) : null}
+              <div className="flex flex-wrap gap-3">
+                <LightButton type="button" variant="ghost" onClick={() => fileInputRef.current?.click()}>
+                  Importar HTML
+                </LightButton>
+                <LightButton type="button" variant="ghost" onClick={startBlankDraft}>
+                  Limpar editor
+                </LightButton>
+              </div>
             </div>
 
             <form className="grid gap-4" onSubmit={saveTemplate}>
-              <Field label="Nome do template">
-                <input
-                  className={InputClassName}
-                  value={form.name}
-                  onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                  required
-                />
-              </Field>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <LightField label="Nome do template">
+                  <input className={LightInputClassName} value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required />
+                </LightField>
 
-              <Field label="Assunto">
-                <input
-                  className={InputClassName}
-                  value={form.subject}
-                  onChange={(event) => setForm((current) => ({ ...current, subject: event.target.value }))}
-                  required
-                />
-              </Field>
+                <LightField label="Assunto">
+                  <input className={LightInputClassName} value={form.subject} onChange={(event) => setForm((current) => ({ ...current, subject: event.target.value }))} required />
+                </LightField>
+              </div>
 
-              <Field label="Preheader" hint="Trecho curto que costuma aparecer ao lado do assunto em muitos inboxes.">
-                <input
-                  className={InputClassName}
-                  value={form.preheader}
-                  onChange={(event) => setForm((current) => ({ ...current, preheader: event.target.value }))}
-                />
-              </Field>
+              <LightField label="Preheader" hint="Linha complementar do assunto, usada por muitos clientes de email.">
+                <input className={LightInputClassName} value={form.preheader} onChange={(event) => setForm((current) => ({ ...current, preheader: event.target.value }))} />
+              </LightField>
 
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <p className="text-sm font-medium text-white">Variaveis detectadas neste rascunho</p>
+              <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-medium text-slate-900">Variaveis detectadas</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {currentVariables.map((variable) => (
-                    <Badge key={variable}>{variable}</Badge>
+                    <LightBadge key={variable}>{variable}</LightBadge>
                   ))}
                 </div>
               </div>
 
-              <Field label="HTML" hint="Use estilos inline, largura maxima perto de 600px e links absolutos para imagens e CTA.">
-                <textarea
-                  className={`${InputClassName} min-h-[360px] font-mono text-xs leading-6`}
-                  value={form.html}
-                  onChange={(event) => setForm((current) => ({ ...current, html: event.target.value }))}
-                />
-              </Field>
+              <LightField label="HTML" hint="Cole o HTML completo ou importe um arquivo. O preview ao lado atualiza automaticamente.">
+                <textarea className={`${LightInputClassName} min-h-[360px] font-mono text-xs leading-6`} value={form.html} onChange={(event) => setForm((current) => ({ ...current, html: event.target.value }))} />
+              </LightField>
 
-              <Field label="Texto simples" hint="Versao plain text usada como fallback e apoio de entregabilidade.">
-                <textarea
-                  className={`${InputClassName} min-h-[220px] font-mono text-xs leading-6`}
-                  value={form.text}
-                  onChange={(event) => setForm((current) => ({ ...current, text: event.target.value }))}
-                />
-              </Field>
+              <LightField label="Texto simples" hint="Versao plain text do template para fallback e consistencia da mensagem.">
+                <textarea className={`${LightInputClassName} min-h-[220px] font-mono text-xs leading-6`} value={form.text} onChange={(event) => setForm((current) => ({ ...current, text: event.target.value }))} />
+              </LightField>
 
               <div className="flex flex-wrap gap-3">
-                <Button type="submit" disabled={isSaving}>
+                <LightButton type="submit" disabled={isSaving}>
                   {isSaving ? 'Salvando...' : selectedTemplateId ? 'Atualizar template' : 'Salvar como novo'}
-                </Button>
-                <Button type="button" variant="ghost" onClick={startBlankDraft}>
-                  Limpar editor
-                </Button>
+                </LightButton>
+                {selectedTemplate ? (
+                  <LightButton type="button" variant="ghost" onClick={() => duplicateSavedTemplate(selectedTemplate)}>
+                    Clonar como novo
+                  </LightButton>
+                ) : null}
               </div>
             </form>
-          </Panel>
+          </LightPanel>
 
-          <Panel className="space-y-5">
-            <div className="flex flex-col gap-4 border-b border-white/10 pb-5 lg:flex-row lg:items-center lg:justify-between">
+          <LightPanel className="space-y-5">
+            <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-amber-300">Preview</p>
-                <h2 className="mt-2 text-xl font-semibold text-white">Visual do email no editor</h2>
-                <p className="mt-2 text-sm text-slate-400">A simulacao aplica merge tags de exemplo para facilitar revisao visual antes de salvar ou testar.</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Preview</p>
+                <h2 className="mt-2 text-xl font-semibold text-slate-900">Leitura rapida do email</h2>
+                <p className="mt-2 text-sm text-slate-500">Revise assunto, merge tags e layout antes de salvar ou enviar um teste.</p>
               </div>
 
-              <div className="flex gap-2 rounded-full border border-white/10 bg-white/5 p-1">
+              <div className="flex gap-2 rounded-full border border-slate-200 bg-slate-50 p-1">
                 <button
                   type="button"
-                  className={`rounded-full px-4 py-2 text-sm transition ${previewMode === 'desktop' ? 'bg-amber-300 text-slate-950' : 'text-slate-300 hover:bg-white/10'}`}
+                  className={`rounded-full px-4 py-2 text-sm transition ${previewMode === 'desktop' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-white'}`}
                   onClick={() => setPreviewMode('desktop')}
                 >
                   Desktop
                 </button>
                 <button
                   type="button"
-                  className={`rounded-full px-4 py-2 text-sm transition ${previewMode === 'mobile' ? 'bg-amber-300 text-slate-950' : 'text-slate-300 hover:bg-white/10'}`}
+                  className={`rounded-full px-4 py-2 text-sm transition ${previewMode === 'mobile' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-white'}`}
                   onClick={() => setPreviewMode('mobile')}
                 >
                   Mobile
@@ -582,52 +708,64 @@ export const TemplatesPage = () => {
               </div>
             </div>
 
-            <div className="rounded-[24px] border border-white/10 bg-slate-900/70 p-4">
-              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-4">
+            <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-4">
                 <div>
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Assunto</p>
-                  <p className="mt-1 text-base font-semibold text-white">{form.subject || 'Sem assunto ainda'}</p>
-                  <p className="mt-2 text-sm text-slate-400">{form.preheader || 'Sem preheader no momento.'}</p>
+                  <p className="mt-1 text-base font-semibold text-slate-900">{form.subject || 'Sem assunto ainda'}</p>
+                  <p className="mt-2 text-sm text-slate-500">{form.preheader || 'Sem preheader no momento.'}</p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-slate-400">
+                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500">
                   <p>Para: {previewContext.first_name} &lt;{previewContext.email}&gt;</p>
                   <p className="mt-1">Reply-To: {previewContext.reply_to}</p>
                 </div>
               </div>
 
               <div className={`pt-5 transition-all ${previewMode === 'mobile' ? 'mx-auto max-w-[390px]' : 'w-full'}`}>
-                <div className="overflow-hidden rounded-[28px] border border-white/10 bg-white shadow-2xl shadow-black/30">
+                <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_32px_70px_-50px_rgba(15,23,42,0.45)]">
                   <iframe title="Preview do template" srcDoc={previewDocument} sandbox="" className="h-[780px] w-full bg-white" />
                 </div>
               </div>
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[0.88fr,1.12fr]">
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <p className="text-sm font-medium text-white">Merge tags de exemplo</p>
-                <div className="mt-3 grid gap-2 text-sm text-slate-300">
-                  <div className="rounded-2xl bg-slate-950/60 px-3 py-3">
+              <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-medium text-slate-900">Merge tags de exemplo</p>
+                <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                  <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
                     <span className="text-slate-500">first_name:</span> {previewContext.first_name}
                   </div>
-                  <div className="rounded-2xl bg-slate-950/60 px-3 py-3">
+                  <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
                     <span className="text-slate-500">campaign_name:</span> {previewContext.campaign_name}
                   </div>
-                  <div className="rounded-2xl bg-slate-950/60 px-3 py-3">
+                  <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3">
                     <span className="text-slate-500">reply_to:</span> {previewContext.reply_to}
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
-                <p className="text-sm font-medium text-white">Plain text renderizado</p>
-                <pre className="mt-3 whitespace-pre-wrap rounded-2xl bg-slate-950/60 px-4 py-4 font-mono text-xs leading-6 text-slate-300">
-                  {previewText}
-                </pre>
+              <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-medium text-slate-900">Plain text renderizado</p>
+                <pre className="mt-3 whitespace-pre-wrap rounded-2xl border border-slate-200 bg-white px-4 py-4 font-mono text-xs leading-6 text-slate-700">{previewText}</pre>
               </div>
             </div>
-          </Panel>
+
+            <div className="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600">
+              <strong className="text-slate-900">Importacao e edicao:</strong> use <code>Importar HTML</code> para trazer um arquivo pronto, <code>Abrir no editor</code> para ajustar um template salvo e <code>Salvar como novo</code> quando quiser criar uma variacao sem sobrescrever o original.
+            </div>
+          </LightPanel>
         </div>
       </div>
+
+      <ConfirmModal
+        open={deletingTemplateId !== null}
+        title="Excluir template"
+        description={`Tem certeza que deseja excluir o template "${templates.find((t) => t.id === deletingTemplateId)?.name ?? ''}"? Esta acao nao pode ser desfeita.`}
+        confirmLabel="Excluir"
+        isDanger
+        onConfirm={() => { if (deletingTemplateId) deleteTemplate(deletingTemplateId); }}
+        onCancel={() => setDeletingTemplateId(null)}
+      />
     </div>
   );
 };

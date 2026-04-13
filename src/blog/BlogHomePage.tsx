@@ -30,15 +30,15 @@ export const BlogHomePage = () => {
           <div className="blog-hero__grid">
             <Reveal as="div" className="blog-hero__copy" delay={20}>
               <p className="blog-kicker">blog.cuiabar.com</p>
-              <h1 className="blog-hero__title">Guias, agenda e gastronomia com recorte local e clima de casa.</h1>
+              <h1 className="blog-hero__title">Um hub editorial para agenda, gastronomia e sinais locais de Campinas.</h1>
               <p className="blog-hero__lede">
-                Um ponto de encontro entre conteudo util e intencao real de visita: o que abrir, quando ir, o que pedir e como acompanhar a Cuiabar sem depender da home principal.
+                O blog nasce como uma extensao da operacao: guia a descoberta, testa modulos mais ousados e conecta conteudo, reserva, clima e canal da casa sem poluir a home principal.
               </p>
 
               <div className="blog-chip-row">
                 <span className="blog-chip">Agenda e pautas locais</span>
                 <span className="blog-chip">Clima em tempo real</span>
-                <span className="blog-chip">Reserva e menu integrados</span>
+                <span className="blog-chip">Conversao rastreada</span>
               </div>
 
               <div className="blog-hero__actions">
@@ -114,10 +114,10 @@ export const BlogHomePage = () => {
       <section className="container-shell py-8">
         <Reveal className="blog-surface blog-lab-panel" delay={40}>
           <div>
-            <p className="blog-footnote">Linha editorial</p>
-            <h2 className="mt-3 font-heading text-4xl text-white">Conteudo enxuto, util e conectado com visita, agenda e contexto.</h2>
+            <p className="blog-footnote">Configuracao ativa</p>
+            <h2 className="mt-3 font-heading text-4xl text-white">Laboratorio editorial focado em SEO, distribuicao e conversao.</h2>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/74">
-              O foco do blog e ajudar quem esta perto da decisao: descobrir novidades, entender o momento da casa e sair daqui com proximo passo claro.
+              Nesta fase, removemos recursos de entretenimento e mantemos o foco no essencial: descoberta organica, leitura, agenda e transicao para reserva.
             </p>
           </div>
 
@@ -125,19 +125,19 @@ export const BlogHomePage = () => {
             <article className="blog-lab-card">
               <p className="blog-footnote">Distribuicao</p>
               <p className="mt-3 text-sm leading-relaxed text-white/72">
-                Canal do WhatsApp, agenda e artigos relacionados trabalham juntos para trazer recorrencia sem excesso de navegacao.
+                Canal do WhatsApp, agenda e artigos relacionados trabalham juntos para aumentar recorrencia.
               </p>
             </article>
             <article className="blog-lab-card">
-              <p className="blog-footnote">Curadoria</p>
+              <p className="blog-footnote">Operacao</p>
               <p className="mt-3 text-sm leading-relaxed text-white/72">
-                Menos volume e mais criterio: cada pauta precisa ajudar em descoberta, contexto ou conversao.
+                Conteudo, CTA e layout em ajuste continuo, sem acoplar elementos que ainda nao entraram no roteiro oficial.
               </p>
             </article>
             <article className="blog-lab-card">
               <p className="blog-footnote">Objetivo</p>
               <p className="mt-3 text-sm leading-relaxed text-white/72">
-                Transformar leitura em acao simples: abrir agenda, falar com a equipe ou reservar com contexto.
+                Converter leitura em acao: abrir agenda, falar com a equipe e reservar com contexto.
               </p>
             </article>
           </div>
@@ -147,40 +147,30 @@ export const BlogHomePage = () => {
       <section className="container-shell py-10">
         <Reveal className="flex items-end justify-between gap-4" delay={70}>
           <div>
-            <p className="blog-kicker">Publicacoes</p>
-            <h2 className="font-heading text-5xl text-white">Leituras para abrir a cidade, o menu e o momento da casa.</h2>
+            <p className="blog-kicker">Conteudos ativos</p>
+            <h2 className="font-heading text-5xl text-white">Arquitetura editorial ja publicada para testar assunto, tom e distribuicao.</h2>
           </div>
         </Reveal>
 
         <div className="mt-8 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
           <Reveal className="grid gap-5 md:grid-cols-2" delay={90}>
-            {secondaryArticles.length > 0 ? (
-              secondaryArticles.map((article, index) => (
-                <Link
-                  key={article.slug}
-                  to={`/${article.slug}`}
-                  className="blog-article-card"
-                  style={{ '--blog-card-delay': `${index * 80}ms` } as CSSProperties}
-                >
-                  <img src={article.image} alt={article.title} className="blog-article-card__image" loading="lazy" />
-                  <div className="blog-article-card__body">
-                    <p className="blog-footnote">
-                      {article.category} · {article.readTime}
-                    </p>
-                    <h3 className="mt-3 font-heading text-3xl text-white">{article.title}</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-white/72">{article.excerpt}</p>
-                  </div>
-                </Link>
-              ))
-            ) : (
-              <article className="blog-surface p-6">
-                <p className="blog-footnote">Mais leituras em breve</p>
-                <h3 className="mt-3 font-heading text-3xl text-white">A base editorial esta sendo expandida.</h3>
-                <p className="mt-4 text-sm leading-relaxed text-white/72">
-                  O primeiro guia ja esta no ar e as proximas publicacoes entram em sequencia para formar uma leitura mais completa do bairro, da agenda e da operacao.
-                </p>
-              </article>
-            )}
+            {secondaryArticles.map((article, index) => (
+              <Link
+                key={article.slug}
+                to={`/${article.slug}`}
+                className="blog-article-card"
+                style={{ '--blog-card-delay': `${index * 80}ms` } as CSSProperties}
+              >
+                <img src={article.image} alt={article.title} className="blog-article-card__image" loading="lazy" />
+                <div className="blog-article-card__body">
+                  <p className="blog-footnote">
+                    {article.category} · {article.readTime}
+                  </p>
+                  <h3 className="mt-3 font-heading text-3xl text-white">{article.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-white/72">{article.excerpt}</p>
+                </div>
+              </Link>
+            ))}
           </Reveal>
 
           <Reveal className="blog-surface p-6" delay={120}>

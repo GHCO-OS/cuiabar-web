@@ -29,8 +29,7 @@ export const App = () => (
         <Route path="/asianrestaurant" element={<Navigate to="/" replace />} />
         <Route path="/burger" element={<Navigate to="/burguer" replace />} />
         <Route path="/burguer-cuiabar" element={<Navigate to="/burguer" replace />} />
-        <Route path="/burguer" element={<BurguerCuiabarPage seoPath="/burguer" domainMode="site" />} />
-        <Route path="/burger-site" element={<BurguerCuiabarPage seoPath="/burger-site" domainMode="subdomain" />} />
+        <Route path="/burguer" element={<BurguerCuiabarPage />} />
         <Route path="/marmita" element={<Navigate to="/pedidos-online" replace />} />
         <Route path="/delivery" element={<Navigate to="/pedidos-online" replace />} />
         <Route path="/online-ordering" element={<Navigate to="/pedidos-online" replace />} />

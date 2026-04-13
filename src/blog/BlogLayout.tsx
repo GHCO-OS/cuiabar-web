@@ -63,10 +63,10 @@ export const BlogLayout = ({ children }: PropsWithChildren) => {
       <footer className="blog-footer">
         <div className="container-shell grid gap-8 lg:grid-cols-[1.3fr_0.8fr_0.8fr]">
           <div>
-            <p className="blog-footnote">Editorial Cuiabar</p>
-            <h2 className="mt-3 font-heading text-4xl text-white">Guias, agenda e contexto local com a linguagem da casa.</h2>
+            <p className="blog-footnote">Blog em refinamento controlado</p>
+            <h2 className="mt-3 font-heading text-4xl text-white">Um laboratorio editorial da Cuiabar para testar pauta, distribuicao e conversao.</h2>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/72">
-              O blog organiza conteudo util para descoberta, agenda e decisao de visita. Ele vive no subdominio para manter a experiencia principal do site mais direta.
+              O blog segue em calibragem de variaveis, tom editorial, integracoes e blocos de conversao. Por isso ele esta publicado no subdominio, enquanto o site principal continua enxuto.
             </p>
           </div>
 

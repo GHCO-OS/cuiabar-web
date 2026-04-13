@@ -1,61 +1,64 @@
-# Status atual e pendências
+# Status atual e pendencias
 
 Atualizado em: 2026-04-13
 
 ## Estado geral
 
-O projeto está funcional como base única para:
+O projeto esta operacional e publicado via Cloudflare.
 
-- site principal
-- burger
-- blog
-- CRM
-- reservas
-- integrações de marketing
+## O que esta ativo
 
-## O que já foi melhorado nesta organização
+- site principal do Cuiabar
+- pagina de menu
+- pagina de pedidos/delivery
+- pagina Burger Cuiabar
+- pagina Espetaria Cuiabar
+- pagina ProRefeicao
+- pagina de vagas
+- pagina de links
+- modulo de reservas
+- CRM/Worker
+- Meta Pixel e camada server-side de CAPI
+- modulo de atendimento WhatsApp com IA no Worker
+- ponte local Baileys em `services/whatsapp-baileys`
+- central operacional de WhatsApp dentro do CRM em `/whatsapp`
+- documentacao de governanca em `AGENTS.md` e `docs/09-ORGANIZACAO-E-GOVERNANCA-IA.md`
+- inventario operacional desta maquina e do bridge em `docs/10-AMBIENTE-LOCAL-E-IDS.md`
+- repositorio GitHub oficial em `github.com/cuiabar/cuiabar-web`
 
-- criada trilha oficial de leitura para novas IAs
-- criada governança de manutenção em `AGENTS.md`
-- criada documentação central em `docs/`
-- guias antigos foram retirados da raiz e preservados em `docs/guias-legados/`
-- artefatos de debug e QA saíram da raiz para `ops-artifacts/`
-- arquivos gerados do Worker passaram a ser tratados como não editáveis
-- GitHub privado adotado como base principal do repositório e da documentação técnica
-- remoto oficial consolidado em `https://github.com/cuiabar/cuiabar-web.git`; `https://github.com/cuiabar/web.git` não deve ser usado
-- migração para operação web-first iniciada e documentada em `docs/11-CODEX-WEB-MIGRACAO.md`
-- secret `CLOUDFLARE_API_TOKEN` configurado no GitHub e workflow remoto validado com sucesso
-- Search Console confirmado por API com acesso à propriedade `sc-domain:cuiabar.com`
-- sitemap principal `https://cuiabar.com/sitemap.xml` submetido por API em 2026-04-11
-- fluxo OAuth inicial do Google Business Profile preparado no Worker, aguardando autorizacao da conta gestora
-- scaffold inicial de WhatsApp Intelligence criado em `worker/whatsapp-intelligence/` com webhook, Llama e trilha de auditoria em D1
-- sprint 1 de estabilizacao do CRM executado:
-  - `crm.cuiabar.com` agora deve responder com HTML reescrito como portal interno, sem metadados da home publica
-  - `x-robots-tag` reforcado para o host do CRM
-  - HTML do CRM marcado com `data-app="crm"` para isolar estilo base
-  - recarga completa de sessao a cada troca de rota removida do `CrmApp`
+## O que merece acompanhamento
 
-## Pontos que ainda exigem acompanhamento
+- revisar warnings de SSR com `<Navigate>` no build
+- consolidar de vez a politica de deploy sem GitHub
+- separar melhor conteudo editorial/blog do restante do projeto
+- revisar periodicamente tokens e permissao do Cloudflare e GitHub
+- reduzir arquivos operacionais temporarios na raiz
+- manter o runtime local do Baileys fora do Google Drive para evitar lock de arquivos
+- preencher segredos reais do bridge interno e da Cloudflare AI
+- acompanhar saude do autostart/watchdog do Baileys em producao
+- criar IDs formais persistentes para `bridge_instance_id` e `machine_instance_id` se isso virar requisito de auditoria
 
-- consolidar a política entre GitHub como fonte principal e Drive como backup complementar
-- revisar estratégia de secrets fora do repositório
-- implantar Google Secret Manager como cofre-mãe oficial
-- decidir separação lógica e operacional entre site, CRM, burger e blog
-- reduzir acoplamento entre múltiplos módulos dentro da mesma branch
-- revisar política de deploy para evitar confusão entre Pages e Worker
-- limpar entradas antigas/erradas de sitemap no Search Console ligadas a rotas do `expresso.cuiabar.com`
-- OAuth do Google Business Profile concluido; `refresh token` e credenciais atualizados no Worker
-- pendencia atual do Google Business Profile: quota do projeto Google retorna `Requests per minute = 0`, bloqueando leitura da API ate ajuste no Google Cloud
-- concluir operacao do gateway Baileys e autenticação interna entre webhook, DO e CRM
-- evoluir pipeline de automacoes WhatsApp para integrar com o fluxo oficial de reservas sem bypass de validação
+## Decisao importante
 
-## Próximo passo estrutural recomendado
+A publicacao do site nao depende do GitHub hoje.
 
-Separar o trabalho em frentes claras:
+Isso significa:
+- o repositório GitHub nao e o mecanismo de deploy do site;
+- o que nao pode faltar para publicacao e o acesso de deploy ao Cloudflare;
+- o GitHub continua sendo a base oficial de versionamento e continuidade.
 
-1. `site`
-2. `crm`
-3. `burger`
-4. `blog`
+## Estado do GitHub
 
-Isso pode ser feito primeiro por branches/convenções, sem quebrar o repositório único.
+- o repositório oficial de versionamento e `cuiabar/cuiabar-web`
+- o repositório e privado
+- a copia operacional principal fica em `C:\workspace\cuiabar-web`
+- o Google Drive fica como backup e snapshot, nao como runtime principal
+
+## Itens que podem ser melhorados depois
+
+- pipeline automatizado e seguro de deploy sem depender de maquina local
+- centralizacao de secrets em cofre apropriado
+- limpeza de artefatos tecnicos locais
+- revisao do modulo de blog
+- refinamento final de QA mobile em paginas especiais
+- refinamento adicional de observabilidade do modulo de WhatsApp

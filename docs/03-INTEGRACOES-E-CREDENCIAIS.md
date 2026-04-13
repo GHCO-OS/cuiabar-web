@@ -1,97 +1,119 @@
-# Integrações e credenciais
+# Integracoes e credenciais
 
-Atualizado em: 2026-04-11
+Atualizado em: 2026-04-13
 
-## Política de segredos
+## Onde consultar os segredos
 
-Este repositório não deve carregar tokens privados, chaves de serviço ou credenciais sensíveis em texto puro.
+Inventario consolidado de chaves compartilhadas por conversa:
 
-O que pode ficar versionado:
+- `../ACESSOS-CHAVES-PROJETO.md`
+- `../KIT-PORTABILIDADE/02-APIS-E-CHAVES.md`
 
-- IDs públicos de pixel, tag, dataset e client IDs
-- nomes de secrets
-- nomes de variáveis
-- documentação operacional sem o valor do segredo
+Esse arquivo deve permanecer restrito.
 
-O que não deve ficar versionado:
-
-- tokens do Cloudflare
-- tokens da Meta
-- chaves privadas do Google
-- arquivos `.env` reais
-- segredos de provedores terceiros
-
-## Onde ficam as integrações
+## Integracoes principais
 
 ### Cloudflare
 
-- config principal: `wrangler.jsonc`
-- pages functions: `functions/`
-- worker/backend: `worker/`
+Usado para:
+- hosting do site principal
+- Worker do CRM
+- reservas
+- D1
+- Workers AI
+- KV
+- Pages Functions
+
+Arquivos principais:
+- `wrangler.jsonc`
+- `functions/`
+- `worker/`
+
+Referencias operacionais:
+
+- `docs/02-OPERACAO-E-DEPLOY.md`
+- `docs/10-AMBIENTE-LOCAL-E-IDS.md`
 
 ### Meta
 
-- tracker frontend: `src/lib/analytics.ts`
-- injeção/eventos: `src/components/AnalyticsTracker.tsx`
-- endpoint server-side: `functions/api/meta-conversions.js`
-- service Worker: `worker/services/meta/metaConversions.ts`
+Usado para:
+- Pixel
+- Conversions API
 
-### Google
+Arquivos principais:
+- `functions/api/meta-conversions.js`
+- `src/lib/analytics.ts`
+- `src/components/AnalyticsTracker.tsx`
+- `index.html`
 
-- autenticação Google/CRM: `wrangler.jsonc`, `worker/services/google/`
-- Calendar: `worker/services/google/calendarService.ts`
-- SEO/search: `src/pages/PesquisaPage.tsx`, `src/lib/seo.ts`, `src/data/seoRoutes.json`
-- Google Business Profile OAuth:
-  - setup: `/oauth/google-business/setup`
-  - start: `/oauth/google-business/start`
-  - callback: `/api/google/business/callback`
-  - settings storage key: `google_business_oauth_connection`
-- Search Console:
-  - service account operacional confirmada em 2026-04-11
-  - propriedade acessível: `sc-domain:cuiabar.com`
-  - sitemap submetido por API: `https://cuiabar.com/sitemap.xml`
-  - propriedade adicional visível: `https://www.cuiabar.com/`
+### WhatsApp / atendimento AI
 
-Observação:
+Transporte:
 
-- a chave privada da service account não deve permanecer em `Downloads` como fonte de operação;
-- o ideal é mover a credencial para um cofre seguro e usar apenas referência operacional na documentação.
-- arquitetura oficial do cofre: `docs/13-ARQUITETURA-DE-SEGREDOS-E-COFRE.md`
+- Baileys local em `services/whatsapp-baileys/`
+- runtime local preparado por `scripts/run-baileys-runtime.ps1`
 
+Segredos do bridge local:
 
-### WhatsApp Intelligence (Llama + CRM interno)
+- `WHATSAPP_WORKER_BASE_URL`
+- `WHATSAPP_INTERNAL_TOKEN`
 
-- worker dedicado: `worker/whatsapp-intelligence/`
-- endpoint inbound: `POST /webhook/baileys`
-- durable object de sessao/saida: `BaileysSessionDO`
-- tabelas operacionais: `customers`, `wa_inbound_events`, `wa_conversations`, `wa_action_logs`, `wa_reservation_requests`
-- segredos esperados (somente em ambiente):
-  - `WEBHOOK_SHARED_SECRET`
-  - `CRM_INTERNAL_SECRET`
-  - `BAILEYS_GATEWAY_TOKEN`
+Segredos Cloudflare/AI:
+
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_AI_API_TOKEN`
+
+Adaptador CRM:
+
+- `CRM_INTERNAL_TOKEN`
+
+Referencias operacionais:
+
+- `docs/06-WHATSAPP-AI-ARQUITETURA.md`
+- `docs/07-WHATSAPP-AI-ENDPOINTS.md`
+- `docs/10-AMBIENTE-LOCAL-E-IDS.md`
+
+### GitHub
+
+Usado para:
+- versionamento principal do codigo
+- continuidade entre maquinas
+- backup externo do workspace operacional
+
+Repositorio principal:
+
+- `https://github.com/cuiabar/cuiabar-web`
 
 Observacao:
 
-- `create_reservation_request` gera fila de solicitacoes para conciliacao com o fluxo oficial de reservas;
-- evitar escrita direta na tabela `reservations` fora do contrato ja validado no backend principal.
+- o GitHub nao substitui o deploy no Cloudflare
+- o inventario desta maquina e do bridge local fica em `docs/10-AMBIENTE-LOCAL-E-IDS.md`
 
-### Blog/editorial
+### Google
 
-- React blog app: `src/blog/`
-- integrações e operação editorial: `blog-options/`
-- scripts de sync/publish: `scripts/`
+Usado para:
+- Google Ads / tag
+- Search Console
+- Calendar
+- Gmail / OAuth
+- conta de servico
 
-### Reservas
+Documentos de apoio:
+- `SEO-SETUP.md`
+- `GOOGLE-CALENDAR-SETUP.md`
+- `GMAIL-OAUTH-SETUP.md`
+- `EMAIL-SETUP.md`
 
-- frontend: `src/reservations/`
-- worker: `worker/reservations/`
-- schema: `migrations/0004_reservations.sql`
+### Bing
 
-## Regra para futuras IAs
+Usado para:
+- Bing Webmaster
 
-Se uma tarefa pedir “a chave”, “o token” ou “o acesso”:
+## Regra pratica
 
-1. não invente o valor
-2. procure primeiro por variáveis já esperadas no código
-3. prefira apontar para o local onde o segredo deve existir
-4. se não houver cofre definido, registrar isso como pendência operacional
+Para qualquer Codex novo:
+
+1. nunca assuma que um token no chat ainda esta valido;
+2. confirme primeiro no provedor;
+3. prefira secrets no Cloudflare/GitHub/cofre em vez de texto puro;
+4. se houver duvida, rotacione o token em vez de insistir num acesso antigo.

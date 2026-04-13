@@ -1,48 +1,61 @@
 # Uso em outro Codex
 
-Atualizado em: 2026-04-13
-
 ## Objetivo
 
-Permitir continuidade entre sessões e entre IAs sem depender de histórico de conversa.
+Permitir que o projeto seja aberto e continuado em outra maquina ou outro Codex sem depender de transferencia manual de contexto.
 
 ## Passo a passo
 
-1. abrir a pasta do projeto
-2. confirmar que o remoto oficial continua sendo `origin -> https://github.com/cuiabar/cuiabar-web.git`
-3. ler:
-   - `START-AQUI.md`
-   - `AGENTS.md`
-   - `docs/00-INDICE-GERAL.md`
-   - `docs/04-STATUS-ATUAL-E-PENDENCIAS.md`
-4. identificar a área correta da tarefa
-5. editar apenas arquivo-fonte
-6. atualizar o documento correto se houver mudança estrutural
+1. Abrir a pasta sincronizada:
 
-## Regra de remoto único
+```txt
+G:\Meu Drive\cuiabar-web
+```
 
-- este projeto deve operar com um único repositório GitHub oficial:
-  - `https://github.com/cuiabar/cuiabar-web.git`
-- não criar fluxo paralelo em outro repositório com o mesmo código
-- se aparecer referência a `https://github.com/cuiabar/web.git`, tratar como referência legada/inválida até ordem explícita em contrário
+2. Ler nesta ordem:
 
-## Validação mínima antes de publicar
+- `START-AQUI.md`
+- `docs/00-INDICE-GERAL.md`
+- `docs/04-STATUS-ATUAL-E-PENDENCIAS.md`
+- `ACESSOS-CHAVES-PROJETO.md`
+
+3. Validar ambiente:
 
 ```bash
 npm install
+npm run lint
 npm run build
 ```
 
-Se a tarefa envolver Worker:
+4. Se precisar publicar:
 
 ```bash
-npm run build:worker
+npm run deploy:pages
+npm run deploy:worker
 ```
 
-## Onde procurar por tipo de demanda
+5. Se o deploy falhar por autenticacao:
 
-- visual e conteúdo: `src/`
-- assets: `public/`
-- CRM/backend: `worker/`
-- Pages middleware: `functions/`
-- deploy: `wrangler.jsonc`, `package.json`, `docs/02-OPERACAO-E-DEPLOY.md`
+- verificar login/token do Cloudflare
+- confirmar permissao de Pages e Worker
+- confirmar acesso ao banco D1 e secrets
+
+## O que um novo Codex precisa saber
+
+- O projeto usa Vite + React no frontend.
+- O deploy atual e Cloudflare manual via Wrangler.
+- O GitHub nao e parte obrigatoria da publicacao atual.
+- As configuracoes centrais do negocio ficam principalmente em:
+  - `src/data/siteConfig.ts`
+  - `src/data/content.ts`
+  - `src/data/seoRoutes.json`
+
+## O que nao fazer sem checar
+
+- nao apagar arquivos de deploy sem confirmar uso
+- nao assumir que todos os tokens em conversas antigas ainda valem
+- nao reativar integracoes experimentais sem validar se fazem parte da operacao atual
+
+## Objetivo final desta pasta
+
+Esta pasta deve funcionar como a copia mestra operacional do website Cuiabar para continuidade de trabalho entre maquinas e entre sessoes Codex.

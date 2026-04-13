@@ -1,6 +1,7 @@
 import { getRequestIp } from '../lib/http';
 import { generateId } from '../lib/security';
 import { createGoogleCalendarEvent } from '../services/google/calendarService';
+import { sendAdConversion } from '../services/google/adsService';
 import type { Env } from '../types';
 import { MEAL_PERIOD_LABELS } from './constants';
 import { sendCustomerReservationCopy, sendRestaurantReservationNotification } from './email';
@@ -132,6 +133,15 @@ export const createReservation = async (env: Env, request: Request, payload: Res
     reservationTime: reservation.reservationTime,
     attribution: attribution ?? null,
   });
+
+  if (attribution?.gclid) {
+    try {
+      // Not awaiting this intentionally to avoid blocking the reservation response
+      sendAdConversion(env, attribution.gclid, reservation.reservationCode, 1, new Date());
+    } catch (error) {
+      console.error('Failed to send Google Ads conversion in createReservation:', error);
+    }
+  }
 
   try {
     const calendarEvent = await createGoogleCalendarEvent(env, {

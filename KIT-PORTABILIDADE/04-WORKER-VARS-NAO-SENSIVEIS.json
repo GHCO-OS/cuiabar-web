@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-04-07",
+  "source": "wrangler.jsonc",
+  "worker_name": "cuiabar-crm",
+  "vars": {
+    "APP_NAME": "Cuiabar CRM",
+    "APP_BASE_URL": "https://crm.cuiabar.com",
+    "BLOG_EDITOR_UPSTREAM_URL": "https://blog-editor-origin.cuiabar.com",
+    "IFOOD_STORE_URL": "https://www.ifood.com.br/delivery/campinas-sp/villa-cuiabar--executivos--pratos-do-dia-jardim-aurelia/1af0e396-a7c8-46e1-b1a5-dd06486bb4ad",
+    "FOOD99_STORE_URL": "https://oia.99app.com/dlp9/C94oJv?area=BR",
+    "SESSION_COOKIE_NAME": "cuiabar_crm_session",
+    "CSRF_COOKIE_NAME": "cuiabar_crm_csrf",
+    "AUTH_MODE": "google_only",
+    "GOOGLE_AUTH_CLIENT_ID": "649268689379-qsc4itpdh8s8028bn0j6shpijr0ed0qr.apps.googleusercontent.com",
+    "GOOGLE_ALLOWED_EMAILS": "leonardo@cuiabar.net,cuiabar@cuiabar.net",
+    "GOOGLE_MANAGER_EMAILS": "leonardo@cuiabar.net,cuiabar@cuiabar.net",
+    "GOOGLE_CALENDAR_ID": "c_cb44b5a5c24377de0d7ec7a6bb840f4ed667ce355c9b4611a4b9d9e1ff7e5782@group.calendar.google.com",
+    "DEFAULT_FROM_EMAIL": "contato@cuiabar.com",
+    "DEFAULT_FROM_NAME": "Cuiabar Restaurantes | Campinas",
+    "DEFAULT_REPLY_TO": "contato@cuiabar.com",
+    "RESERVATION_NOTIFICATION_EMAIL": "cuiabar@cuiabar.net",
+    "RESERVATION_APP_BASE_URL": "https://reservas.cuiabar.com",
+    "ZOHO_ACCOUNTS_DOMAIN": "https://accounts.zoho.com",
+    "ZOHO_API_DOMAIN": "https://www.zohoapis.com",
+    "ENABLE_OPEN_TRACKING": "false",
+    "SEND_BATCH_SIZE": "25",
+    "SEND_RATE_PER_MINUTE": "45",
+    "SEND_PAUSE_MS": "1500",
+    "CAMPAIGN_MAX_RECIPIENTS": "5000",
+    "DOUBLE_OPT_IN_ENABLED": "false"
+  },
+  "d1": {
+    "binding": "DB",
+    "database_name": "cuiabar_crm",
+    "database_id": "1c8de55c-c5f4-4985-8c5b-5ac1a010214d"
+  }
+}

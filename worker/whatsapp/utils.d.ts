@@ -1,0 +1,11 @@
+export declare const normalizePhoneE164: (value: string) => string;
+export declare const tryNormalizePhoneE164: (value: string | null | undefined) => string | null;
+export declare const phonesMatch: (left: string | null | undefined, right: string | null | undefined) => boolean;
+export declare const sanitizeMessageText: (value: string | null | undefined, maxLength?: number) => string;
+export declare const normalizeFreeText: (value: string | null | undefined) => string;
+export declare const isFullName: (value: string | null | undefined) => boolean;
+export declare const parseJsonObjectFromText: <T>(value: string) => T | null;
+export declare const sha256Hex: (value: string) => Promise<string>;
+export declare const safeFirstName: (value: string | null | undefined) => string | null;
+export declare const appendUniqueTags: (current: string[], next: string[]) => string[];
+export declare const boolFromEnv: (value: string | undefined, fallback?: boolean) => boolean;

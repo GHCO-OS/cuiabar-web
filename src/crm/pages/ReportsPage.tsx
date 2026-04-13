@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { downloadUrl } from '../api';
 import { Badge, PageHeader, Panel } from '../components';
 import { useCrm } from '../context';
+import { campaignStatusLabels, label } from '../labels';
 import type { Campaign } from '../types';
 import { crmRequest } from '../api';
 
@@ -40,7 +41,7 @@ export const ReportsPage = () => {
                     <p className="font-medium text-white">{campaign.name}</p>
                     <p className="text-sm text-slate-400">{campaign.subject}</p>
                   </div>
-                  <Badge tone={campaign.status === 'sent' ? 'success' : campaign.status === 'failed' ? 'danger' : 'warning'}>{campaign.status}</Badge>
+                  <Badge tone={campaign.status === 'sent' ? 'success' : campaign.status === 'failed' ? 'danger' : 'warning'}>{label(campaignStatusLabels, campaign.status)}</Badge>
                 </div>
                 <div className="mt-3 grid gap-2 text-sm text-slate-300 md:grid-cols-4">
                   <span>Destinatarios: {campaign.totalRecipients}</span>

@@ -7,7 +7,6 @@ export type SeoConfig = {
   ogDescription?: string;
   image?: string;
   imageAlt?: string;
-  siteName?: string;
   canonicalUrl?: string;
   keywords?: string[];
   robots?: string;
@@ -24,7 +23,6 @@ export const applySeo = ({
   ogDescription,
   image = DEFAULT_IMAGE,
   imageAlt = title,
-  siteName = SITE_NAME,
   canonicalUrl,
   keywords,
   robots = 'index,follow,max-image-preview:large',
@@ -52,7 +50,7 @@ export const applySeo = ({
   );
   ensureMeta('meta[property="og:image"]', 'property', 'og:image').setAttribute('content', image);
   ensureMeta('meta[property="og:image:alt"]', 'property', 'og:image:alt').setAttribute('content', imageAlt);
-  ensureMeta('meta[property="og:site_name"]', 'property', 'og:site_name').setAttribute('content', siteName);
+  ensureMeta('meta[property="og:site_name"]', 'property', 'og:site_name').setAttribute('content', SITE_NAME);
   ensureMeta('meta[property="og:locale"]', 'property', 'og:locale').setAttribute('content', 'pt_BR');
   ensureMeta('meta[name="twitter:card"]', 'name', 'twitter:card').setAttribute('content', 'summary_large_image');
   ensureMeta('meta[name="twitter:site"]', 'name', 'twitter:site').setAttribute('content', TWITTER_HANDLE);

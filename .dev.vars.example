@@ -1,0 +1,4 @@
+SETUP_ADMIN_TOKEN="change-me"
+CRM_INTERNAL_TOKEN="change-me"
+CLOUDFLARE_ACCOUNT_ID="change-me"
+CLOUDFLARE_AI_API_TOKEN="optional-if-using-rest-mode"

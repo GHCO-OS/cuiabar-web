@@ -53,8 +53,7 @@ const toAbsoluteUrl = (value) => {
   return `${siteOrigin}${value.startsWith('/') ? value : `/${value}`}`;
 };
 
-const buildCanonicalUrl = (routePath, routeSeo) =>
-  routeSeo.canonicalUrl ?? `${siteOrigin}${routeSeo.canonicalPath ?? (routePath === '/' ? '/' : routePath)}`;
+const buildCanonicalUrl = (routePath, routeSeo) => `${siteOrigin}${routeSeo.canonicalPath ?? (routePath === '/' ? '/' : routePath)}`;
 
 const normalizePrice = (value) => {
   if (!value) {
@@ -172,8 +171,7 @@ const buildWebPageSchema = (routePath, routeSeo) => ({
   inLanguage: 'pt-BR',
 });
 
-const shouldPrerenderRoute = (routePath, routeSeo) =>
-  routeSeo.prerender === true || (routeSeo.includeInSitemap !== false && (!routeSeo.canonicalPath || routeSeo.canonicalPath === routePath));
+const shouldPrerenderRoute = (routePath, routeSeo) => routeSeo.includeInSitemap !== false && (!routeSeo.canonicalPath || routeSeo.canonicalPath === routePath);
 
 const injectPrerenderedRoot = (html, prerenderedMarkup) => {
   if (!prerenderedMarkup) {
@@ -186,7 +184,6 @@ const injectPrerenderedRoot = (html, prerenderedMarkup) => {
 const injectRouteMetadata = (html, routePath, routeSeo, prerenderedMarkup = '') => {
   const title = routeSeo.title;
   const description = routeSeo.description;
-  const resolvedSiteName = routeSeo.siteName || siteName;
   const image = toAbsoluteUrl(routeSeo.image || defaultImage);
   const imageAlt = routeSeo.imageAlt || title;
   const canonicalUrl = buildCanonicalUrl(routePath, routeSeo);
@@ -210,7 +207,7 @@ const injectRouteMetadata = (html, routePath, routeSeo, prerenderedMarkup = '') 
   output = upsertTag(output, /<meta\s+property="og:image"\s+content=".*?"\s*\/?>/i, `<meta property="og:image" content="${escapeHtml(image)}" />`);
   output = upsertTag(output, /<meta\s+property="og:image:alt"\s+content=".*?"\s*\/?>/i, `<meta property="og:image:alt" content="${escapeHtml(imageAlt)}" />`);
   output = upsertTag(output, /<meta\s+property="og:image:secure_url"\s+content=".*?"\s*\/?>/i, `<meta property="og:image:secure_url" content="${escapeHtml(image)}" />`);
-  output = upsertTag(output, /<meta\s+property="og:site_name"\s+content=".*?"\s*\/?>/i, `<meta property="og:site_name" content="${escapeHtml(resolvedSiteName)}" />`);
+  output = upsertTag(output, /<meta\s+property="og:site_name"\s+content=".*?"\s*\/?>/i, `<meta property="og:site_name" content="${escapeHtml(siteName)}" />`);
   output = upsertTag(output, /<meta\s+property="og:type"\s+content=".*?"\s*\/?>/i, `<meta property="og:type" content="${escapeHtml(ogType)}" />`);
   output = upsertTag(output, /<meta\s+property="og:url"\s+content=".*?"\s*\/?>/i, `<meta property="og:url" content="${escapeHtml(canonicalUrl)}" />`);
   output = upsertTag(output, /<meta\s+name="twitter:card"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:card" content="summary_large_image" />`);

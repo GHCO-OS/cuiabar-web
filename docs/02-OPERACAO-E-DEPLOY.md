@@ -1,10 +1,16 @@
-# Operação e deploy
+# Operacao e deploy
 
 Atualizado em: 2026-04-13
 
+## Requisitos
+
+- Node.js 20+
+- npm 10+
+- acesso ao Cloudflare com Wrangler autenticado ou token valido
+
 ## Comandos principais
 
-Instalar:
+Instalacao:
 
 ```bash
 npm install
@@ -16,86 +22,72 @@ Desenvolvimento:
 npm run dev
 ```
 
-Build principal:
+Validacao:
 
 ```bash
+npm run lint
 npm run build
 ```
 
-Build do Worker:
-
-```bash
-npm run build:worker
-```
-
-Deploy do site no Cloudflare Pages:
+Deploy do site principal no Cloudflare Pages:
 
 ```bash
 npm run deploy:pages
 ```
 
-Deploy do blog:
-
-```bash
-npm run deploy:blog
-```
-
-Deploy do Worker:
+Deploy do Worker/CRM/Reservas:
 
 ```bash
 npm run deploy:worker
 ```
 
-Migrações D1:
+## Como a publicacao funciona hoje
+
+### Site principal
+
+- O build gera `dist/`
+- O deploy vai para o projeto Cloudflare Pages `cuiabar-site`
+- O comando usado e `wrangler pages deploy dist --project-name=cuiabar-site`
+
+### Worker
+
+- O Worker principal e `cuiabar-crm`
+- A configuracao esta em `wrangler.jsonc`
+- O deploy usa `wrangler deploy`
+
+## Conclusao importante sobre GitHub
+
+No estado atual:
+
+- o GitHub nao publica o site;
+- o que mantem o site e o CRM publicados e o acesso Cloudflare/Wrangler;
+- o repositório GitHub oficial para versionamento e continuidade deste projeto e `https://github.com/cuiabar/cuiabar-web`.
+
+Estado aplicado em 2026-04-13:
+
+- a copia operacional principal passou a ser `C:\workspace\cuiabar-web`;
+- `G:\Meu Drive\cuiabar-web` fica como backup, snapshot e base de consulta;
+- o remote `origin` local deve apontar para `https://github.com/cuiabar/cuiabar-web.git`;
+- a publicacao de codigo no GitHub e independente do deploy no Cloudflare;
+- os identificadores desta maquina e do bridge local ficaram registrados em `docs/10-AMBIENTE-LOCAL-E-IDS.md`.
+
+## D1 / banco
+
+Comandos relevantes:
 
 ```bash
 npm run d1:migrate:local
 npm run d1:migrate:remote
 ```
 
-## Arquivos centrais de operação
+Banco configurado em `wrangler.jsonc`:
 
-- `package.json`
-- `wrangler.jsonc`
-- `public/_redirects`
-- `functions/_middleware.js`
-- `functions/robots.txt.js`
+- binding: `DB`
+- database_name: `cuiabar_crm`
 
-## Guias operacionais legados preservados
+## Riscos operacionais
 
-Os guias antigos foram movidos para:
-
-- `docs/guias-legados/DEPLOY-CLOUDFLARE.md`
-- `docs/guias-legados/DEPLOY-RESERVAS-CLOUDFLARE.md`
-- `docs/guias-legados/README-RESERVAS.md`
-- `docs/guias-legados/RESERVAS-SETUP.md`
-
-## Regra operacional importante
-
-Este projeto concentra múltiplos módulos em uma base só. Portanto:
-
-- mudanças em `src/` podem afetar Pages e subdomínios
-- mudanças em `worker/` podem afetar CRM, reservas e integrações
-- deploy do site e deploy do Worker são fluxos diferentes
-
-## Fonte principal do projeto
-
-A partir desta organização:
-
-- o repositório GitHub privado é a fonte principal de código e documentação versionada
-- o único remoto oficial do projeto é `https://github.com/cuiabar/cuiabar-web.git`
-- o repositório `https://github.com/cuiabar/web.git` não deve ser usado como destino operacional
-- o Drive deve ser tratado apenas como backup complementar e acervo de apoio
-- segredos não devem ser mantidos em GitHub nem em documentação aberta do Drive
-
-## Deploy remoto via GitHub
-
-O repositório já possui workflow preparado em:
-
-- `.github/workflows/deploy-cloudflare.yml`
-
-Para ativar publicação remota por push em `main`, falta configurar no GitHub:
-
-- secret `CLOUDFLARE_API_TOKEN`
-
-Com isso, o projeto pode ser operado por GitHub/Codex Web sem depender da máquina local para deploy rotineiro.
+- Se o token do Cloudflare expirar, o deploy manual para.
+- Se as secrets nao estiverem presentes no ambiente Cloudflare, partes como login Google, e-mail e tracking server-side podem falhar.
+- Existem avisos conhecidos de SSR relacionados a `<Navigate>` em `StaticRouter`; isso nao bloqueia o build, mas merece limpeza futura.
+- Se o runtime local do Baileys perder a sessao, o bridge volta para `qr_ready` e exige novo pareamento manual.

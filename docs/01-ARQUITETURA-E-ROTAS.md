@@ -1,96 +1,120 @@
 # Arquitetura e rotas
 
-Atualizado em: 2026-04-13
+## Stack principal
 
-## Módulos do repositório
+- React 18
+- Vite 5
+- TypeScript
+- Tailwind CSS
+- React Router DOM
+- Cloudflare Pages
+- Cloudflare Workers
+- Cloudflare D1
+- Cloudflare Workers AI
+- Cloudflare KV
+- Node.js local para a ponte Baileys
 
-Este repositório hoje concentra quatro frentes principais:
+## Estrutura principal
 
-1. site público principal do Cuiabar
-2. experiências e páginas especiais, incluindo Burger Cuiabar
-3. CRM e backend operacional
-4. blog e fluxo editorial
+```txt
+src/
+  app/            app principal e roteamento
+  components/     componentes reutilizaveis
+  sections/       secoes da home
+  pages/          paginas principais do site
+  data/           configuracoes e conteudo
+  hooks/          SEO, comportamento e utilitarios React
+  lib/            analytics e helpers
+  styles/         estilos globais
+  reservations/   frontend do modulo de reservas
+  blog/           estrutura do blog/editorial
 
-## Mapa das pastas
+functions/
+  api/            funcoes Pages, incluindo Meta CAPI
 
-- `src/app/`
-  Shell principal do app público e roteamento base.
+worker/
+  reservations/   backend do modulo de reservas
+  services/       servicos auxiliares, ex.: Google
+  whatsapp/       backend do atendimento por WhatsApp com IA
 
-- `src/pages/`
-  Páginas do site principal e landing pages públicas.
+services/
+  whatsapp-baileys/ ponte local do WhatsApp Web via Baileys
 
-- `src/sections/`
-  Blocos reutilizáveis da home e de páginas institucionais.
+migrations/
+  migrations do banco D1
+```
 
-- `src/blog/`
-  Aplicação/blog editorial separada dentro do mesmo monorepo leve.
+## Configuracao central
 
-- `src/burger/`
-  Área experimental/dedicada para experiência Burger Cuiabar.
+Arquivos mais importantes para operacao:
 
-- `src/crm/`
-  Interface do CRM.
+- `src/data/siteConfig.ts`
+- `src/data/seoRoutes.json`
+- `src/data/content.ts`
+- `src/app/App.tsx`
+- `wrangler.jsonc`
+- `package.json`
 
-- `src/reservations/`
-  Frontend do portal de reservas.
+## Rotas principais do site
 
-- `worker/`
-  Backend principal em Cloudflare Workers: CRM, integrações, reservas, autenticação e rotas server-side dedicadas.
+- `/`
+  Home institucional/comercial.
 
-- `functions/`
-  Cloudflare Pages Functions e middleware do site estático.
+- `/menu`
+  Cardapio principal do restaurante.
 
+- `/pedidos-online`
+  Pagina de pedidos online.
 
-- `worker/whatsapp-intelligence/`
-  Worker dedicado para automacoes de WhatsApp com Llama, auditoria e bridge para gateway Baileys.
+- `/delivery`
+  Alias da pagina de pedidos online.
 
-- `migrations/`
-  Banco D1 e evolução de schema.
+- `/burguer` e `/burger`
+  Pagina especial do Burger Cuiabar.
 
-- `public/`
-  Assets estáticos organizados por área:
-  - `public/home/`
-  - `public/menu/`
-  - `public/prorefeicao/`
-  - `public/vagas/`
-  - `public/burguer/`
-  - `public/fonts/`
+- `/espetaria`
+  Pagina especial da Espetaria Cuiabar.
 
-## Rotas e domínios principais
+- `/prorefeicao`
+  Pagina institucional da operacao ProRefeicao.
 
-- `cuiabar.com`
-  Site principal.
+- `/vagas`
+  Pagina de vagas com links externos para formularios.
 
-- `burger.cuiabar.com`
-  Experiência Burger Cuiabar conectada ao mesmo projeto.
+- `/links`
+  Pagina estilo link-in-bio.
+
+- `/agenda`
+  Agenda/programacao.
+
+- `/reservas`
+  Fluxo publico de reservas.
+
+## Rotas de infraestrutura
 
 - `crm.cuiabar.com`
-  CRM e backend administrativo.
+  CRM/operacao administrativa hospedada via Worker.
 
 - `reservas.cuiabar.com`
-  Portal de reservas.
+  Portal/infra de reservas hospedada via Worker.
 
-- `blog.cuiabar.com`
-  Presença editorial e operação de conteúdo.
+- `blog.cuiabar.com/editor*`
+  Faixa reservada para editor/blog.
 
-## Fonte de edição por tipo de mudança
+- `crm.cuiabar.com/api/internal/whatsapp/*`
+  Endpoints internos consumidos pela ponte Baileys local.
 
-- site institucional: `src/pages/`, `src/sections/`, `src/data/`
-- SEO público: `src/data/seo.ts`, `src/data/seoRoutes.json`, `src/lib/seo.ts`
-- analytics/pixels: `src/lib/analytics.ts`, `src/components/AnalyticsTracker.tsx`, `functions/api/meta-conversions.js`
-- burger: `src/pages/BurguerCuiabarPage.tsx`, `src/burger/`, `public/burguer/`
-- CRM: `src/crm/`, `worker/`, `worker/whatsapp-intelligence/`
-- reservas: `src/reservations/`, `worker/reservations/`, `migrations/0004_reservations.sql`
-- blog: `src/blog/`, `blog-options/`, scripts editoriais
+- `crm.cuiabar.com/api/admin/whatsapp/*`
+  Endpoints administrativos do modulo de WhatsApp.
 
-## Observações de entrega por host
+- `crm.cuiabar.com/api/internal/whatsapp/crm/sync`
+  Camada adaptadora REST para sincronizacao com o CRM.
 
-- `crm.cuiabar.com` usa o mesmo bundle frontend do monorepo, mas o HTML base do host deve ser reescrito no Worker para responder como portal interno:
-  - `<html data-app="crm">`
-  - metadados próprios do CRM
-  - `x-robots-tag` com `noindex`
-  - `cache-control` sem armazenamento para o HTML
+## Observacoes relevantes
 
-- regra de manutenção:
-  - o host do CRM não deve reaproveitar metadados, canonical, pixels ou shell pública do site institucional como resposta final de HTML;
-  - o runtime React continua selecionando o app por hostname em `src/main.tsx`, mas o boundary entre site público e CRM também precisa existir no nível da resposta HTTP do Worker.
+- O projeto mistura frontend estatico no Pages com Worker para modulos dinamicos.
+- O site principal usa `dist/` como bundle estatico.
+- O Worker usa `worker/index.ts` com assets do `dist`.
+- A configuracao atual de deploy e local/manual via Wrangler, nao por integracao GitHub -> Cloudflare.
+- O modulo de WhatsApp usa um bridge Baileys local para transporte, KV para sessao/cache e Workers AI com fallback para REST da Cloudflare.
+- Para nao quebrar o CRM atual de e-mail marketing, o atendimento WhatsApp grava primeiro em `customer_profiles` e so vincula a `contacts` quando houver match seguro ou e-mail conhecido.

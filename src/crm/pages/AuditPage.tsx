@@ -1,18 +1,33 @@
 import { useEffect, useState } from 'react';
 import { crmRequest } from '../api';
-import { PageHeader, Panel, Table } from '../components';
+import { LoadingSpinner, Pagination, PageHeader, Panel, Table } from '../components';
 import { useCrm } from '../context';
 import type { AuditLogEntry } from '../types';
 
 export const AuditPage = () => {
   const { csrfToken } = useCrm();
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 50;
+
+  const load = (p = page) => {
+    const query = new URLSearchParams({ page: String(p), pageSize: String(pageSize) });
+    crmRequest<{ ok: true; logs: AuditLogEntry[]; pagination: { page: number; totalPages: number } }>(`/api/audit-logs?${query}`, {}, csrfToken)
+      .then((response) => {
+        setLogs(response.logs);
+        setTotalPages(response.pagination?.totalPages ?? 1);
+      })
+      .catch(() => setLogs([]))
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
-    crmRequest<{ ok: true; logs: AuditLogEntry[] }>('/api/audit-logs', {}, csrfToken)
-      .then((response) => setLogs(response.logs))
-      .catch(() => setLogs([]));
-  }, [csrfToken]);
+    load(page);
+  }, [csrfToken, page]);
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="space-y-6">
@@ -42,6 +57,12 @@ export const AuditPage = () => {
             ))}
           </tbody>
         </Table>
+        {logs.length === 0 ? (
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center">
+            <p className="text-sm text-slate-400">Nenhuma entrada de auditoria encontrada.</p>
+          </div>
+        ) : null}
+        <Pagination page={page} totalPages={totalPages} onPageChange={(p) => { setPage(p); setLoading(true); }} />
       </Panel>
     </div>
   );

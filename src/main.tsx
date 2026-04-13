@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './styles/global.css';
 
-type RuntimeAppKey = 'site' | 'crm' | 'reservas' | 'burger';
+type RuntimeAppKey = 'site' | 'crm' | 'reservas';
 
 const getRuntimeAppKey = (): RuntimeAppKey => {
   const hostname = window.location.hostname.toLowerCase();
@@ -17,10 +17,6 @@ const getRuntimeAppKey = (): RuntimeAppKey => {
     return 'reservas';
   }
 
-  if (forcedApp === 'burger' || hostname === 'burger.cuiabar.com') {
-    return 'burger';
-  }
-
   return 'site';
 };
 
@@ -31,18 +27,10 @@ const RootApp =
     ? lazy(() => import('./crm/CrmApp').then((module) => ({ default: () => <module.CrmApp /> })))
     : runtimeAppKey === 'reservas'
       ? lazy(() => import('./reservations/ReservationsApp').then((module) => ({ default: module.ReservationsApp })))
-      : runtimeAppKey === 'burger'
-        ? lazy(() => import('./burger/BurgerApp').then((module) => ({ default: module.BurgerApp })))
       : lazy(() => import('./app/App').then((module) => ({ default: module.App })));
 
 const fallbackLabel =
-  runtimeAppKey === 'crm'
-    ? 'Carregando CRM...'
-    : runtimeAppKey === 'reservas'
-      ? 'Carregando reservas...'
-      : runtimeAppKey === 'burger'
-        ? 'Carregando Burger Cuiabar...'
-        : 'Carregando Villa Cuiabar...';
+  runtimeAppKey === 'crm' ? 'Carregando CRM...' : runtimeAppKey === 'reservas' ? 'Carregando reservas...' : 'Carregando Villa Cuiabar...';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

@@ -1,6 +1,10 @@
-# Cuiabar Web - índice geral
+# Cuiabar Web - indice geral
 
-Atualizado em: 2026-04-10
+Atualizado em: 2026-04-13
+
+## Objetivo
+
+Este diretorio centraliza a documentacao operacional do website Cuiabar para que o projeto possa ser aberto e operado em outros Codex, sem depender de memoria de conversa ou de um unico computador.
 
 ## Ordem recomendada de leitura
 
@@ -11,43 +15,70 @@ Atualizado em: 2026-04-10
 5. `02-OPERACAO-E-DEPLOY.md`
 6. `03-INTEGRACOES-E-CREDENCIAIS.md`
 7. `04-STATUS-ATUAL-E-PENDENCIAS.md`
+8. `06-WHATSAPP-AI-ARQUITETURA.md`
+9. `07-WHATSAPP-AI-ENDPOINTS.md`
+10. `08-WHATSAPP-AI-PAYLOADS.md`
+11. `10-AMBIENTE-LOCAL-E-IDS.md`
 
-## Documentos centrais
+## Arquivos centrais
 
 - `01-ARQUITETURA-E-ROTAS.md`
-  Mapa dos módulos e das áreas de código.
+  Mapa do projeto, stack, pastas e principais rotas.
 
 - `02-OPERACAO-E-DEPLOY.md`
-  Como rodar, buildar e publicar.
+  Como rodar, buildar e publicar no Cloudflare.
 
 - `03-INTEGRACOES-E-CREDENCIAIS.md`
-  Inventário das integrações e política de segredos.
+  Inventario das integracoes e onde consultar credenciais.
 
 - `04-STATUS-ATUAL-E-PENDENCIAS.md`
-  O que está ativo, o que precisa de atenção e o que ainda está em evolução.
+  O que esta ativo, o que foi descontinuado e o que ainda precisa de atencao.
 
 - `05-USO-EM-OUTRO-CODEX.md`
-  Como abrir o projeto em outra máquina ou outra IA.
+  Passo a passo para abrir e continuar o projeto em outra maquina/instancia Codex.
 
 - `09-ORGANIZACAO-E-GOVERNANCA-IA.md`
-  Regras de manutenção e convenção de organização.
+  Regra de organizacao do repositorio, mapa de busca e convencao obrigatoria para futuras IAs.
 
-- `10-ESTRATEGIA-DE-BRANCHES-E-MODULOS.md`
-  Plano recomendado para separar trabalho por frentes sem quebrar o repositório único.
+- `06-WHATSAPP-AI-ARQUITETURA.md`
+  Arquitetura detalhada do atendimento por WhatsApp com IA, estrategia de integracao com o CRM atual, schema D1 e estrutura de pastas.
 
-- `11-CODEX-WEB-MIGRACAO.md`
-  Estado da migração para operação web-first via GitHub/Codex Web.
+- `07-WHATSAPP-AI-ENDPOINTS.md`
+  Contratos das rotas internas, administrativas e do bridge local do modulo de WhatsApp.
 
-- `12-PROJETO-MODERNIZACAO-SEO-MOBILE-E-DISTRIBUICAO.md`
-  Plano recomendado para indexação, performance mobile, mídia na Cloudflare e integração com Google/Bing.
+- `08-WHATSAPP-AI-PAYLOADS.md`
+  Exemplos de payloads do bridge Baileys, sync CRM e acoes administrativas.
 
-- `13-ARQUITETURA-DE-SEGREDOS-E-COFRE.md`
-  Arquitetura oficial de cofre-mãe, runtime, CI/CD, rotação e uso seguro de credenciais.
+- `10-AMBIENTE-LOCAL-E-IDS.md`
+  Inventario do PC operacional, bridge local, host IDs e referencias de runtime para suporte e continuidade.
 
-## Material complementar
+## Documentos antigos ainda uteis
 
-- `guias-legados/`
-  Guias antigos e operacionais preservados como apoio, sem ocupar a raiz do projeto.
+Esses arquivos continuam validos como apoio:
 
-- `backlog/TODO.md`
-  Itens abertos e lembretes ainda não transformados em plano definitivo.
+- `README.md`
+- `DEPLOY-CLOUDFLARE.md`
+- `DEPLOY-RESERVAS-CLOUDFLARE.md`
+- `README-RESERVAS.md`
+- `RESERVAS-SETUP.md`
+- `GOOGLE-CALENDAR-SETUP.md`
+- `EMAIL-SETUP.md`
+- `META-CAPI-SETUP.md`
+- `SEO-SETUP.md`
+- `SEO-TECHNICAL-PLAN.md`
+
+## Credenciais
+
+O inventario de chaves compartilhadas em conversa esta em:
+
+- `../ACESSOS-CHAVES-PROJETO.md`
+
+Esse arquivo contem segredos em texto puro e deve ser tratado como confidencial.
+
+## Kit adicional para outras ferramentas
+
+Tambem existe um pacote rapido em:
+
+- `../KIT-PORTABILIDADE/00-LEIA-ME.md`
+
+Esse conjunto foi montado para facilitar reutilizacao do projeto em outras ferramentas e outras instancias, incluindo copia da chave da conta de servico Google e snapshot das integracoes principais.

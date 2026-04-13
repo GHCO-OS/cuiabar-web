@@ -24,8 +24,7 @@ export const StaticSiteApp = () => (
       <Route path="/agenda/:eventSlug" element={<AgendaEventPage />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:slug" element={<BlogPostPage />} />
-      <Route path="/burguer" element={<BurguerCuiabarPage seoPath="/burguer" domainMode="site" />} />
-      <Route path="/burger-site" element={<BurguerCuiabarPage seoPath="/burger-site" domainMode="subdomain" />} />
+      <Route path="/burguer" element={<BurguerCuiabarPage />} />
       <Route path="/espetaria" element={<EspetariaCuiabarPage />} />
       <Route path="/links" element={<LinksPage />} />
       <Route path="/menu" element={<MenuPage />} />

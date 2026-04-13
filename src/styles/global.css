@@ -48,27 +48,12 @@
 }
 
 body {
-  @apply m-0 font-body antialiased;
-}
-
-html:not([data-app='crm']) body {
-  @apply bg-cream text-cocoa;
+  @apply m-0 bg-cream font-body text-cocoa antialiased;
   background-image:
     radial-gradient(circle at top right, rgba(178, 146, 88, 0.14), transparent 28%),
     radial-gradient(circle at left center, rgba(172, 84, 39, 0.14), transparent 32%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(249, 243, 234, 0.94));
   background-attachment: fixed;
-}
-
-html[data-app='crm'] {
-  color: #e2e8f0;
-  background: #020617;
-}
-
-html[data-app='crm'] body {
-  background: #020617;
-  background-image: none;
-  color: #e2e8f0;
 }
 
 .container-shell {
@@ -1385,36 +1370,6 @@ html[data-app='crm'] body {
 
   .blog-insight-grid {
     grid-template-columns: 1fr;
-  }
-}
-
-.burger-float-slow {
-  animation: burger-float-slow 7.2s ease-in-out infinite;
-}
-
-.burger-float-fast {
-  animation: burger-float-fast 5.6s ease-in-out infinite;
-}
-
-@keyframes burger-float-slow {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-
-  50% {
-    transform: translate3d(0, -12px, 0) rotate(-1.2deg);
-  }
-}
-
-@keyframes burger-float-fast {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  50% {
-    transform: translate3d(0, -9px, 0) scale(1.03);
   }
 }
 

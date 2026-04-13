@@ -1,246 +1,161 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { crmRequest } from '../api';
-import { Badge, Button, Field, InputClassName, MetricCard, PageHeader, Panel } from '../components';
+import { Button, Field, InputClassName, LoadingSpinner, MetricCard, PageHeader, Panel } from '../components';
 import { useCrm } from '../context';
-import type { Contact, DashboardMetrics, Template } from '../types';
-
-type QuickSendPayload = {
-  ok: true;
-  campaignId: string;
-  recipientCount: number;
-  missingEmails: string[];
-};
-
-const normalizeEmails = (input: string) =>
-  [...new Set(input.split(/[\n,;]+/).map((entry) => entry.trim().toLowerCase()).filter(Boolean))];
+import type { ContactList, DashboardMetrics, Segment, Template } from '../types';
 
 export const DashboardPage = () => {
   const { csrfToken } = useCrm();
+  const navigate = useNavigate();
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [search, setSearch] = useState('');
-  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
-  const [manualEmails, setManualEmails] = useState('');
-  const [templateId, setTemplateId] = useState('');
-  const [salutationMode, setSalutationMode] = useState<'personalized' | 'generic'>('personalized');
-  const [sending, setSending] = useState(false);
-  const [sendStatus, setSendStatus] = useState<string | null>(null);
-  const [sendError, setSendError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const load = async () => {
-    const [metricsResponse, templatesResponse, contactsResponse] = await Promise.all([
-      crmRequest<{ ok: true; metrics: DashboardMetrics }>('/api/reports/dashboard', {}, csrfToken),
-      crmRequest<{ ok: true; templates: Template[] }>('/api/templates', {}, csrfToken),
-      crmRequest<{ ok: true; contacts: Contact[] }>('/api/contacts?status=active', {}, csrfToken),
-    ]);
-
-    setMetrics(metricsResponse.metrics);
-    setTemplates(templatesResponse.templates);
-    setContacts(contactsResponse.contacts);
-    setTemplateId((current) => current || templatesResponse.templates[0]?.id || '');
-  };
+  const [quickDispatch, setQuickDispatch] = useState({
+    name: '',
+    templateId: '',
+    listId: '',
+    segmentId: '',
+  });
+  const [templates, setTemplates] = useState<Array<{ id: string; name: string }>>([]);
+  const [lists, setLists] = useState<Array<{ id: string; name: string }>>([]);
+  const [segments, setSegments] = useState<Array<{ id: string; name: string }>>([]);
+  const [dispatching, setDispatching] = useState(false);
+  const [dispatchMsg, setDispatchMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    load().catch(() => undefined);
+    Promise.all([
+      crmRequest<{ ok: true; metrics: DashboardMetrics }>('/api/reports/dashboard', {}, csrfToken)
+        .then((response) => setMetrics(response.metrics))
+        .catch(() => setMetrics(null)),
+      crmRequest<{ ok: true; templates: Template[] }>('/api/templates', {}, csrfToken)
+        .then((response) => setTemplates(response.templates.map((t) => ({ id: t.id, name: t.name }))))
+        .catch(() => undefined),
+      crmRequest<{ ok: true; lists: ContactList[] }>('/api/lists', {}, csrfToken)
+        .then((response) => setLists(response.lists.map((l) => ({ id: l.id, name: l.name }))))
+        .catch(() => undefined),
+      crmRequest<{ ok: true; segments: Segment[] }>('/api/segments', {}, csrfToken)
+        .then((response) => setSegments(response.segments.map((s) => ({ id: s.id, name: s.name }))))
+        .catch(() => undefined),
+    ]).finally(() => setLoading(false));
   }, [csrfToken]);
 
-  const filteredContacts = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
-    return contacts
-      .filter((contact) => contact.optInStatus !== 'pending' && contact.optInStatus !== 'double_opt_in_pending')
-      .filter((contact) =>
-        normalizedSearch
-          ? [contact.email, contact.firstName, contact.lastName].some((value) => value.toLowerCase().includes(normalizedSearch))
-          : true,
-      )
-      .slice(0, 8);
-  }, [contacts, search]);
-
-  const mergedRecipients = useMemo(() => {
-    const pasted = normalizeEmails(manualEmails);
-    return [...new Set([...selectedEmails, ...pasted])];
-  }, [manualEmails, selectedEmails]);
-
-  const addRecipient = (email: string) => {
-    setSelectedEmails((current) => (current.includes(email) ? current : [...current, email]));
-  };
-
-  const removeRecipient = (email: string) => {
-    setSelectedEmails((current) => current.filter((entry) => entry !== email));
-    setManualEmails((current) => normalizeEmails(current).filter((entry) => entry !== email).join('\n'));
-  };
-
-  const sendQuickCampaign = async () => {
-    setSendError(null);
-    setSendStatus(null);
-    setSending(true);
+  const handleQuickDispatch = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setDispatching(true);
+    setDispatchMsg(null);
     try {
-      const response = await crmRequest<QuickSendPayload>(
-        '/api/campaigns/quick-send',
+      const campaign = await crmRequest<{ ok: true; campaign: { id: string } }>(
+        '/api/campaigns',
         {
           method: 'POST',
           body: JSON.stringify({
-            emails: mergedRecipients,
-            templateId,
-            salutationMode,
+            name: quickDispatch.name,
+            subject: quickDispatch.name,
+            preheader: '',
+            templateId: quickDispatch.templateId,
+            listId: quickDispatch.listId || null,
+            segmentId: quickDispatch.segmentId || null,
+            fromName: 'Cuiabar Restaurantes | Campinas',
+            fromEmail: 'contato@cuiabar.com',
+            replyTo: 'contato@cuiabar.com',
+            scheduledAt: null,
           }),
         },
         csrfToken,
       );
-      setSendStatus(
-        `Disparo criado e processado. Campanha ${response.campaignId} com ${response.recipientCount} destinatarios.${response.missingEmails.length ? ` E-mails nao encontrados no CRM: ${response.missingEmails.join(', ')}.` : ''}`,
-      );
-      setManualEmails('');
-      setSelectedEmails([]);
-      await load();
-    } catch (requestError) {
-      setSendError(requestError instanceof Error ? requestError.message : 'Falha ao enviar o disparo rapido.');
+      await crmRequest(`/api/campaigns/${campaign.campaign.id}/launch`, { method: 'POST', body: JSON.stringify({ scheduledAt: null }) }, csrfToken);
+      navigate('/campaigns');
+    } catch {
+      setDispatchMsg('Erro ao disparar campanha. Verifique os dados e tente novamente.');
     } finally {
-      setSending(false);
+      setDispatching(false);
     }
   };
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Dashboard"
-        description="O disparador rapido fica aqui no topo: escolha o template, os clientes e a saudacao. O sistema registra envio, abertura observada, cliques e descadastro sem prometer inbox placement."
+        description="O painel deixa claro o que e observavel: envios aceitos pela API, falhas detectadas, cliques e descadastros. Nao existe promessa de inbox placement."
       />
-
-      <Panel className="space-y-6">
-        <div className="flex flex-col gap-3 border-b border-white/10 pb-5 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-amber-300">Primeira funcao</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">Disparador rapido</h2>
-            <p className="mt-2 max-w-3xl text-sm text-slate-300">
-              Selecione o template, escolha os contatos do CRM e defina se a saudacao deve usar o nome de cada cliente ou a forma generica <strong>cliente</strong>.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge tone="success">Click tracking ativo</Badge>
-            <Badge tone="warning">Open tracking observavel e imperfeito</Badge>
-          </div>
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[1.05fr,0.95fr]">
-          <div className="space-y-4">
-            <Field label="Template">
-              <select className={InputClassName} value={templateId} onChange={(event) => setTemplateId(event.target.value)}>
-                <option value="">Selecione um template</option>
-                {templates.map((template) => (
-                  <option key={template.id} value={template.id}>
-                    {template.name} - {template.subject}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            <Field label="Saudacao" hint="Personalizada usa o first_name quando existir. Generica substitui por “cliente” para todos.">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  className={`rounded-2xl border px-4 py-3 text-left text-sm transition ${salutationMode === 'personalized' ? 'border-amber-300 bg-amber-300/10 text-white' : 'border-white/10 bg-white/5 text-slate-300'}`}
-                  onClick={() => setSalutationMode('personalized')}
-                >
-                  <div className="font-semibold">Nome personalizado</div>
-                  <div className="mt-1 text-xs text-slate-400">Usa o nome salvo em cada contato.</div>
-                </button>
-                <button
-                  type="button"
-                  className={`rounded-2xl border px-4 py-3 text-left text-sm transition ${salutationMode === 'generic' ? 'border-amber-300 bg-amber-300/10 text-white' : 'border-white/10 bg-white/5 text-slate-300'}`}
-                  onClick={() => setSalutationMode('generic')}
-                >
-                  <div className="font-semibold">Generico “cliente”</div>
-                  <div className="mt-1 text-xs text-slate-400">Padroniza a saudacao para todos os destinatarios.</div>
-                </button>
-              </div>
-            </Field>
-
-            <Field label="Colar e-mails" hint="Cole e-mails separados por virgula, ponto e virgula ou quebra de linha. O envio so usa contatos que ja existem no CRM.">
-              <textarea className={`${InputClassName} min-h-[132px]`} value={manualEmails} onChange={(event) => setManualEmails(event.target.value)} placeholder="cliente1@exemplo.com&#10;cliente2@exemplo.com" />
-            </Field>
-
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-white">Destinatarios selecionados</p>
-                  <p className="mt-1 text-xs text-slate-400">Total pronto para envio: {mergedRecipients.length}</p>
-                </div>
-                <Button variant="ghost" disabled={mergedRecipients.length === 0} onClick={() => { setSelectedEmails([]); setManualEmails(''); }}>
-                  Limpar
-                </Button>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {mergedRecipients.length ? (
-                  mergedRecipients.map((email) => (
-                    <button
-                      key={email}
-                      type="button"
-                      onClick={() => removeRecipient(email)}
-                      className="rounded-full border border-white/10 bg-slate-900/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-rose-300 hover:text-rose-200"
-                    >
-                      {email}
-                    </button>
-                  ))
-                ) : (
-                  <p className="text-sm text-slate-400">Nenhum destinatario selecionado ainda.</p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Button disabled={sending || !templateId || mergedRecipients.length === 0} onClick={sendQuickCampaign}>
-                {sending ? 'Enviando...' : 'Enviar disparo'}
-              </Button>
-            </div>
-            {sendStatus ? <p className="text-sm text-emerald-300">{sendStatus}</p> : null}
-            {sendError ? <p className="text-sm text-rose-300">{sendError}</p> : null}
-          </div>
-
-          <div className="space-y-4">
-            <Field label="Buscar clientes do CRM" hint="Clique para adicionar rapidamente contatos ativos e elegiveis ao disparo.">
-              <input className={InputClassName} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nome ou e-mail" />
-            </Field>
-            <div className="grid gap-3">
-              {filteredContacts.map((contact) => (
-                <button
-                  key={contact.id}
-                  type="button"
-                  onClick={() => addRecipient(contact.email)}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-4 text-left transition hover:border-amber-300/50 hover:bg-white/10"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-medium text-white">{[contact.firstName, contact.lastName].filter(Boolean).join(' ') || 'Contato sem nome'}</p>
-                      <p className="mt-1 text-sm text-slate-300">{contact.email}</p>
-                      <p className="mt-2 text-xs text-slate-400">
-                        Fonte: {contact.source || 'nao informada'} · Opt-in: {contact.optInStatus}
-                      </p>
-                    </div>
-                    <Badge tone={selectedEmails.includes(contact.email) ? 'success' : 'neutral'}>{selectedEmails.includes(contact.email) ? 'adicionado' : 'adicionar'}</Badge>
-                  </div>
-                </button>
-              ))}
-              {!filteredContacts.length ? <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">Nenhum contato ativo encontrado para esse filtro.</p> : null}
-            </div>
-          </div>
-        </div>
-      </Panel>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Campanhas" value={metrics?.campaignsSent ?? 0} />
         <MetricCard label="Contatos ativos" value={metrics?.activeContacts ?? 0} />
-        <MetricCard label="Aberturas observadas" value={metrics?.totalOpens ?? 0} note="Pixel de abertura por destinatario. Use como sinal auxiliar, nao como verdade absoluta." />
-        <MetricCard label="Open rate observado" value={`${metrics?.openRate ?? 0}%`} note="Calculado em cima de eventos observados." />
+        <MetricCard label="Cliques totais" value={metrics?.totalClicks ?? 0} note="Click tracking por redirect e a metrica central do sistema." />
+        <MetricCard label="CTR observado" value={`${metrics?.ctr ?? 0}%`} note="Baseado em eventos observaveis, sem inferir inbox." />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Cliques totais" value={metrics?.totalClicks ?? 0} note="Click tracking por redirect e a metrica mais confiavel do sistema." />
-        <MetricCard label="CTR observado" value={`${metrics?.ctr ?? 0}%`} note="Baseado em eventos observaveis, sem inferir inbox." />
+      <div className="grid gap-4 md:grid-cols-2">
         <MetricCard label="Falhas de envio" value={metrics?.failures ?? 0} />
         <MetricCard label="Descadastros" value={metrics?.unsubscribes ?? 0} />
       </div>
+
+      <Panel>
+        <h2 className="text-lg font-semibold text-white">Disparo rapido</h2>
+        <form className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4" onSubmit={handleQuickDispatch}>
+          <Field label="Nome da campanha">
+            <input
+              className={InputClassName}
+              value={quickDispatch.name}
+              onChange={(event) => setQuickDispatch((current) => ({ ...current, name: event.target.value }))}
+              required
+            />
+          </Field>
+          <Field label="Template">
+            <select
+              className={InputClassName}
+              value={quickDispatch.templateId}
+              onChange={(event) => setQuickDispatch((current) => ({ ...current, templateId: event.target.value }))}
+              required
+            >
+              <option value="">Selecione</option>
+              {templates.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {template.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Lista">
+            <select
+              className={InputClassName}
+              value={quickDispatch.listId}
+              onChange={(event) => setQuickDispatch((current) => ({ ...current, listId: event.target.value, segmentId: '' }))}
+            >
+              <option value="">Nenhuma</option>
+              {lists.map((list) => (
+                <option key={list.id} value={list.id}>
+                  {list.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Segmento">
+            <select
+              className={InputClassName}
+              value={quickDispatch.segmentId}
+              onChange={(event) => setQuickDispatch((current) => ({ ...current, segmentId: event.target.value, listId: '' }))}
+            >
+              <option value="">Nenhum</option>
+              {segments.map((segment) => (
+                <option key={segment.id} value={segment.id}>
+                  {segment.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <div className="md:col-span-2 lg:col-span-4 flex items-center gap-4">
+            <Button type="submit" disabled={dispatching}>
+              {dispatching ? 'Disparando...' : 'Disparar agora'}
+            </Button>
+            {dispatchMsg ? <p className="text-sm text-rose-400">{dispatchMsg}</p> : null}
+          </div>
+        </form>
+      </Panel>
 
       <Panel>
         <h2 className="text-lg font-semibold text-white">Envios por periodo</h2>

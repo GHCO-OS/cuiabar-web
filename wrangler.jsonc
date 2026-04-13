@@ -2,7 +2,7 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "cuiabar-crm",
   "main": "worker/index.ts",
-  "compatibility_date": "2026-03-13",
+  "compatibility_date": "2026-04-08",
   "placement": {
     "mode": "smart"
   },
@@ -18,10 +18,6 @@
   },
   "routes": [
     {
-      "pattern": "burger.cuiabar.com/*",
-      "zone_name": "cuiabar.com"
-    },
-    {
       "pattern": "crm.cuiabar.com",
       "custom_domain": true
     },
@@ -32,10 +28,6 @@
     {
       "pattern": "blog.cuiabar.com/editor*",
       "zone_name": "cuiabar.com"
-    },
-    {
-      "pattern": "blog.cuiabar.com/api/blog*",
-      "zone_name": "cuiabar.com"
     }
   ],
   "triggers": {
@@ -44,8 +36,8 @@
   "vars": {
     "APP_NAME": "Cuiabar CRM",
     "APP_BASE_URL": "https://crm.cuiabar.com",
+    "CRM_INTEGRATION_MODE": "local",
     "BLOG_EDITOR_UPSTREAM_URL": "https://blog-editor-origin.cuiabar.com",
-    "BLOG_EDITOR_ALLOWED_EMAILS": "leonardo@cuiabar.net,cuiabar@cuiabar.net",
     "IFOOD_STORE_URL": "https://www.ifood.com.br/delivery/campinas-sp/villa-cuiabar--executivos--pratos-do-dia-jardim-aurelia/1af0e396-a7c8-46e1-b1a5-dd06486bb4ad",
     "FOOD99_STORE_URL": "https://oia.99app.com/dlp9/C94oJv?area=BR",
     "SESSION_COOKIE_NAME": "cuiabar_crm_session",
@@ -60,14 +52,23 @@
     "DEFAULT_REPLY_TO": "contato@cuiabar.com",
     "RESERVATION_NOTIFICATION_EMAIL": "cuiabar@cuiabar.net",
     "RESERVATION_APP_BASE_URL": "https://reservas.cuiabar.com",
-    "ZOHO_ACCOUNTS_DOMAIN": "https://accounts.zoho.com",
-    "ZOHO_API_DOMAIN": "https://www.zohoapis.com",
     "ENABLE_OPEN_TRACKING": "false",
     "SEND_BATCH_SIZE": "25",
     "SEND_RATE_PER_MINUTE": "45",
     "SEND_PAUSE_MS": "1500",
     "CAMPAIGN_MAX_RECIPIENTS": "5000",
-    "DOUBLE_OPT_IN_ENABLED": "false"
+    "DOUBLE_OPT_IN_ENABLED": "false",
+    "WHATSAPP_AI_MODE": "binding",
+    "WHATSAPP_AI_MODEL": "@cf/meta/llama-3.1-8b-instruct",
+    "WHATSAPP_MENU_URL": "https://cuiabar.com/menu",
+    "WHATSAPP_BURGER_URL": "https://cuiabar.com/burguer",
+    "WHATSAPP_DELIVERY_URL": "https://cuiabar.com/delivery",
+    "WHATSAPP_EXPRESSO_URL": "https://expresso.cuiabar.com",
+    "WHATSAPP_CHANNEL_URL": "https://whatsapp.com/channel/0029VbAcHLXFSAsxCt6lly0a",
+    "WHATSAPP_ADDRESS": "Av. Brigadeiro Rafael Tobias de Aguiar, 1121 - Jardim Aurelia - Campinas/SP",
+    "WHATSAPP_HOURS_SUMMARY": "Delivery no almoco todos os dias, delivery a noite de quarta a sabado e atendimento presencial com musica ao vivo as sextas, sabados e domingos.",
+    "WHATSAPP_PHONE_DISPLAY": "(19) 3305-8878",
+    "WHATSAPP_RESERVATION_BEST_EFFORT_ENABLED": "true"
   },
   "d1_databases": [
     {
@@ -76,12 +77,16 @@
       "database_id": "1c8de55c-c5f4-4985-8c5b-5ac1a010214d",
       "migrations_dir": "migrations"
     }
-  ]
-  // Para ativar midia 100% Cloudflare no blog:
-  // "r2_buckets": [
-  //   {
-  //     "binding": "BLOG_MEDIA",
-  //     "bucket_name": "cuiabar-blog-media"
-  //   }
-  // ]
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "WHATSAPP_KV"
+    }
+  ],
+  "dev": {
+    "generate_types": true
+  }
 }

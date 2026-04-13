@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { crmRequest } from '../api';
-import { Badge, Button, Field, InputClassName, PageHeader, Panel, Table } from '../components';
+import { Badge, Button, ConfirmModal, Field, InputClassName, LoadingSpinner, Pagination, PageHeader, Panel, Table } from '../components';
 import { useCrm } from '../context';
+import { campaignStatusLabels, label } from '../labels';
 import type { Campaign, ContactList, Segment, Template } from '../types';
 
 type CampaignMetrics = {
@@ -9,19 +10,22 @@ type CampaignMetrics = {
     recipients: number;
     sent: number;
     failed: number;
-    opensTotal: number;
-    opensUnique: number;
-    openedContacts: number;
     clicksTotal: number;
     clicksUnique: number;
     clickedContacts: number;
     unsubscribed: number;
-    openRate: number;
     ctr: number;
     deliveryObservedRate: number;
   };
   topLinks: Array<{ id: string; original_url: string; click_count_total: number; click_count_unique: number }>;
-  recipients: Array<{ email_snapshot: string; status: string; sent_at: string | null; opened_at: string | null; clicked_at: string | null; unsubscribed_at: string | null; last_error: string | null }>;
+  recipients: Array<{ email_snapshot: string; status: string; sent_at: string | null; clicked_at: string | null; unsubscribed_at: string | null; last_error: string | null }>;
+};
+
+type CampaignProgress = {
+  sent: number;
+  failed: number;
+  queued: number;
+  total: number;
 };
 
 export const CampaignsPage = () => {
@@ -33,6 +37,12 @@ export const CampaignsPage = () => {
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>('');
   const [metrics, setMetrics] = useState<CampaignMetrics | null>(null);
   const [testEmails, setTestEmails] = useState('');
+  const [confirmAction, setConfirmAction] = useState<string | null>(null);
+  const [cloning, setCloning] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState<CampaignProgress | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [form, setForm] = useState({
     name: '',
     subject: '',
@@ -46,22 +56,32 @@ export const CampaignsPage = () => {
     scheduledAt: '',
   });
 
-  const loadBase = async () => {
+  const loadBase = async (p = page) => {
+    const query = new URLSearchParams({ page: String(p), pageSize: '50' });
     const [campaignResponse, templateResponse, listResponse, segmentResponse] = await Promise.all([
-      crmRequest<{ ok: true; campaigns: Campaign[] }>('/api/campaigns', {}, csrfToken),
+      crmRequest<{ ok: true; campaigns: Campaign[]; pagination?: { page: number; totalPages: number } }>(`/api/campaigns?${query}`, {}, csrfToken),
       crmRequest<{ ok: true; templates: Template[] }>('/api/templates', {}, csrfToken),
       crmRequest<{ ok: true; lists: ContactList[] }>('/api/lists', {}, csrfToken),
       crmRequest<{ ok: true; segments: Segment[] }>('/api/segments', {}, csrfToken),
     ]);
     setCampaigns(campaignResponse.campaigns);
+    setTotalPages(campaignResponse.pagination?.totalPages ?? 1);
     setTemplates(templateResponse.templates);
     setLists(listResponse.lists);
     setSegments(segmentResponse.segments);
   };
 
   useEffect(() => {
-    loadBase().catch(() => undefined);
+    loadBase(1)
+      .catch(() => undefined)
+      .finally(() => setLoading(false));
   }, [csrfToken]);
+
+  useEffect(() => {
+    if (page > 1) {
+      loadBase(page).catch(() => undefined);
+    }
+  }, [page]);
 
   useEffect(() => {
     if (!selectedCampaignId) {
@@ -74,6 +94,21 @@ export const CampaignsPage = () => {
   }, [csrfToken, selectedCampaignId]);
 
   const selectedCampaign = useMemo(() => campaigns.find((campaign) => campaign.id === selectedCampaignId) ?? null, [campaigns, selectedCampaignId]);
+
+  useEffect(() => {
+    if (selectedCampaign?.status !== 'sending') {
+      setProgress(null);
+      return;
+    }
+    const poll = () => {
+      crmRequest<{ ok: true } & CampaignProgress>(`/api/campaigns/${selectedCampaignId}/progress`, {}, csrfToken)
+        .then((response) => setProgress({ sent: response.sent, failed: response.failed, queued: response.queued, total: response.total }))
+        .catch(() => undefined);
+    };
+    poll();
+    const intervalId = setInterval(poll, 5000);
+    return () => clearInterval(intervalId);
+  }, [csrfToken, selectedCampaignId, selectedCampaign?.status]);
 
   const saveCampaign = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -88,6 +123,36 @@ export const CampaignsPage = () => {
     await loadBase();
   };
 
+  const deleteCampaign = async () => {
+    if (!selectedCampaignId) return;
+    await crmRequest(`/api/campaigns/${selectedCampaignId}`, { method: 'DELETE' }, csrfToken);
+    setSelectedCampaignId('');
+    await loadBase();
+  };
+
+  const cloneCampaign = async () => {
+    if (!selectedCampaignId) return;
+    setCloning(true);
+    try {
+      await crmRequest(`/api/campaigns/${selectedCampaignId}/duplicate`, { method: 'POST' }, csrfToken);
+      await loadBase();
+    } finally {
+      setCloning(false);
+    }
+  };
+
+  const pauseCampaign = async () => {
+    if (!selectedCampaignId) return;
+    await crmRequest(`/api/campaigns/${selectedCampaignId}/pause`, { method: 'POST' }, csrfToken);
+    await loadBase();
+  };
+
+  const cancelCampaign = async () => {
+    if (!selectedCampaignId) return;
+    await crmRequest(`/api/campaigns/${selectedCampaignId}/cancel`, { method: 'POST' }, csrfToken);
+    await loadBase();
+  };
+
   const sendTest = async () => {
     if (!selectedCampaignId) return;
     await crmRequest(
@@ -96,6 +161,8 @@ export const CampaignsPage = () => {
       csrfToken,
     );
   };
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="space-y-6">
@@ -119,31 +186,82 @@ export const CampaignsPage = () => {
                     <div className="font-medium text-white">{campaign.name}</div>
                     <div className="text-xs text-slate-400">{campaign.subject}</div>
                   </td>
-                  <td className="px-4 py-3 text-slate-300">{campaign.listId ? `Lista ${campaign.listId}` : campaign.segmentId ? `Segmento ${campaign.segmentId}` : 'Sem publico'}</td>
+                  <td className="px-4 py-3 text-slate-300">{campaign.listId ? (lists.find((l) => l.id === campaign.listId)?.name ?? 'Lista') : campaign.segmentId ? (segments.find((s) => s.id === campaign.segmentId)?.name ?? 'Segmento') : 'Sem publico'}</td>
                   <td className="px-4 py-3">
-                    <Badge tone={campaign.status === 'sent' ? 'success' : campaign.status === 'draft' ? 'neutral' : campaign.status === 'failed' ? 'danger' : 'warning'}>{campaign.status}</Badge>
+                    <Badge tone={campaign.status === 'sent' ? 'success' : campaign.status === 'draft' ? 'neutral' : campaign.status === 'failed' ? 'danger' : 'warning'}>{label(campaignStatusLabels, campaign.status)}</Badge>
                   </td>
                   <td className="px-4 py-3 text-slate-300">{campaign.totalSent}/{campaign.totalRecipients}</td>
                 </tr>
               ))}
             </tbody>
           </Table>
+          {campaigns.length === 0 ? (
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center">
+              <p className="text-sm text-slate-400">Nenhuma campanha criada ainda. Crie a primeira campanha no painel ao lado.</p>
+            </div>
+          ) : null}
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
           {selectedCampaign ? (
             <div className="grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-4">
+              {progress && selectedCampaign?.status === 'sending' ? (
+                <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-amber-200">Enviando campanha...</span>
+                    <span className="font-semibold text-white">{progress.sent}/{progress.total}</span>
+                  </div>
+                  <div className="mt-3 h-2 w-full rounded-full bg-white/10">
+                    <div
+                      className="h-2 rounded-full bg-amber-400 transition-all"
+                      style={{ width: `${progress.total > 0 ? Math.round((progress.sent / progress.total) * 100) : 0}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-amber-300/80">{progress.failed} falhas · {progress.queued} na fila</p>
+                </div>
+              ) : null}
               <div className="flex flex-wrap gap-3">
-                <Button onClick={() => launchCampaign()}>Enviar agora</Button>
-                <Button variant="ghost" onClick={() => launchCampaign(new Date(Date.now() + 15 * 60 * 1000).toISOString())}>
-                  Agendar +15 min
-                </Button>
+                {selectedCampaign?.status === 'draft' || selectedCampaign?.status === 'scheduled' ? (
+                  <Button onClick={() => setConfirmAction('launch')}>Enviar agora</Button>
+                ) : null}
+                {selectedCampaign?.status === 'draft' ? (
+                  <Button variant="ghost" onClick={() => launchCampaign(new Date(Date.now() + 15 * 60 * 1000).toISOString())}>
+                    Agendar +15 min
+                  </Button>
+                ) : null}
                 <Button variant="ghost" onClick={sendTest}>
-                  Send test
+                  Enviar teste
                 </Button>
-                <Button variant="ghost" onClick={() => crmRequest(`/api/campaigns/${selectedCampaign.id}/process`, { method: 'POST' }, csrfToken)}>
-                  Processar lote
+                {selectedCampaign?.status === 'sending' ? (
+                  <>
+                    <Button variant="ghost" onClick={() => setConfirmAction('process')}>
+                      Processar lote
+                    </Button>
+                    <Button variant="ghost" onClick={pauseCampaign}>
+                      Pausar
+                    </Button>
+                    <Button variant="danger" onClick={() => setConfirmAction('cancel')}>
+                      Cancelar envio
+                    </Button>
+                  </>
+                ) : null}
+                {selectedCampaign?.status === 'paused' ? (
+                  <>
+                    <Button onClick={() => setConfirmAction('launch')}>Retomar envio</Button>
+                    <Button variant="danger" onClick={() => setConfirmAction('cancel')}>
+                      Cancelar
+                    </Button>
+                  </>
+                ) : null}
+                <Button variant="ghost" disabled={cloning} onClick={cloneCampaign}>
+                  {cloning ? 'Clonando...' : 'Clonar campanha'}
                 </Button>
+                {['draft', 'cancelled', 'failed'].includes(selectedCampaign?.status ?? '') ? (
+                  <Button variant="danger" onClick={() => setConfirmAction('delete')}>
+                    Excluir
+                  </Button>
+                ) : null}
               </div>
-              <Field label="Test recipients" hint="Separados por virgula">
+              <Field label="Destinatarios de teste" hint="Separados por virgula">
                 <input className={InputClassName} value={testEmails} onChange={(event) => setTestEmails(event.target.value)} />
               </Field>
               {metrics ? (
@@ -154,10 +272,8 @@ export const CampaignsPage = () => {
                       <li>Destinatarios: {metrics.metrics.recipients}</li>
                       <li>Enviados: {metrics.metrics.sent}</li>
                       <li>Falhas: {metrics.metrics.failed}</li>
-                      <li>Aberturas unicas observadas: {metrics.metrics.opensUnique}</li>
-                      <li>Open rate observado: {metrics.metrics.openRate}%</li>
                       <li>CTR observado: {metrics.metrics.ctr}%</li>
-                      <li>Delivery observed rate: {metrics.metrics.deliveryObservedRate}%</li>
+                      <li>Taxa de entrega observada: {metrics.metrics.deliveryObservedRate}%</li>
                     </ul>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-4">
@@ -219,19 +335,63 @@ export const CampaignsPage = () => {
                 ))}
               </select>
             </Field>
-            <Field label="From name">
+            <Field label="Nome do remetente">
               <input className={InputClassName} value={form.fromName} onChange={(event) => setForm((current) => ({ ...current, fromName: event.target.value }))} />
             </Field>
-            <Field label="From email">
+            <Field label="E-mail remetente">
               <input className={InputClassName} type="email" value={form.fromEmail} onChange={(event) => setForm((current) => ({ ...current, fromEmail: event.target.value }))} />
             </Field>
-            <Field label="Reply-To">
+            <Field label="Responder para">
               <input className={InputClassName} type="email" value={form.replyTo} onChange={(event) => setForm((current) => ({ ...current, replyTo: event.target.value }))} />
             </Field>
             <Button type="submit">Salvar campanha</Button>
           </form>
         </Panel>
       </div>
+
+      <ConfirmModal
+        open={confirmAction === 'launch' && selectedCampaignId !== ''}
+        title="Confirmar envio de campanha"
+        description={`Tem certeza que deseja enviar a campanha "${selectedCampaign?.name ?? ''}" agora? O envio sera processado em lotes conforme as configuracoes de taxa.`}
+        confirmLabel="Enviar agora"
+        onConfirm={() => {
+          setConfirmAction(null);
+          launchCampaign();
+        }}
+        onCancel={() => setConfirmAction(null)}
+      />
+
+      <ConfirmModal
+        open={confirmAction === 'process' && selectedCampaignId !== ''}
+        title="Processar lote manual"
+        description={`Deseja processar o proximo lote de envios da campanha "${selectedCampaign?.name ?? ''}"? Isso nao substitui o agendamento automatico.`}
+        confirmLabel="Processar lote"
+        onConfirm={() => {
+          setConfirmAction(null);
+          crmRequest(`/api/campaigns/${selectedCampaignId}/process`, { method: 'POST' }, csrfToken).then(() => loadBase());
+        }}
+        onCancel={() => setConfirmAction(null)}
+      />
+
+      <ConfirmModal
+        open={confirmAction === 'cancel' && selectedCampaignId !== ''}
+        title="Cancelar campanha"
+        description={`Tem certeza que deseja cancelar a campanha "${selectedCampaign?.name ?? ''}"? O envio sera interrompido e nao podera ser retomado.`}
+        confirmLabel="Cancelar envio"
+        isDanger
+        onConfirm={() => { setConfirmAction(null); cancelCampaign(); }}
+        onCancel={() => setConfirmAction(null)}
+      />
+
+      <ConfirmModal
+        open={confirmAction === 'delete' && selectedCampaignId !== ''}
+        title="Excluir campanha"
+        description={`Tem certeza que deseja excluir a campanha "${selectedCampaign?.name ?? ''}"? Esta acao nao pode ser desfeita.`}
+        confirmLabel="Excluir"
+        isDanger
+        onConfirm={() => { setConfirmAction(null); deleteCampaign(); }}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   );
 };

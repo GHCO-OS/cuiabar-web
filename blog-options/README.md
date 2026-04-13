@@ -54,6 +54,6 @@ Nao faz sentido publicar varias opcoes no mesmo `blog.cuiabar.com` ao mesmo temp
 Por isso, no lugar de um `deploy-all-blogs.sh` que colocaria stacks em conflito, este pacote usa:
 
 - um starter por opcao
-- um helper em `scripts/deploy-blog-option.sh`
+- um helper na raiz chamado `deploy-blog-option.sh`
 
 Assim a equipe escolhe uma arquitetura por vez, sem colisao de portas, banco ou dominio.

@@ -1,0 +1,21 @@
+import type { DietaryRestrictionType, DiscoverySource, GuestCountMode, MealPeriod, ReservationStatus, ReservationTime, SeatingPreference } from './types';
+export declare const RESERVATION_TIMEZONE = "America/Sao_Paulo";
+export declare const RESERVATION_DURATION_HOURS = 2;
+export declare const RESERVATION_TIME_OPTIONS: Array<{
+    value: ReservationTime;
+    label: string;
+    mealPeriod: MealPeriod;
+}>;
+export declare const RESERVATION_STATUSES: ReservationStatus[];
+export declare const GUEST_COUNT_MODES: GuestCountMode[];
+export declare const RESERVATION_FOR_TYPES: readonly ["self", "other"];
+export declare const DIETARY_RESTRICTION_TYPES: DietaryRestrictionType[];
+export declare const SEATING_PREFERENCES: SeatingPreference[];
+export declare const DISCOVERY_SOURCES: DiscoverySource[];
+export declare const DIETARY_RESTRICTION_LABELS: Record<DietaryRestrictionType, string>;
+export declare const SEATING_PREFERENCE_LABELS: Record<SeatingPreference, string>;
+export declare const DISCOVERY_SOURCE_LABELS: Record<DiscoverySource, string>;
+export declare const MEAL_PERIOD_LABELS: Record<MealPeriod, string>;
+export declare const STANDARD_TOLERANCE_POLICY = "Reservas possuem tolerancia de 10 minutos. Apos o horario combinado, a mesa podera ser desmontada e liberada por ordem de chegada.";
+export declare const LARGE_PARTY_TOLERANCE_POLICY = "Para grupos acima de 10 pessoas nao ha tolerancia. Apos o horario combinado, a mesa podera ser desmontada e liberada por ordem de chegada.";
+export declare const FULL_TOLERANCE_POLICY = "Reservas possuem tolerancia de 10 minutos. Para grupos acima de 10 pessoas, nao ha tolerancia. Apos o horario combinado, a mesa podera ser desmontada e liberada por ordem de chegada.";

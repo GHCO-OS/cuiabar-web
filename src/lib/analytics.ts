@@ -211,7 +211,7 @@ const getMetaConversionsEndpoint = () => {
   }
 
   if (hostname.endsWith('.cuiabar.com')) {
-    return '/api/meta-conversions';
+    return 'https://cuiabar.com/api/meta-conversions';
   }
 
   return '/api/meta-conversions';

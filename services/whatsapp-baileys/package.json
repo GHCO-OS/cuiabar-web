@@ -1,0 +1,27 @@
+{
+  "name": "villa-cuiabar-whatsapp-baileys",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "baileys": "^7.0.0-rc.9",
+    "dotenv": "^17.4.1",
+    "pino": "^10.3.1",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "@types/qrcode": "^1.5.6",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "libsignal": "https://codeload.github.com/WhiskeySockets/libsignal-node/tar.gz/master"
+  }
+}

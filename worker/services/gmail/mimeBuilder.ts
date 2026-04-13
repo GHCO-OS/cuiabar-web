@@ -18,8 +18,31 @@ const base64Url = (value: string) =>
     .replace(/\//g, '_')
     .replace(/=+$/g, '');
 
+const toBase64 = (value: string) => {
+  const bytes = new TextEncoder().encode(value);
+  let binary = '';
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary);
+};
+
+const wrapBase64Lines = (value: string, size = 76) => {
+  const lines: string[] = [];
+
+  for (let index = 0; index < value.length; index += size) {
+    lines.push(value.slice(index, index + size));
+  }
+
+  return lines.join('\r\n');
+};
+
 export const buildMimeMessage = (payload: MimePayload) => {
   const boundary = `crm_${crypto.randomUUID().replace(/-/g, '')}`;
+  const encodedText = wrapBase64Lines(toBase64(payload.text));
+  const encodedHtml = wrapBase64Lines(toBase64(payload.html));
   const headers = [
     `From: ${encodeHeader(payload.fromName)} <${payload.fromEmail}>`,
     `To: ${payload.to}`,
@@ -37,15 +60,15 @@ export const buildMimeMessage = (payload: MimePayload) => {
     '',
     `--${boundary}`,
     'Content-Type: text/plain; charset="UTF-8"',
-    'Content-Transfer-Encoding: 7bit',
+    'Content-Transfer-Encoding: base64',
     '',
-    payload.text,
+    encodedText,
     '',
     `--${boundary}`,
     'Content-Type: text/html; charset="UTF-8"',
-    'Content-Transfer-Encoding: 7bit',
+    'Content-Transfer-Encoding: base64',
     '',
-    payload.html,
+    encodedHtml,
     '',
     `--${boundary}--`,
     '',

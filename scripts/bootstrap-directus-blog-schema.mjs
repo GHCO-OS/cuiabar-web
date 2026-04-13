@@ -1,6 +1,6 @@
 const directusUrl = (process.env.DIRECTUS_URL || 'http://localhost:8055').trim().replace(/\/$/, '');
 const adminEmail = (process.env.DIRECTUS_ADMIN_EMAIL || 'admin@cuiabar.com').trim();
-const adminPassword = String(process.env.DIRECTUS_ADMIN_PASSWORD || '').trim();
+const adminPassword = (process.env.DIRECTUS_ADMIN_PASSWORD || 'AdminCuiabar2026!').trim();
 const collection = (process.env.DIRECTUS_BLOG_COLLECTION || 'blog_posts').trim();
 
 const fieldBlueprint = [
@@ -172,10 +172,6 @@ const ensureSeedPost = async (token) => {
 };
 
 const main = async () => {
-  if (!adminPassword) {
-    throw new Error('Defina DIRECTUS_ADMIN_PASSWORD antes de executar o bootstrap do Directus.');
-  }
-
   const login = await request('/auth/login', {
     method: 'POST',
     body: {

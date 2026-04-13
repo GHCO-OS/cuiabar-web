@@ -10,7 +10,6 @@ export const BlogPostPage = () => {
   const { slug = '' } = useParams();
   const article = getKnowledgeArticleBySlug(slug);
   const { editorialNote } = useCampinasWeather();
-  const relatedArticles = knowledgeArticles.filter((item) => item.slug !== article?.slug).slice(0, 3);
 
   if (!article) {
     return <Navigate to="/" replace />;
@@ -85,26 +84,28 @@ export const BlogPostPage = () => {
           </Reveal>
 
           <Reveal className="blog-surface p-6" delay={140}>
-            <p className="blog-footnote">Leitura complementar</p>
-            <h3 className="mt-3 font-heading text-3xl text-white">Conteudo direto, sem ruido e com proximo passo claro.</h3>
+            <p className="blog-footnote">Status da iteracao</p>
+            <h3 className="mt-3 font-heading text-3xl text-white">Refino em andamento, sem modulos extras.</h3>
             <p className="mt-4 text-sm leading-relaxed text-white/72">
-              Cada artigo do blog precisa ajudar em uma decisao real: descobrir um contexto, entender a agenda da casa ou encurtar o caminho ate reserva e contato.
+              Nesta fase o foco e clareza editorial e conversao. Recursos secundarios ficam pausados ate fecharmos variaveis de conteudo e navegacao.
             </p>
           </Reveal>
         </div>
       </div>
 
-      {relatedArticles.length > 0 ? (
-        <Reveal className="mt-10" delay={150}>
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="blog-footnote">Leituras relacionadas</p>
-              <h2 className="mt-3 font-heading text-4xl text-white">Continue explorando o editorial da casa.</h2>
-            </div>
+      <Reveal className="mt-10" delay={150}>
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="blog-footnote">Leituras relacionadas</p>
+            <h2 className="mt-3 font-heading text-4xl text-white">Continue explorando o editorial da casa.</h2>
           </div>
+        </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {relatedArticles.map((relatedArticle) => (
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {knowledgeArticles
+            .filter((item) => item.slug !== article.slug)
+            .slice(0, 3)
+            .map((relatedArticle) => (
               <Link key={relatedArticle.slug} to={`/${relatedArticle.slug}`} className="blog-article-card">
                 <img src={relatedArticle.image} alt={relatedArticle.title} className="blog-article-card__image" loading="lazy" />
                 <div className="blog-article-card__body">
@@ -114,9 +115,8 @@ export const BlogPostPage = () => {
                 </div>
               </Link>
             ))}
-          </div>
-        </Reveal>
-      ) : null}
+        </div>
+      </Reveal>
     </section>
   );
 };

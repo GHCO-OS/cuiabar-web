@@ -516,17 +516,13 @@
       ]
     },
     "/burguer": {
-      "title": "Burger Cuiabar | Site oficial da hamburgueria em Campinas",
-      "description": "Página oficial do Burger Cuiabar com cardápio principal, presença própria em burger.cuiabar.com e links para iFood e 99Food em Campinas.",
+      "title": "Burguer Cuiabar | Hambúrguer no Jardim Aurélia em Campinas",
+      "description": "Landing page oficial do Burger Cuiabar com destaque para pedidos no site burger.cuiabar.com e canais de apoio no iFood e 99Food em Campinas.",
       "image": "https://cuiabar.com/burguer/burger-classico.png",
-      "imageAlt": "Hambúrguer clássico do Burger Cuiabar",
-      "siteName": "Burger Cuiabar",
+      "imageAlt": "Hambúrguer clássico do Burguer Cuiabar",
       "type": "website",
       "changefreq": "weekly",
-      "priority": "0.6",
-      "canonicalUrl": "https://burger.cuiabar.com/",
-      "robots": "noindex,follow",
-      "includeInSitemap": false,
+      "priority": "0.9",
       "keywords": [
         "hambúrguer em Campinas",
         "hambúrguer Jardim Aurélia",
@@ -544,9 +540,9 @@
         {
           "@context": "https://schema.org",
           "@type": "Menu",
-          "name": "Cardápio Burger Cuiabar",
-          "description": "Cardápio principal do Burger Cuiabar com burgers preparados na chapa, combos e canais oficiais de pedido.",
-          "url": "https://burger.cuiabar.com/",
+          "name": "Cardápio Burguer Cuiabar",
+          "description": "Projeto piloto do Cuiabar com burgers preparados na chapa, carnes selecionadas e combos, com destaque para o canal proprio burger.cuiabar.com e apoio em iFood e 99Food.",
+          "url": "https://cuiabar.com/burguer",
           "inLanguage": "pt-BR",
           "hasMenuSection": [
             {
@@ -622,84 +618,6 @@
               ]
             }
           ]
-        }
-      ]
-    },
-    "/burger-site": {
-      "title": "Burger Cuiabar | Hamburgueria em Campinas com iFood e 99Food",
-      "description": "Site oficial do Burger Cuiabar com presença própria em burger.cuiabar.com, cardápio principal e links oficiais para iFood e 99Food em Campinas.",
-      "image": "https://cuiabar.com/burguer/capa-burger-cuiabar.png",
-      "imageAlt": "Burger Cuiabar em destaque no site oficial",
-      "siteName": "Burger Cuiabar",
-      "type": "website",
-      "changefreq": "weekly",
-      "priority": "0.9",
-      "canonicalUrl": "https://burger.cuiabar.com/",
-      "includeInSitemap": false,
-      "prerender": true,
-      "keywords": [
-        "burger cuiabar",
-        "hamburgueria em Campinas",
-        "burger campinas",
-        "burger.cuiabar.com",
-        "iFood burger cuiabar",
-        "99Food burger cuiabar",
-        "hambúrguer no Jardim Aurélia"
-      ],
-      "schema": [
-        {
-          "@context": "https://schema.org",
-          "@type": "FastFoodRestaurant",
-          "name": "Burger Cuiabar",
-          "description": "Hamburgueria do Cuiabar em Campinas, com presença própria em burger.cuiabar.com e pedidos oficiais no iFood e no 99Food.",
-          "url": "https://burger.cuiabar.com/",
-          "image": [
-            "https://cuiabar.com/burguer/capa-burger-cuiabar.png",
-            "https://cuiabar.com/burguer/burger-classico.png",
-            "https://cuiabar.com/burguer/burger-bacon.png"
-          ],
-          "telephone": "+55 19 3305-8878",
-          "servesCuisine": [
-            "Hambúrgueres",
-            "Smash burger",
-            "Fast food"
-          ],
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Av. Brigadeiro Rafael Tobias de Aguiar, 1121 - Jardim Aurélia",
-            "addressLocality": "Campinas",
-            "addressRegion": "SP",
-            "addressCountry": "BR"
-          },
-          "sameAs": [
-            "https://instagram.com/burgercuiabar",
-            "https://www.ifood.com.br/delivery/campinas-sp/burger-cuiabar----picanha-smash-vila-proost-de-souza/14734c59-f45a-41e2-80b0-f1914971f6e1?utm_medium=share",
-            "https://oia.99app.com/dlp9/cn3kx8?area=BR"
-          ],
-          "hasMenu": "https://burger.cuiabar.com/",
-          "potentialAction": [
-            {
-              "@type": "OrderAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "https://www.ifood.com.br/delivery/campinas-sp/burger-cuiabar----picanha-smash-vila-proost-de-souza/14734c59-f45a-41e2-80b0-f1914971f6e1?utm_medium=share"
-              }
-            },
-            {
-              "@type": "OrderAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "https://oia.99app.com/dlp9/cn3kx8?area=BR"
-              }
-            }
-          ]
-        },
-        {
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "name": "Burger Cuiabar",
-          "url": "https://burger.cuiabar.com/",
-          "inLanguage": "pt-BR"
         }
       ]
     },
@@ -1062,18 +980,18 @@
       "includeInSitemap": false
     },
     "/burger": {
-      "title": "Burger Cuiabar | Site oficial da hamburgueria em Campinas",
-      "description": "Atalho para o site oficial do Burger Cuiabar em burger.cuiabar.com.",
+      "title": "Burguer Cuiabar | Cardápio piloto em Campinas",
+      "description": "Atalho para a landing oficial do Burguer Cuiabar com pedido no iFood.",
       "image": "https://cuiabar.com/burguer/burger-classico.png",
-      "canonicalUrl": "https://burger.cuiabar.com/",
+      "canonicalPath": "/burguer",
       "robots": "noindex,follow",
       "includeInSitemap": false
     },
     "/burguer-cuiabar": {
-      "title": "Burger Cuiabar | Site oficial da hamburgueria em Campinas",
-      "description": "Atalho para o site oficial do Burger Cuiabar em burger.cuiabar.com.",
+      "title": "Burguer Cuiabar | Cardápio piloto em Campinas",
+      "description": "Atalho para a landing oficial do Burguer Cuiabar com pedido no iFood.",
       "image": "https://cuiabar.com/burguer/burger-classico.png",
-      "canonicalUrl": "https://burger.cuiabar.com/",
+      "canonicalPath": "/burguer",
       "robots": "noindex,follow",
       "includeInSitemap": false
     },

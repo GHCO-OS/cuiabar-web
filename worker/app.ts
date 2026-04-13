@@ -6,15 +6,9 @@ import { csvResponse, getRequestIp, HttpError, isMutationMethod, jsonError, requ
 import { applyMergeTags, extractHrefLinks, extractMergeVariables, prepareTemplateContent, replaceHtmlLinks, replaceTextLinks } from './lib/template';
 import { ensureEmail, generateId, hashPassword, normalizeEmail, randomToken, requireStrongPassword, verifyPassword } from './lib/security';
 import { sendViaGmail } from './services/gmail/gmailSender';
-import { isGoogleAdsConfigured } from './services/google/googleAdsAuth';
-import { fetchGoogleAdsCampaignMetrics, getGoogleAdsCustomerSummary, listGoogleAdsAccessibleCustomers, uploadGoogleAdsClickConversion } from './services/google/googleAdsService';
 import { verifyGoogleIdToken } from './services/google/verifyIdToken';
-import { fetchMetaCampaignMetrics, fetchMetaLeadAds, forwardMetaEvent, getMetaPixelId, getMetaPixelSummary, isMetaConfigured, isMetaGraphConfigured } from './services/meta/metaConversions';
-import { isZohoConfigured } from './services/zoho/zohoAuth';
-import { upsertZohoContact } from './services/zoho/zohoContacts';
-import { getZohoOrganization } from './services/zoho/zohoCrm';
 import { registerReservationRoutes } from './reservations/routes';
-import { publishScheduledBlogPosts, registerBlogRoutes } from './blog/routes';
+import { registerWhatsAppRoutes } from './whatsapp/routes';
 import type { AppVariables, AuthUser, CampaignRecord, ContactRecord, Env, RoleName, SessionRecord, TemplateRecord } from './types';
 
 type AppContext = Context<{ Bindings: Env; Variables: AppVariables }>;
@@ -64,7 +58,6 @@ type RecipientRecord = {
   last_error: string | null;
   send_attempts: number;
   sent_at: string | null;
-  opened_at: string | null;
   clicked_at: string | null;
   unsubscribed_at: string | null;
   bounce_at: string | null;
@@ -92,34 +85,7 @@ type GmailOAuthConnection = {
   source?: 'panel_oauth' | 'cloudflare_secret';
 };
 
-type GoogleBusinessOAuthConnection = {
-  email?: string;
-  refreshToken?: string;
-  scope?: string | null;
-  grantedAt?: string | null;
-  source?: 'panel_oauth' | 'cloudflare_secret';
-};
-
-type ContactProviderLinkRecord = {
-  id: string;
-  contact_id: string;
-  provider: string;
-  provider_module: string;
-  external_id: string;
-  sync_status: string;
-  last_synced_at: string | null;
-  last_error: string | null;
-  metadata_json: string;
-  created_at: string;
-  updated_at: string;
-};
-
-type ContactListRow = ContactRecord & {
-  zoho_external_id?: string | null;
-  zoho_sync_status?: string | null;
-  zoho_last_synced_at?: string | null;
-  zoho_last_error?: string | null;
-};
+type ContactListRow = ContactRecord;
 
 type PublicInteractionPayload = {
   event_name?: string;
@@ -132,33 +98,19 @@ type PublicInteractionPayload = {
   source?: string;
 };
 
-type MetaConnectorSettings = {
-  adAccountId?: string | null;
-  leadFormIds?: string[];
-  lookbackDays?: number;
-  autoCreateContacts?: boolean;
-};
-
-type GoogleAdsConnectorSettings = {
-  customerId?: string | null;
-  loginCustomerId?: string | null;
-  conversionAction?: string | null;
-  lookbackDays?: number;
-  autoUploadLeadConversions?: boolean;
-  conversionValue?: number;
-  currencyCode?: string | null;
-};
-
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 14;
 const GMAIL_OAUTH_STATE_COOKIE_NAME = 'cuiabar_gmail_oauth_state';
-const GOOGLE_BUSINESS_OAUTH_STATE_COOKIE_NAME = 'cuiabar_google_business_oauth_state';
 const RESERVED_TEMPLATE_VARIABLES = ['first_name', 'last_name', 'email', 'unsubscribe_url', 'campaign_name', 'reply_to'];
 const DEFAULT_IFOOD_STORE_URL =
   'https://www.ifood.com.br/delivery/campinas-sp/villa-cuiabar--executivos--pratos-do-dia-jardim-aurelia/1af0e396-a7c8-46e1-b1a5-dd06486bb4ad';
 const DEFAULT_99FOOD_STORE_URL = 'https://oia.99app.com/dlp9/C94oJv?area=BR';
-const DEFAULT_META_LOOKBACK_DAYS = 30;
-const DEFAULT_GOOGLE_ADS_LOOKBACK_DAYS = 30;
-const TRANSPARENT_GIF_BASE64 = 'R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+const CSRF_EXEMPT_PATHS = [
+  '/api/auth/login',
+  '/api/bootstrap/admin',
+  '/api/gmail/oauth/exchange',
+  '/api/internal/whatsapp/crm/sync',
+];
+const isCsrfExemptPath = (path: string) => CSRF_EXEMPT_PATHS.includes(path) || path.startsWith('/api/internal/whatsapp/');
 
 const PERMISSIONS: Record<RoleName, Permission[]> = {
   gerente: [
@@ -181,7 +133,7 @@ const PERMISSIONS: Record<RoleName, Permission[]> = {
   operador_marketing: ['dashboard:read', 'contacts:read', 'lists:read', 'segments:read', 'templates:manage', 'campaigns:read', 'campaigns:write', 'reports:read'],
 };
 
-const mapContact = (row: ContactListRow, zohoConfigured = true) => ({
+const mapContact = (row: ContactListRow) => ({
   id: row.id,
   email: row.email,
   firstName: row.first_name ?? '',
@@ -196,18 +148,6 @@ const mapContact = (row: ContactListRow, zohoConfigured = true) => ({
   lastClickedAt: row.last_clicked_at,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
-  zoho: {
-    externalId: row.zoho_sync_status === 'error' && row.zoho_external_id?.startsWith('pending_') ? null : row.zoho_external_id ?? null,
-    status: row.zoho_external_id
-      ? row.zoho_sync_status === 'error'
-        ? 'error'
-        : 'synced'
-      : zohoConfigured
-        ? 'pending'
-        : 'not_configured',
-    lastSyncedAt: row.zoho_last_synced_at ?? null,
-    lastError: row.zoho_last_error ?? null,
-  },
 });
 
 const parseAudienceFilter = (queryValue: string | null) => (queryValue ? queryValue.trim() : '');
@@ -265,48 +205,6 @@ const writeSetting = async (env: Env, key: string, value: unknown, userId?: stri
   );
 };
 
-const normalizeStringList = (value: unknown) =>
-  Array.isArray(value)
-    ? value
-        .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
-        .filter(Boolean)
-    : [];
-
-const readMetaConnectorSettings = async (env: Env) => {
-  const stored = await readSetting<MetaConnectorSettings>(env, 'meta_connector', {});
-  return {
-    adAccountId: stored.adAccountId?.trim() || env.META_AD_ACCOUNT_ID?.trim() || null,
-    leadFormIds: normalizeStringList(stored.leadFormIds).length > 0 ? normalizeStringList(stored.leadFormIds) : normalizeStringList(env.META_LEAD_FORM_IDS?.split(',') ?? []),
-    lookbackDays: Math.max(1, Number(stored.lookbackDays) || DEFAULT_META_LOOKBACK_DAYS),
-    autoCreateContacts: stored.autoCreateContacts !== false,
-  } satisfies MetaConnectorSettings;
-};
-
-const readGoogleAdsConnectorSettings = async (env: Env) => {
-  const stored = await readSetting<GoogleAdsConnectorSettings>(env, 'google_ads_connector', {});
-  return {
-    customerId: stored.customerId?.trim() || env.GOOGLE_ADS_CUSTOMER_ID?.trim() || null,
-    loginCustomerId: stored.loginCustomerId?.trim() || env.GOOGLE_ADS_LOGIN_CUSTOMER_ID?.trim() || null,
-    conversionAction: stored.conversionAction?.trim() || env.GOOGLE_ADS_CONVERSION_ACTION?.trim() || null,
-    lookbackDays: Math.max(1, Number(stored.lookbackDays) || DEFAULT_GOOGLE_ADS_LOOKBACK_DAYS),
-    autoUploadLeadConversions: stored.autoUploadLeadConversions !== false,
-    conversionValue: Number.isFinite(Number(stored.conversionValue)) ? Number(stored.conversionValue) : 1,
-    currencyCode: stored.currencyCode?.trim() || 'BRL',
-  } satisfies GoogleAdsConnectorSettings;
-};
-
-const isOpenTrackingEnabled = async (env: Env) => {
-  const deliverability = await readSetting(env, 'deliverability', {
-    openTrackingEnabled: true,
-  });
-
-  if (typeof deliverability.openTrackingEnabled === 'boolean') {
-    return deliverability.openTrackingEnabled;
-  }
-
-  return parseBoolean(env.ENABLE_OPEN_TRACKING, true);
-};
-
 const readGmailOAuthConnection = async (env: Env) => {
   const primary = await readSetting<GmailOAuthConnection | null>(env, 'gmail_oauth_connection', null);
   if (primary?.refreshToken) {
@@ -321,63 +219,6 @@ const storeGmailOAuthConnection = async (env: Env, connection: GmailOAuthConnect
   await writeSetting(env, 'gmail_oauth_connection', connection, null);
   await writeSetting(env, 'gmail_oauth_pending', connection, null);
 };
-
-const readGoogleBusinessOAuthConnection = async (env: Env) => {
-  const primary = await readSetting<GoogleBusinessOAuthConnection | null>(env, 'google_business_oauth_connection', null);
-  if (primary?.refreshToken) {
-    return primary;
-  }
-
-  const legacy = await readSetting<GoogleBusinessOAuthConnection | null>(env, 'google_business_oauth_pending', null);
-  if (legacy?.refreshToken) {
-    return legacy;
-  }
-
-  if (env.GOOGLE_BUSINESS_REFRESH_TOKEN) {
-    return {
-      refreshToken: env.GOOGLE_BUSINESS_REFRESH_TOKEN,
-      grantedAt: null,
-      scope: 'https://www.googleapis.com/auth/business.manage',
-      source: 'cloudflare_secret',
-    };
-  }
-
-  return null;
-};
-
-const storeGoogleBusinessOAuthConnection = async (env: Env, connection: GoogleBusinessOAuthConnection) => {
-  await writeSetting(env, 'google_business_oauth_connection', connection, null);
-  await writeSetting(env, 'google_business_oauth_pending', connection, null);
-};
-
-const googleBusinessOauthSetupHtml = (env: Env) => `<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Google Business Profile OAuth</title>
-    <style>
-      body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#f6f0e8;color:#20140f;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px}
-      .card{max-width:760px;background:#fff;padding:32px;border-radius:28px;box-shadow:0 28px 80px rgba(32,20,15,.12)}
-      .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff3eb;color:#9b3f21;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-      h1{margin:18px 0 12px;font-size:clamp(28px,4vw,42px)}
-      p{line-height:1.65}
-      code{font-family:ui-monospace,SFMono-Regular,monospace;background:#fff6ef;padding:2px 6px;border-radius:8px}
-      .button{display:inline-flex;align-items:center;justify-content:center;padding:14px 20px;border-radius:16px;background:#9b3f21;color:#fff;text-decoration:none;font-weight:700}
-      .muted{color:#6b5a51}
-    </style>
-  </head>
-  <body>
-    <main class="card">
-      <span class="pill">google business profile</span>
-      <h1>Autorizar o Perfil da Empresa</h1>
-      <p>Use a conta Google que já gerencia o perfil do Cuiabar. O fluxo vai solicitar permissão e gravar o <code>refresh token</code> no CRM para futuras automações.</p>
-      <p><strong>Redirect URI configurada no Google Cloud:</strong> <code>${env.APP_BASE_URL}/api/google/business/callback</code></p>
-      <p class="muted">Se esta URI não for a mesma cadastrada no OAuth Client, o Google recusará a autorização.</p>
-      <a class="button" href="/go/google-business-auth">Autorizar Google Business Profile</a>
-    </main>
-  </body>
-</html>`;
 
 const auditLog = async (
   env: Env,
@@ -404,327 +245,6 @@ const auditLog = async (
       nowIso(),
     ),
   );
-};
-
-const startConnectorSyncRun = async (env: Env, provider: string, syncType: string, accountId?: string | null) => {
-  const id = generateId('sync');
-  await run(
-    env.DB.prepare(
-      `INSERT INTO ad_platform_sync_runs (id, provider, sync_type, status, account_id, summary_json, started_at, created_at)
-       VALUES (?, ?, ?, 'running', ?, '{}', ?, ?)`,
-    ).bind(id, provider, syncType, accountId ?? null, nowIso(), nowIso()),
-  );
-  return id;
-};
-
-const finishConnectorSyncRun = async (
-  env: Env,
-  id: string,
-  status: 'success' | 'error',
-  summary: Record<string, unknown>,
-  error?: string | null,
-) => {
-  await run(
-    env.DB.prepare(
-      `UPDATE ad_platform_sync_runs
-       SET status = ?, summary_json = ?, error = ?, finished_at = ?
-       WHERE id = ?`,
-    ).bind(status, asJson(summary), error ?? null, nowIso(), id),
-  );
-};
-
-const upsertAdPlatformAccount = async (
-  env: Env,
-  provider: string,
-  externalAccountId: string,
-  accountName: string | null,
-  accountStatus: string | null,
-  metadata: Record<string, unknown> = {},
-  lastError: string | null = null,
-) => {
-  await run(
-    env.DB.prepare(
-      `INSERT INTO ad_platform_accounts
-        (id, provider, external_account_id, account_name, account_status, metadata_json, last_synced_at, last_error, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(provider, external_account_id) DO UPDATE SET
-         account_name = excluded.account_name,
-         account_status = excluded.account_status,
-         metadata_json = excluded.metadata_json,
-         last_synced_at = excluded.last_synced_at,
-         last_error = excluded.last_error,
-         updated_at = excluded.updated_at`,
-    ).bind(generateId('acct'), provider, externalAccountId, accountName, accountStatus, asJson(metadata), nowIso(), lastError, nowIso(), nowIso()),
-  );
-};
-
-const upsertAdCampaignMetric = async (
-  env: Env,
-  provider: string,
-  accountId: string,
-  campaignId: string,
-  metricDate: string,
-  payload: {
-    campaignName: string | null;
-    campaignStatus: string | null;
-    impressions: number;
-    clicks: number;
-    interactions: number;
-    ctr: number | null;
-    spendAmount: number;
-    spendCurrency: string | null;
-    conversions: number;
-    raw: Record<string, unknown>;
-  },
-) => {
-  await run(
-    env.DB.prepare(
-      `INSERT INTO ad_platform_campaign_metrics
-        (id, provider, account_id, campaign_id, campaign_name, campaign_status, metric_date, impressions, clicks, interactions, ctr, spend_amount, spend_currency, conversions, raw_json, synced_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(provider, account_id, campaign_id, metric_date) DO UPDATE SET
-         campaign_name = excluded.campaign_name,
-         campaign_status = excluded.campaign_status,
-         impressions = excluded.impressions,
-         clicks = excluded.clicks,
-         interactions = excluded.interactions,
-         ctr = excluded.ctr,
-         spend_amount = excluded.spend_amount,
-         spend_currency = excluded.spend_currency,
-         conversions = excluded.conversions,
-         raw_json = excluded.raw_json,
-         synced_at = excluded.synced_at,
-         updated_at = excluded.updated_at`,
-    ).bind(
-      generateId('cpm'),
-      provider,
-      accountId,
-      campaignId,
-      payload.campaignName,
-      payload.campaignStatus,
-      metricDate,
-      payload.impressions,
-      payload.clicks,
-      payload.interactions,
-      payload.ctr,
-      payload.spendAmount,
-      payload.spendCurrency,
-      payload.conversions,
-      asJson(payload.raw),
-      nowIso(),
-      nowIso(),
-      nowIso(),
-    ),
-  );
-};
-
-const recordAdLead = async (
-  env: Env,
-  payload: {
-    provider: string;
-    externalLeadId: string;
-    accountId?: string | null;
-    formId?: string | null;
-    campaignId?: string | null;
-    adsetId?: string | null;
-    adId?: string | null;
-    contactId?: string | null;
-    email?: string | null;
-    phone?: string | null;
-    fullName?: string | null;
-    leadCreatedAt?: string | null;
-    syncedToContact?: boolean;
-    raw: Record<string, unknown>;
-  },
-) => {
-  await run(
-    env.DB.prepare(
-      `INSERT INTO ad_platform_leads
-        (id, provider, external_lead_id, account_id, form_id, campaign_id, adset_id, ad_id, contact_id, email, phone, full_name, lead_created_at, payload_json, synced_to_contact, synced_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(provider, external_lead_id) DO UPDATE SET
-         account_id = excluded.account_id,
-         form_id = excluded.form_id,
-         campaign_id = excluded.campaign_id,
-         adset_id = excluded.adset_id,
-         ad_id = excluded.ad_id,
-         contact_id = COALESCE(excluded.contact_id, ad_platform_leads.contact_id),
-         email = COALESCE(excluded.email, ad_platform_leads.email),
-         phone = COALESCE(excluded.phone, ad_platform_leads.phone),
-         full_name = COALESCE(excluded.full_name, ad_platform_leads.full_name),
-         lead_created_at = COALESCE(excluded.lead_created_at, ad_platform_leads.lead_created_at),
-         payload_json = excluded.payload_json,
-         synced_to_contact = excluded.synced_to_contact,
-         synced_at = excluded.synced_at,
-         updated_at = excluded.updated_at`,
-    ).bind(
-      generateId('lead'),
-      payload.provider,
-      payload.externalLeadId,
-      payload.accountId ?? null,
-      payload.formId ?? null,
-      payload.campaignId ?? null,
-      payload.adsetId ?? null,
-      payload.adId ?? null,
-      payload.contactId ?? null,
-      payload.email ?? null,
-      payload.phone ?? null,
-      payload.fullName ?? null,
-      payload.leadCreatedAt ?? null,
-      asJson(payload.raw),
-      payload.syncedToContact ? 1 : 0,
-      payload.syncedToContact ? nowIso() : null,
-      nowIso(),
-      nowIso(),
-    ),
-  );
-};
-
-const recordConversionUpload = async (
-  env: Env,
-  payload: {
-    provider: string;
-    contactId?: string | null;
-    externalClickId?: string | null;
-    clickIdType?: string | null;
-    conversionKey?: string | null;
-    conversionLabel?: string | null;
-    conversionTime?: string | null;
-    conversionValue?: number | null;
-    currencyCode?: string | null;
-    status: 'success' | 'error' | 'skipped';
-    providerResponse?: Record<string, unknown>;
-    error?: string | null;
-  },
-) => {
-  await run(
-    env.DB.prepare(
-      `INSERT INTO ad_platform_conversion_uploads
-        (id, provider, contact_id, external_click_id, click_id_type, conversion_key, conversion_label, conversion_time, conversion_value, currency_code, status, provider_response_json, error, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    ).bind(
-      generateId('cnv'),
-      payload.provider,
-      payload.contactId ?? null,
-      payload.externalClickId ?? null,
-      payload.clickIdType ?? null,
-      payload.conversionKey ?? null,
-      payload.conversionLabel ?? null,
-      payload.conversionTime ?? null,
-      payload.conversionValue ?? null,
-      payload.currencyCode ?? null,
-      payload.status,
-      asJson(payload.providerResponse ?? {}),
-      payload.error ?? null,
-      nowIso(),
-      nowIso(),
-    ),
-  );
-};
-
-const splitFullName = (value: string | null | undefined) => {
-  const normalized = value?.trim();
-  if (!normalized) {
-    return { firstName: null, lastName: null };
-  }
-
-  const [firstName, ...rest] = normalized.split(/\s+/);
-  return {
-    firstName: firstName || null,
-    lastName: rest.length > 0 ? rest.join(' ') : null,
-  };
-};
-
-const findContactByEmailOrPhone = async (env: Env, email?: string | null, phone?: string | null) => {
-  if (email) {
-    const match = await first<ContactRecord>(env.DB.prepare('SELECT * FROM contacts WHERE email = ?').bind(ensureEmail(email)));
-    if (match) {
-      return match;
-    }
-  }
-
-  const normalizedPhone = phone?.replace(/\D+/g, '');
-  if (normalizedPhone) {
-    return first<ContactRecord>(env.DB.prepare("SELECT * FROM contacts WHERE REPLACE(REPLACE(REPLACE(COALESCE(phone, ''), ' ', ''), '-', ''), '(', '') LIKE ?").bind(`%${normalizedPhone}%`));
-  }
-
-  return null;
-};
-
-const upsertExternalContact = async (
-  env: Env,
-  payload: {
-    email?: string | null;
-    phone?: string | null;
-    fullName?: string | null;
-    source: string;
-    tags?: string[];
-    optInStatus?: string;
-  },
-) => {
-  if (!payload.email && !payload.phone) {
-    return null;
-  }
-
-  const { firstName, lastName } = splitFullName(payload.fullName);
-  const existing = await findContactByEmailOrPhone(env, payload.email ?? null, payload.phone ?? null);
-  const contactId = existing?.id ?? generateId('ctc');
-  const tags = new Set<string>([...(existing ? parseJsonText<string[]>(existing.tags_json, []) : []), ...(payload.tags ?? [])].map((tag) => tag.trim()).filter(Boolean));
-  const nextOptInStatus = payload.optInStatus?.trim() || existing?.opt_in_status || 'pending';
-  const safeEmail = payload.email ? ensureEmail(payload.email) : existing?.email ?? null;
-  const safePhone = payload.phone?.trim() || existing?.phone || null;
-
-  if (existing) {
-    await run(
-      env.DB.prepare(
-        `UPDATE contacts
-         SET email = COALESCE(?, email),
-             first_name = COALESCE(NULLIF(?, ''), first_name),
-             last_name = COALESCE(NULLIF(?, ''), last_name),
-             phone = COALESCE(NULLIF(?, ''), phone),
-             source = COALESCE(NULLIF(?, ''), source),
-             tags_json = ?,
-             opt_in_status = CASE
-               WHEN status IN ('unsubscribed', 'suppressed') THEN opt_in_status
-               ELSE ?
-             END,
-             updated_at = ?
-         WHERE id = ?`,
-      ).bind(
-        safeEmail,
-        firstName || '',
-        lastName || '',
-        safePhone || '',
-        payload.source,
-        asJson([...tags]),
-        nextOptInStatus,
-        nowIso(),
-        existing.id,
-      ),
-    );
-  } else {
-    await run(
-      env.DB.prepare(
-        `INSERT INTO contacts
-          (id, email, first_name, last_name, phone, source, tags_json, status, opt_in_status, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)`,
-      ).bind(contactId, safeEmail, firstName, lastName, safePhone, payload.source, asJson([...tags]), nextOptInStatus, nowIso(), nowIso()),
-    );
-  }
-
-  return first<ContactRecord>(env.DB.prepare('SELECT * FROM contacts WHERE id = ?').bind(contactId));
-};
-
-const toGoogleAdsDateTime = (isoDateTime: string) => {
-  const date = new Date(isoDateTime);
-  const tzMinutes = -date.getTimezoneOffset();
-  const sign = tzMinutes >= 0 ? '+' : '-';
-  const absoluteMinutes = Math.abs(tzMinutes);
-  const hours = String(Math.floor(absoluteMinutes / 60)).padStart(2, '0');
-  const minutes = String(absoluteMinutes % 60).padStart(2, '0');
-  const pad = (value: number) => String(value).padStart(2, '0');
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${sign}${hours}:${minutes}`;
 };
 
 const getSessionBundle = async (env: Env, sessionId: string | undefined) => {
@@ -883,14 +403,6 @@ const buildPartnerRedirectUrl = (request: Request, targetUrl: string, defaults: 
   return { target, clickId, incoming };
 };
 
-const getContactZohoLink = async (env: Env, contactId: string) =>
-  first<ContactProviderLinkRecord>(
-    env.DB.prepare(
-      `SELECT * FROM contact_provider_links
-       WHERE contact_id = ? AND provider = 'zoho_crm' AND provider_module = 'Contacts'`,
-    ).bind(contactId),
-  );
-
 const storePublicInteraction = async (
   env: Env,
   request: Request,
@@ -951,79 +463,6 @@ const storePublicInteraction = async (
       nowIso(),
     ),
   );
-};
-
-const syncContactToZoho = async (env: Env, contact: ContactRecord) => {
-  if (!isZohoConfigured(env)) {
-    return { configured: false, synced: false as const, externalId: null, error: null as string | null };
-  }
-
-  const currentLink = await getContactZohoLink(env, contact.id);
-
-  try {
-    const sync = await upsertZohoContact(env, {
-      contactId: contact.id,
-      email: contact.email,
-      firstName: contact.first_name,
-      lastName: contact.last_name,
-      phone: contact.phone,
-      source: contact.source,
-      tags: parseJsonText<string[]>(contact.tags_json, []),
-      status: contact.status,
-      optInStatus: contact.opt_in_status,
-    });
-
-    await run(
-      env.DB.prepare(
-        `INSERT INTO contact_provider_links
-          (id, contact_id, provider, provider_module, external_id, sync_status, last_synced_at, last_error, metadata_json, created_at, updated_at)
-         VALUES (?, ?, 'zoho_crm', 'Contacts', ?, 'active', ?, null, ?, ?, ?)
-         ON CONFLICT(contact_id, provider, provider_module)
-         DO UPDATE SET
-           external_id = excluded.external_id,
-           sync_status = 'active',
-           last_synced_at = excluded.last_synced_at,
-           last_error = null,
-           metadata_json = excluded.metadata_json,
-           updated_at = excluded.updated_at`,
-      ).bind(
-        currentLink?.id || generateId('lnk'),
-        contact.id,
-        sync.externalId,
-        nowIso(),
-        asJson({ action: sync.action, message: sync.message, status: sync.rawStatus }),
-        currentLink?.created_at || nowIso(),
-        nowIso(),
-      ),
-    );
-
-    return { configured: true, synced: true as const, externalId: sync.externalId, error: null as string | null };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Falha ao sincronizar contato no Zoho.';
-    await run(
-      env.DB.prepare(
-        `INSERT INTO contact_provider_links
-          (id, contact_id, provider, provider_module, external_id, sync_status, last_synced_at, last_error, metadata_json, created_at, updated_at)
-         VALUES (?, ?, 'zoho_crm', 'Contacts', ?, 'error', null, ?, ?, ?, ?)
-         ON CONFLICT(contact_id, provider, provider_module)
-         DO UPDATE SET
-           sync_status = 'error',
-           last_error = excluded.last_error,
-           metadata_json = excluded.metadata_json,
-           updated_at = excluded.updated_at`,
-      ).bind(
-        currentLink?.id || generateId('lnk'),
-        contact.id,
-        currentLink?.external_id || `pending_${contact.id}`,
-        message,
-        asJson({ lastFailureAt: nowIso() }),
-        currentLink?.created_at || nowIso(),
-        nowIso(),
-      ),
-    );
-
-    return { configured: true, synced: false as const, externalId: currentLink?.external_id ?? null, error: message };
-  }
 };
 
 const createSession = async (env: Env, request: Request, userId: string) => {
@@ -1094,10 +533,7 @@ const mapCampaign = (row: CampaignRecord) => ({
   totalSent: row.total_sent,
   totalFailed: row.total_failed,
   totalClicked: row.total_clicked,
-  totalOpened: row.total_opened,
   totalUnsubscribed: row.total_unsubscribed,
-  totalOpenEvents: row.total_open_events,
-  totalUniqueOpens: row.total_unique_opens,
   totalClickEvents: row.total_click_events,
   totalUniqueClicks: row.total_unique_clicks,
   sendBatchSize: row.send_batch_size,
@@ -1240,6 +676,7 @@ const getContactsForSegment = async (env: Env, segmentId: string) => {
 };
 
 const getAudienceContacts = async (env: Env, campaign: CampaignRecord) => {
+  const suppressedEmails = await getSuppressedEmails(env);
   let contacts: ContactDto[] = [];
 
   if (campaign.list_id) {
@@ -1250,11 +687,6 @@ const getAudienceContacts = async (env: Env, campaign: CampaignRecord) => {
     throw new HttpError(400, 'A campanha precisa apontar para uma lista ou segmento.');
   }
 
-  return filterEligibleContacts(env, contacts);
-};
-
-const filterEligibleContacts = async (env: Env, contacts: ContactDto[]) => {
-  const suppressedEmails = await getSuppressedEmails(env);
   return contacts.filter((contact) => {
     if (suppressedEmails.has(normalizeEmail(contact.email))) {
       return false;
@@ -1308,13 +740,9 @@ const renderEmailForRecipient = async (
   recipient: RecipientRecord,
   contact: ContactDto,
 ) => {
-  const personalization = parseJsonText<Record<string, unknown>>(recipient.personalization_json, {});
-  const salutationMode = personalization.salutationMode === 'generic' ? 'generic' : 'personalized';
-  const overrideFirstName = typeof personalization.firstName === 'string' ? personalization.firstName.trim() : '';
-  const mergeFirstName = salutationMode === 'generic' ? 'cliente' : overrideFirstName || contact.firstName || 'cliente';
   const unsubscribeUrl = `${env.APP_BASE_URL}/unsubscribe/${recipient.unsubscribe_token}`;
   const merge = {
-    first_name: mergeFirstName,
+    first_name: contact.firstName,
     last_name: contact.lastName,
     email: contact.email,
     unsubscribe_url: unsubscribeUrl,
@@ -1333,18 +761,10 @@ const renderEmailForRecipient = async (
   const preheaderHtml = campaign.preheader
     ? `<div style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;">${campaign.preheader}</div>`
     : '';
-  const trackingPixel = (await isOpenTrackingEnabled(env))
-    ? `<img src="${env.APP_BASE_URL}/o/${recipient.tracking_token}" alt="" width="1" height="1" style="display:block!important;border:0!important;margin:0!important;padding:0!important;height:1px!important;width:1px!important;opacity:0!important;" />`
-    : '';
-  const htmlWithClicks = `${preheaderHtml}${replaceHtmlLinks(merged.html, replacements)}`;
-  const html =
-    trackingPixel && /<\/body>/i.test(htmlWithClicks)
-      ? htmlWithClicks.replace(/<\/body>/i, `${trackingPixel}</body>`)
-      : `${htmlWithClicks}${trackingPixel}`;
 
   return {
     subject: applyMergeTags(campaign.subject, merge),
-    html,
+    html: `${preheaderHtml}${replaceHtmlLinks(merged.html, replacements)}`,
     text: replaceTextLinks(merged.text, replacements),
     unsubscribeUrl,
   };
@@ -1392,21 +812,6 @@ const refreshCampaignStats = async (env: Env, campaignId: string) => {
     ).bind(campaignId),
   );
 
-  const openStats = await first<{
-    total_open_events: number;
-    total_unique_opens: number;
-    total_opened: number;
-  }>(
-    env.DB.prepare(
-      `SELECT
-        COUNT(*) AS total_open_events,
-        SUM(CASE WHEN is_unique = 1 THEN 1 ELSE 0 END) AS total_unique_opens,
-        COUNT(DISTINCT contact_id) AS total_opened
-       FROM campaign_open_events
-       WHERE campaign_id = ?`,
-    ).bind(campaignId),
-  );
-
   const observedRate = recipientStats?.total_sent
     ? Number(((clickStats?.total_clicked ?? 0) / Math.max(recipientStats.total_sent, 1)).toFixed(4))
     : 0;
@@ -1416,10 +821,7 @@ const refreshCampaignStats = async (env: Env, campaignId: string) => {
       `UPDATE campaigns
        SET total_sent = ?,
            total_failed = ?,
-           total_opened = ?,
            total_unsubscribed = ?,
-           total_open_events = ?,
-           total_unique_opens = ?,
            total_click_events = ?,
            total_unique_clicks = ?,
            total_clicked = ?,
@@ -1429,10 +831,7 @@ const refreshCampaignStats = async (env: Env, campaignId: string) => {
     ).bind(
       recipientStats?.total_sent ?? 0,
       recipientStats?.total_failed ?? 0,
-      openStats?.total_opened ?? 0,
       recipientStats?.total_unsubscribed ?? 0,
-      openStats?.total_open_events ?? 0,
-      openStats?.total_unique_opens ?? 0,
       clickStats?.total_click_events ?? 0,
       clickStats?.total_unique_clicks ?? 0,
       clickStats?.total_clicked ?? 0,
@@ -1453,7 +852,6 @@ const queueCampaignRecipients = async (env: Env, campaign: CampaignRecord) => {
   }
 
   await run(env.DB.prepare('DELETE FROM campaign_click_events WHERE campaign_id = ?').bind(campaign.id));
-  await run(env.DB.prepare('DELETE FROM campaign_open_events WHERE campaign_id = ?').bind(campaign.id));
   await run(env.DB.prepare('DELETE FROM campaign_links WHERE campaign_id = ?').bind(campaign.id));
   await run(env.DB.prepare('DELETE FROM campaign_recipients WHERE campaign_id = ?').bind(campaign.id));
   await run(env.DB.prepare('DELETE FROM send_events WHERE campaign_id = ?').bind(campaign.id));
@@ -1484,74 +882,13 @@ const queueCampaignRecipients = async (env: Env, campaign: CampaignRecord) => {
   await run(
     env.DB.prepare(
       `UPDATE campaigns
-       SET total_recipients = ?, total_sent = 0, total_failed = 0, total_clicked = 0, total_opened = 0, total_unsubscribed = 0,
-           total_open_events = 0, total_unique_opens = 0, total_click_events = 0, total_unique_clicks = 0, updated_at = ?
+       SET total_recipients = ?, total_sent = 0, total_failed = 0, total_clicked = 0, total_unsubscribed = 0,
+           total_click_events = 0, total_unique_clicks = 0, updated_at = ?
        WHERE id = ?`,
     ).bind(contacts.length, nowIso(), campaign.id),
   );
 
   return contacts.length;
-};
-
-const queueSpecificRecipients = async (
-  env: Env,
-  campaign: CampaignRecord,
-  contacts: ContactDto[],
-  options?: {
-    salutationMode?: 'personalized' | 'generic';
-  },
-) => {
-  const eligibleContacts = await filterEligibleContacts(env, contacts);
-  if (eligibleContacts.length === 0) {
-    throw new HttpError(400, 'Nenhum destinatario elegivel foi encontrado para este disparo.');
-  }
-  if (eligibleContacts.length > campaign.max_recipients) {
-    throw new HttpError(400, `O disparo excede o limite configurado de ${campaign.max_recipients} destinatarios.`);
-  }
-
-  await run(env.DB.prepare('DELETE FROM campaign_click_events WHERE campaign_id = ?').bind(campaign.id));
-  await run(env.DB.prepare('DELETE FROM campaign_open_events WHERE campaign_id = ?').bind(campaign.id));
-  await run(env.DB.prepare('DELETE FROM campaign_links WHERE campaign_id = ?').bind(campaign.id));
-  await run(env.DB.prepare('DELETE FROM campaign_recipients WHERE campaign_id = ?').bind(campaign.id));
-  await run(env.DB.prepare('DELETE FROM send_events WHERE campaign_id = ?').bind(campaign.id));
-
-  for (const contact of eligibleContacts) {
-    await run(
-      env.DB.prepare(
-        `INSERT INTO campaign_recipients
-          (id, campaign_id, contact_id, email_snapshot, first_name_snapshot, last_name_snapshot, personalization_json,
-           tracking_token, unsubscribe_token, status, send_attempts, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'queued', 0, ?, ?)`,
-      ).bind(
-        generateId('rcp'),
-        campaign.id,
-        contact.id,
-        contact.email,
-        contact.firstName || null,
-        contact.lastName || null,
-        asJson({
-          tags: contact.tags,
-          source: contact.source,
-          salutationMode: options?.salutationMode === 'generic' ? 'generic' : 'personalized',
-        }),
-        randomToken(18),
-        randomToken(18),
-        nowIso(),
-        nowIso(),
-      ),
-    );
-  }
-
-  await run(
-    env.DB.prepare(
-      `UPDATE campaigns
-       SET total_recipients = ?, total_sent = 0, total_failed = 0, total_clicked = 0, total_opened = 0, total_unsubscribed = 0,
-           total_open_events = 0, total_unique_opens = 0, total_click_events = 0, total_unique_clicks = 0, updated_at = ?
-       WHERE id = ?`,
-    ).bind(eligibleContacts.length, nowIso(), campaign.id),
-  );
-
-  return eligibleContacts.length;
 };
 
 const markContactSuppressed = async (env: Env, email: string, reason: string, contactId?: string | null, details: Record<string, unknown> = {}) => {
@@ -1622,12 +959,16 @@ const sendRecipient = async (
     const message = error instanceof Error ? error.message : 'Falha desconhecida.';
     const errorCode = classifySendFailure(message);
 
+    // Para rate_limited ou erros desconhecidos, mantemos 'queued' para retry.
+    // Apenas 'invalid_recipient' marca como 'failed' imediatamente.
+    const newStatus = errorCode === 'invalid_recipient' ? 'failed' : 'queued';
+
     await run(
       env.DB.prepare(
         `UPDATE campaign_recipients
-         SET status = 'failed', last_error = ?, updated_at = ?, send_attempts = send_attempts + 1
+         SET status = ?, last_error = ?, updated_at = ?, send_attempts = send_attempts + 1
          WHERE id = ?`,
-      ).bind(message.slice(0, 500), nowIso(), recipient.id),
+      ).bind(newStatus, message.slice(0, 500), nowIso(), recipient.id),
     );
     await run(
       env.DB.prepare(
@@ -1652,6 +993,15 @@ const sendRecipient = async (
 };
 
 const processCampaignQueue = async (env: Env, request?: Request, campaignId?: string) => {
+  const sendingSettings = await readSetting(env, 'sending', {
+    batchSize: parseNumber(env.SEND_BATCH_SIZE, 25),
+    ratePerMinute: parseNumber(env.SEND_RATE_PER_MINUTE, 45),
+    pauseMs: parseNumber(env.SEND_PAUSE_MS, 1500),
+    campaignMaxRecipients: parseNumber(env.CAMPAIGN_MAX_RECIPIENTS, 5000),
+    retryLimit: 3,
+  });
+  const retryLimit = sendingSettings.retryLimit ?? 3;
+
   const dueScheduledCampaigns = await all<{ id: string }>(
     env.DB.prepare(
       `SELECT id FROM campaigns
@@ -1696,20 +1046,23 @@ const processCampaignQueue = async (env: Env, request?: Request, campaignId?: st
     const recipients = await all<RecipientRecord>(
       env.DB.prepare(
         `SELECT * FROM campaign_recipients
-         WHERE campaign_id = ? AND status = 'queued'
+         WHERE campaign_id = ? AND status = 'queued' AND send_attempts < ?
          ORDER BY created_at ASC
          LIMIT ?`,
-      ).bind(campaign.id, batchLimit),
+      ).bind(campaign.id, retryLimit, batchLimit),
     );
 
     for (const recipient of recipients) {
       await sendRecipient(env, campaign, template, recipient, request);
+      if (campaign.send_pause_ms > 0) await new Promise((r) => setTimeout(r, campaign.send_pause_ms));
     }
 
     await refreshCampaignStats(env, campaign.id);
 
     const remaining = await first<{ total: number }>(
-      env.DB.prepare(`SELECT COUNT(*) AS total FROM campaign_recipients WHERE campaign_id = ? AND status = 'queued'`).bind(campaign.id),
+      env.DB.prepare(
+        `SELECT COUNT(*) AS total FROM campaign_recipients WHERE campaign_id = ? AND status = 'queued' AND send_attempts < ?`,
+      ).bind(campaign.id, retryLimit),
     );
 
     if ((remaining?.total ?? 0) === 0) {
@@ -1805,7 +1158,6 @@ const buildDeliverabilityChecklist = async (env: Env) => {
     listUnsubscribeEnabled: true,
     optInRequired: true,
     doubleOptInEnabled: false,
-    openTrackingEnabled: true,
     warmingPlan: '',
     bounceHandling: '',
     complaintHandling: '',
@@ -1824,7 +1176,6 @@ const buildDeliverabilityChecklist = async (env: Env) => {
       { key: 'dkim', label: 'DKIM', ok: Boolean(deliverability.dkimConfigured) },
       { key: 'dmarc', label: 'DMARC', ok: Boolean(deliverability.dmarcConfigured) },
       { key: 'list_unsubscribe', label: 'List-Unsubscribe', ok: Boolean(deliverability.listUnsubscribeEnabled) },
-      { key: 'open_tracking', label: 'Open tracking observavel', ok: Boolean(deliverability.openTrackingEnabled), note: 'Opcional e imperfeito. Use como sinal auxiliar.' },
     ],
     operational: [
       { key: 'opt_in', label: 'Opt-in valido', ok: Boolean(deliverability.optInRequired) },
@@ -1984,7 +1335,7 @@ export const createApp = () => {
     if (
       isMutationMethod(c.req.method) &&
       c.req.path.startsWith('/api/') &&
-      !['/api/auth/login', '/api/bootstrap/admin', '/api/gmail/oauth/exchange'].includes(c.req.path)
+      !isCsrfExemptPath(c.req.path)
     ) {
       requireCsrf(c);
     }
@@ -2013,26 +1364,12 @@ export const createApp = () => {
   );
 
   registerReservationRoutes(app);
-  registerBlogRoutes(app);
+  registerWhatsAppRoutes(app);
 
   app.post('/api/meta-conversions', async (c) => {
     const body = await requireJsonBody<PublicInteractionPayload>(c.req.raw);
     const customData = body.custom_data ?? {};
     const userData = body.user_data ?? {};
-    let metaForwardResult: { configured: boolean; forwarded: boolean; eventsReceived?: number } = {
-      configured: isMetaConfigured(c.env),
-      forwarded: false,
-    };
-    let metaForwardError: string | null = null;
-
-    if (isMetaConfigured(c.env)) {
-      try {
-        metaForwardResult = await forwardMetaEvent(c.env, c.req.raw, body);
-      } catch (error) {
-        metaForwardError = error instanceof Error ? error.message : 'Falha ao encaminhar evento para a Meta.';
-      }
-    }
-
     await storePublicInteraction(c.env, c.req.raw, {
       eventId: body.event_id ?? null,
       eventName: body.event_name || 'unknown_event',
@@ -2071,21 +1408,10 @@ export const createApp = () => {
         eventTime: body.event_time || null,
         customData,
         userData,
-        metaForwarded: metaForwardResult.forwarded,
-        metaForwardError,
       },
     });
 
-    return c.json({
-      ok: true,
-      received: true,
-      meta: {
-        configured: metaForwardResult.configured,
-        forwarded: metaForwardResult.forwarded,
-        eventsReceived: metaForwardResult.eventsReceived ?? 0,
-        error: metaForwardError,
-      },
-    });
+    return c.json({ ok: true, received: true });
   });
 
   app.post('/api/public/contacts/capture', async (c) => {
@@ -2165,102 +1491,6 @@ export const createApp = () => {
       );
     }
 
-    const contact = await first<ContactRecord>(c.env.DB.prepare('SELECT * FROM contacts WHERE id = ?').bind(contactId));
-    const zohoSync = contact ? await syncContactToZoho(c.env, contact) : { configured: false, synced: false as const, externalId: null, error: null as string | null };
-    const googleAdsSettings = await readGoogleAdsConnectorSettings(c.env);
-    const captureMetadata = parseJsonText<Record<string, unknown>>(JSON.stringify(body.metadata ?? {}), {});
-    const gclid = typeof captureMetadata.gclid === 'string' ? captureMetadata.gclid.trim() : null;
-    const gbraid = typeof captureMetadata.gbraid === 'string' ? captureMetadata.gbraid.trim() : null;
-    const wbraid = typeof captureMetadata.wbraid === 'string' ? captureMetadata.wbraid.trim() : null;
-    let googleAdsConversion:
-      | {
-          configured: boolean;
-          uploaded: boolean;
-          status: 'success' | 'error' | 'skipped';
-          error: string | null;
-        }
-      | undefined;
-
-    if (contact && googleAdsSettings.autoUploadLeadConversions) {
-      const clickId = gclid || gbraid || wbraid;
-      const clickIdType = gclid ? 'gclid' : gbraid ? 'gbraid' : wbraid ? 'wbraid' : null;
-      if (!googleAdsSettings.customerId || !googleAdsSettings.conversionAction || !isGoogleAdsConfigured(c.env) || !clickId || !clickIdType) {
-        googleAdsConversion = {
-          configured: Boolean(googleAdsSettings.customerId && googleAdsSettings.conversionAction && isGoogleAdsConfigured(c.env)),
-          uploaded: false,
-          status: 'skipped',
-          error: clickId ? 'Google Ads ainda nao esta configurado para upload de conversoes.' : 'Nenhum click ID do Google foi informado nesta captura.',
-        };
-        await recordConversionUpload(c.env, {
-          provider: 'google_ads',
-          contactId: contact.id,
-          externalClickId: clickId,
-          clickIdType,
-          conversionKey: googleAdsSettings.conversionAction,
-          conversionLabel: 'contact_capture',
-          conversionTime: nowIso(),
-          conversionValue: googleAdsSettings.conversionValue,
-          currencyCode: googleAdsSettings.currencyCode,
-          status: 'skipped',
-          error: googleAdsConversion.error,
-        });
-      } else {
-        try {
-          const result = await uploadGoogleAdsClickConversion(c.env, {
-            customerId: googleAdsSettings.customerId,
-            conversionAction: googleAdsSettings.conversionAction,
-            conversionDateTime: toGoogleAdsDateTime(nowIso()),
-            conversionValue: googleAdsSettings.conversionValue ?? 1,
-            currencyCode: googleAdsSettings.currencyCode || 'BRL',
-            gclid,
-            gbraid,
-            wbraid,
-            orderId: contact.id,
-          });
-          googleAdsConversion = {
-            configured: true,
-            uploaded: true,
-            status: 'success',
-            error: null,
-          };
-          await recordConversionUpload(c.env, {
-            provider: 'google_ads',
-            contactId: contact.id,
-            externalClickId: clickId,
-            clickIdType,
-            conversionKey: googleAdsSettings.conversionAction,
-            conversionLabel: 'contact_capture',
-            conversionTime: nowIso(),
-            conversionValue: googleAdsSettings.conversionValue,
-            currencyCode: googleAdsSettings.currencyCode,
-            status: 'success',
-            providerResponse: result as Record<string, unknown>,
-          });
-        } catch (error) {
-          const message = error instanceof Error ? error.message : 'Falha ao enviar conversao para o Google Ads.';
-          googleAdsConversion = {
-            configured: true,
-            uploaded: false,
-            status: 'error',
-            error: message,
-          };
-          await recordConversionUpload(c.env, {
-            provider: 'google_ads',
-            contactId: contact.id,
-            externalClickId: clickId,
-            clickIdType,
-            conversionKey: googleAdsSettings.conversionAction,
-            conversionLabel: 'contact_capture',
-            conversionTime: nowIso(),
-            conversionValue: googleAdsSettings.conversionValue,
-            currencyCode: googleAdsSettings.currencyCode,
-            status: 'error',
-            error: message,
-          });
-        }
-      }
-    }
-
     await storePublicInteraction(c.env, c.req.raw, {
       eventName: 'contact_capture',
       eventCategory: 'contact_capture',
@@ -2273,8 +1503,6 @@ export const createApp = () => {
         optInStatus,
         tags: [...tags],
         listId: body.listId ?? null,
-        zohoSync,
-        googleAdsConversion,
         payload: body.metadata ?? {},
       },
     });
@@ -2283,8 +1511,6 @@ export const createApp = () => {
       ok: true,
       created: !existing,
       contactId,
-      zohoSync,
-      googleAdsConversion,
     });
   });
 
@@ -2370,167 +1596,6 @@ export const createApp = () => {
       allowedEmails: [...parseEmailSet(c.env.GOOGLE_ALLOWED_EMAILS)],
     }),
   );
-
-  const createGoogleBusinessAuthRedirectResponse = (c: any) => {
-    if (!c.env.GOOGLE_BUSINESS_CLIENT_ID || !c.env.GOOGLE_BUSINESS_CLIENT_SECRET) {
-      throw new HttpError(400, 'As credenciais OAuth do Google Business Profile ainda nao foram configuradas no Worker.');
-    }
-
-    const requestOrigin = new URL(c.req.url).origin;
-    const requestHost = new URL(c.req.url).hostname;
-    const redirectUri = `${requestOrigin}/api/google/business/callback`;
-    const state = randomToken(24);
-    const secure = new URL(c.req.url).protocol === 'https:';
-    const cookieDomain = requestHost.endsWith('.cuiabar.com') ? '.cuiabar.com' : undefined;
-
-    setCookie(c, GOOGLE_BUSINESS_OAUTH_STATE_COOKIE_NAME, state, {
-      httpOnly: true,
-      secure,
-      sameSite: 'Lax',
-      domain: cookieDomain,
-      path: '/',
-      maxAge: 60 * 10,
-    });
-
-    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-    authUrl.searchParams.set('client_id', c.env.GOOGLE_BUSINESS_CLIENT_ID);
-    authUrl.searchParams.set('redirect_uri', redirectUri);
-    authUrl.searchParams.set('response_type', 'code');
-    authUrl.searchParams.set('scope', 'profile email https://www.googleapis.com/auth/business.manage');
-    authUrl.searchParams.set('access_type', 'offline');
-    authUrl.searchParams.set('prompt', 'consent');
-    authUrl.searchParams.set('include_granted_scopes', 'true');
-    authUrl.searchParams.set('state', state);
-
-    const loginHint = normalizeEmail(c.env.GOOGLE_MANAGER_EMAILS?.split(',')[0] || c.env.GOOGLE_ALLOWED_EMAILS?.split(',')[0] || '');
-    if (loginHint) {
-      authUrl.searchParams.set('login_hint', loginHint);
-    }
-
-    return c.redirect(authUrl.toString(), 302);
-  };
-
-  app.get('/oauth/google-business/setup', (c) => c.html(googleBusinessOauthSetupHtml(c.env)));
-
-  app.get('/oauth/google-business/start', (c) => createGoogleBusinessAuthRedirectResponse(c));
-
-  app.get('/go/google-business-auth', (c) => createGoogleBusinessAuthRedirectResponse(c));
-
-  app.get('/api/google/business/callback', async (c) => {
-    const requestOrigin = new URL(c.req.url).origin;
-    const requestHost = new URL(c.req.url).hostname;
-    const redirectUri = `${requestOrigin}/api/google/business/callback`;
-    const expectedState = getCookie(c, GOOGLE_BUSINESS_OAUTH_STATE_COOKIE_NAME);
-    deleteCookie(c, GOOGLE_BUSINESS_OAUTH_STATE_COOKIE_NAME, {
-      path: '/',
-      domain: requestHost.endsWith('.cuiabar.com') ? '.cuiabar.com' : undefined,
-    });
-
-    const oauthError = c.req.query('error');
-    if (oauthError) {
-      const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Autorizacao cancelada</title><style>body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#f8fafc;color:#0f172a;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px}.card{max-width:680px;background:#fff;padding:32px;border-radius:28px;box-shadow:0 30px 80px rgba(15,23,42,.10)}.error{color:#b91c1c}code{font-family:ui-monospace,SFMono-Regular,monospace}</style></head><body><main class="card"><h1 class="error">Autorizacao nao concluida</h1><p>O Google retornou <code>${oauthError}</code>.</p><p>Volte ao chat e me envie essa mensagem para eu ajustar o fluxo.</p></main></body></html>`;
-      return c.html(html, 400);
-    }
-
-    const state = c.req.query('state');
-    const code = c.req.query('code');
-    if (!expectedState || !state || state !== expectedState) {
-      throw new HttpError(400, 'Estado do OAuth invalido ou expirado. Tente novamente a partir da tela de setup.');
-    }
-    if (!code) {
-      throw new HttpError(400, 'Codigo de autorizacao ausente no callback do Google Business Profile.');
-    }
-    if (!c.env.GOOGLE_BUSINESS_CLIENT_ID || !c.env.GOOGLE_BUSINESS_CLIENT_SECRET) {
-      throw new HttpError(400, 'As credenciais OAuth do Google Business Profile ainda nao foram configuradas no Worker.');
-    }
-
-    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        code,
-        client_id: c.env.GOOGLE_BUSINESS_CLIENT_ID,
-        client_secret: c.env.GOOGLE_BUSINESS_CLIENT_SECRET,
-        redirect_uri: redirectUri,
-        grant_type: 'authorization_code',
-      }),
-    });
-
-    const tokenPayload = (await tokenResponse.json()) as {
-      access_token?: string;
-      refresh_token?: string;
-      id_token?: string;
-      scope?: string;
-      error?: string;
-      error_description?: string;
-    };
-
-    if (!tokenResponse.ok) {
-      throw new HttpError(400, 'Google recusou a troca do codigo OAuth do Business Profile.', tokenPayload);
-    }
-
-    let authorizedEmail = '';
-
-    if (tokenPayload.id_token) {
-      const identity = await verifyGoogleIdToken(c.env, tokenPayload.id_token, c.env.GOOGLE_BUSINESS_CLIENT_ID);
-      authorizedEmail = identity.email.toLowerCase();
-    } else if (tokenPayload.access_token) {
-      const userinfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-          authorization: `Bearer ${tokenPayload.access_token}`,
-        },
-      });
-
-      const userinfoPayload = (await userinfoResponse.json()) as {
-        email?: string;
-        error?: {
-          message?: string;
-        };
-      };
-
-      if (!userinfoResponse.ok || !userinfoPayload.email) {
-        throw new HttpError(
-          400,
-          'O Google nao retornou dados suficientes para validar a conta autorizada.',
-          userinfoPayload,
-        );
-      }
-
-      authorizedEmail = userinfoPayload.email.toLowerCase();
-    } else {
-      throw new HttpError(400, 'O Google nao retornou tokens suficientes para validar a conta autorizada.');
-    }
-
-    const allowedBusinessEmails = parseEmailSet(c.env.GOOGLE_MANAGER_EMAILS || c.env.GOOGLE_ALLOWED_EMAILS);
-    if (allowedBusinessEmails.size > 0 && !allowedBusinessEmails.has(authorizedEmail)) {
-      throw new HttpError(403, `A autorizacao precisa ser feita com uma conta gestora do Cuiabar. Conta atual: ${authorizedEmail}.`);
-    }
-
-    if (!tokenPayload.refresh_token) {
-      throw new HttpError(
-        409,
-        'O Google nao retornou refresh token. Revogue o acesso anterior do app nesta conta e autorize novamente.',
-        { email: authorizedEmail, scope: tokenPayload.scope ?? null },
-      );
-    }
-
-    await storeGoogleBusinessOAuthConnection(c.env, {
-      email: authorizedEmail,
-      refreshToken: tokenPayload.refresh_token,
-      scope: tokenPayload.scope ?? null,
-      grantedAt: nowIso(),
-      source: 'panel_oauth',
-    });
-    await auditLog(c.env, c.req.raw, null, 'google_business.oauth.exchange', 'app_settings', 'google_business_oauth_connection', {
-      email: authorizedEmail,
-      scope: tokenPayload.scope ?? null,
-    });
-
-    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Google Business autorizado</title><style>body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#eef4f7;color:#0f172a;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px}.card{max-width:720px;background:#fff;padding:32px;border-radius:28px;box-shadow:0 30px 80px rgba(15,23,42,.10)}.ok{color:#166534}code{font-family:ui-monospace,SFMono-Regular,monospace}</style></head><body><main class="card"><h1 class="ok">Autorizacao concluida</h1><p>O Google Business Profile de <strong>${authorizedEmail}</strong> foi autorizado e o <code>refresh token</code> ficou salvo no CRM.</p><p>Volte ao chat e me responda <strong>autorizei</strong> para eu validar a conexao e seguir com a integracao do perfil.</p></main></body></html>`;
-    return c.html(html);
-  });
 
   app.get('/oauth/gmail/setup', (c) => c.html(gmailOauthSetupHtml(c.env)));
 
@@ -2996,13 +2061,26 @@ export const createApp = () => {
     return c.json({ ok: true });
   });
 
+  app.delete('/api/users/:id', async (c) => {
+    const actor = requirePermission(c, 'users:manage');
+    const userId = c.req.param('id');
+    if (actor.id === userId) {
+      throw new HttpError(400, 'Voce nao pode excluir sua propria conta.');
+    }
+    await run(c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId));
+    await auditLog(c.env, c.req.raw, actor.id, 'user.delete', 'user', userId, {});
+    return c.json({ ok: true });
+  });
+
   app.get('/api/contacts', async (c) => {
     requirePermission(c, 'contacts:read');
     const search = parseAudienceFilter(c.req.query('search') ?? null);
     const status = parseAudienceFilter(c.req.query('status') ?? null);
     const source = parseAudienceFilter(c.req.query('source') ?? null);
+    const page = Math.max(1, parseInt(c.req.query('page') ?? '1', 10) || 1);
+    const pageSize = Math.min(200, Math.max(1, parseInt(c.req.query('pageSize') ?? '50', 10) || 50));
     const clauses: string[] = [];
-    const params: string[] = [];
+    const params: (string | number)[] = [];
 
     if (search) {
       clauses.push('(email LIKE ? OR first_name LIKE ? OR last_name LIKE ?)');
@@ -3017,22 +2095,26 @@ export const createApp = () => {
       params.push(source);
     }
 
-    const sql = `SELECT
-        c.*,
-        cpl.external_id AS zoho_external_id,
-        cpl.sync_status AS zoho_sync_status,
-        cpl.last_synced_at AS zoho_last_synced_at,
-        cpl.last_error AS zoho_last_error
+    const whereClause = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+
+    const countRow = await first<{ total: number }>(
+      c.env.DB.prepare(`SELECT COUNT(*) AS total FROM contacts c ${whereClause}`).bind(...params),
+    );
+    const total = countRow?.total ?? 0;
+    const totalPages = Math.ceil(total / pageSize);
+    const offset = (page - 1) * pageSize;
+
+    const sql = `SELECT c.*
       FROM contacts c
-      LEFT JOIN contact_provider_links cpl
-        ON cpl.contact_id = c.id
-       AND cpl.provider = 'zoho_crm'
-       AND cpl.provider_module = 'Contacts'
-      ${clauses.length ? `WHERE ${clauses.join(' AND ')}` : ''}
+      ${whereClause}
       ORDER BY c.created_at DESC
-      LIMIT 500`;
-    const rows = await all<ContactListRow>(c.env.DB.prepare(sql).bind(...params));
-    return c.json({ ok: true, contacts: rows.map((row) => mapContact(row, isZohoConfigured(c.env))) });
+      LIMIT ? OFFSET ?`;
+    const rows = await all<ContactListRow>(c.env.DB.prepare(sql).bind(...params, pageSize, offset));
+    return c.json({
+      ok: true,
+      contacts: rows.map((row) => mapContact(row)),
+      pagination: { page, pageSize, total, totalPages },
+    });
   });
 
   app.post('/api/contacts', async (c) => {
@@ -3068,10 +2150,8 @@ export const createApp = () => {
         nowIso(),
       ),
     );
-    const contact = await first<ContactRecord>(c.env.DB.prepare('SELECT * FROM contacts WHERE id = ?').bind(contactId));
-    const zohoSync = contact ? await syncContactToZoho(c.env, contact) : { configured: isZohoConfigured(c.env), synced: false, externalId: null, error: null };
-    await auditLog(c.env, c.req.raw, actor.id, 'contact.create', 'contact', contactId, { email, zohoSync });
-    return c.json({ ok: true, contactId, zohoSync });
+    await auditLog(c.env, c.req.raw, actor.id, 'contact.create', 'contact', contactId, { email });
+    return c.json({ ok: true, contactId });
   });
 
   app.put('/api/contacts/:id', async (c) => {
@@ -3103,10 +2183,17 @@ export const createApp = () => {
         contactId,
       ),
     );
-    const contact = await first<ContactRecord>(c.env.DB.prepare('SELECT * FROM contacts WHERE id = ?').bind(contactId));
-    const zohoSync = contact ? await syncContactToZoho(c.env, contact) : { configured: isZohoConfigured(c.env), synced: false, externalId: null, error: null };
-    await auditLog(c.env, c.req.raw, actor.id, 'contact.update', 'contact', contactId, { ...body, zohoSync });
-    return c.json({ ok: true, zohoSync });
+    await auditLog(c.env, c.req.raw, actor.id, 'contact.update', 'contact', contactId, body);
+    return c.json({ ok: true });
+  });
+
+  app.delete('/api/contacts/:id', async (c) => {
+    const actor = requirePermission(c, 'contacts:write');
+    const contactId = c.req.param('id');
+    await run(c.env.DB.prepare('DELETE FROM contact_list_items WHERE contact_id = ?').bind(contactId));
+    await run(c.env.DB.prepare('DELETE FROM contacts WHERE id = ?').bind(contactId));
+    await auditLog(c.env, c.req.raw, actor.id, 'contact.delete', 'contact', contactId, {});
+    return c.json({ ok: true });
   });
 
   app.get('/api/contacts/:id/history', async (c) => {
@@ -3145,7 +2232,6 @@ export const createApp = () => {
       ).bind(contactId),
     );
 
-    const zohoLink = await getContactZohoLink(c.env, contactId);
     const publicInteractions = await all<{
       created_at: string;
       event_name: string;
@@ -3170,14 +2256,6 @@ export const createApp = () => {
       clicks,
       unsubscribes,
       publicInteractions,
-      zoho: zohoLink
-        ? {
-            externalId: zohoLink.external_id,
-            status: zohoLink.sync_status,
-            lastSyncedAt: zohoLink.last_synced_at,
-            lastError: zohoLink.last_error,
-          }
-        : null,
     });
   });
 
@@ -3237,10 +2315,6 @@ export const createApp = () => {
                WHERE id = ?`,
             ).bind(firstName, lastName, phone, source, asJson([...tags]), nowIso(), existing.id),
           );
-          const contact = await first<ContactRecord>(c.env.DB.prepare('SELECT * FROM contacts WHERE id = ?').bind(existing.id));
-          if (contact) {
-            await syncContactToZoho(c.env, contact);
-          }
           skippedRows += 1;
         } else {
           await run(
@@ -3250,10 +2324,6 @@ export const createApp = () => {
                VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)`,
             ).bind(contactId, email, firstName || null, lastName || null, phone || null, source || null, asJson([...tags]), optInStatus, nowIso(), nowIso()),
           );
-          const contact = await first<ContactRecord>(c.env.DB.prepare('SELECT * FROM contacts WHERE id = ?').bind(contactId));
-          if (contact) {
-            await syncContactToZoho(c.env, contact);
-          }
           importedRows += 1;
         }
 
@@ -3289,46 +2359,6 @@ export const createApp = () => {
       importedRows,
       updatedRows: skippedRows,
       errors,
-    });
-  });
-
-  app.post('/api/contacts/sync/zoho', async (c) => {
-    const actor = requirePermission(c, 'contacts:write');
-    const body = await requireJsonBody<{ contactIds?: string[] }>(c.req.raw).catch(() => ({} as { contactIds?: string[] }));
-    const rows = body.contactIds?.length
-      ? await all<ContactRecord>(
-          c.env.DB.prepare(
-            `SELECT * FROM contacts
-             WHERE id IN (${body.contactIds.map(() => '?').join(',')})
-             ORDER BY created_at DESC`,
-          ).bind(...body.contactIds),
-        )
-      : await all<ContactRecord>(c.env.DB.prepare('SELECT * FROM contacts ORDER BY created_at DESC LIMIT 500'));
-
-    const results: Array<{ contactId: string; email: string; synced: boolean; externalId: string | null; error: string | null }> = [];
-    for (const row of rows) {
-      const sync = await syncContactToZoho(c.env, row);
-      results.push({
-        contactId: row.id,
-        email: row.email,
-        synced: sync.synced,
-        externalId: sync.externalId,
-        error: sync.error,
-      });
-    }
-
-    await auditLog(c.env, c.req.raw, actor.id, 'contact.sync_zoho_batch', 'contact', null, {
-      requested: body.contactIds?.length ?? rows.length,
-      synced: results.filter((item) => item.synced).length,
-      failed: results.filter((item) => !item.synced).length,
-    });
-
-    return c.json({
-      ok: true,
-      total: results.length,
-      synced: results.filter((item) => item.synced).length,
-      failed: results.filter((item) => !item.synced).length,
-      results,
     });
   });
 
@@ -3403,6 +2433,21 @@ export const createApp = () => {
     return c.json({ ok: true });
   });
 
+  app.delete('/api/lists/:id', async (c) => {
+    const actor = requirePermission(c, 'lists:write');
+    const listId = c.req.param('id');
+    const inUse = await first<{ total: number }>(
+      c.env.DB.prepare(`SELECT COUNT(*) AS total FROM campaigns WHERE list_id = ? AND status NOT IN ('cancelled', 'failed', 'draft')`).bind(listId),
+    );
+    if ((inUse?.total ?? 0) > 0) {
+      throw new HttpError(409, 'Esta lista esta em uso por uma ou mais campanhas ativas. Cancele as campanhas antes de excluir a lista.');
+    }
+    await run(c.env.DB.prepare('DELETE FROM contact_list_items WHERE list_id = ?').bind(listId));
+    await run(c.env.DB.prepare('DELETE FROM contact_lists WHERE id = ?').bind(listId));
+    await auditLog(c.env, c.req.raw, actor.id, 'list.delete', 'contact_list', listId, {});
+    return c.json({ ok: true });
+  });
+
   app.get('/api/segments', async (c) => {
     requirePermission(c, 'segments:read');
     const rows = await all<{
@@ -3453,6 +2498,28 @@ export const createApp = () => {
     );
     await auditLog(c.env, c.req.raw, actor.id, 'segment.update', 'segment', segmentId, body.rules);
     return c.json({ ok: true });
+  });
+
+  app.delete('/api/segments/:id', async (c) => {
+    const actor = requirePermission(c, 'segments:write');
+    const segmentId = c.req.param('id');
+    const inUse = await first<{ total: number }>(
+      c.env.DB.prepare(`SELECT COUNT(*) AS total FROM campaigns WHERE segment_id = ? AND status NOT IN ('cancelled', 'failed', 'draft')`).bind(segmentId),
+    );
+    if ((inUse?.total ?? 0) > 0) {
+      throw new HttpError(409, 'Este segmento esta em uso por uma ou mais campanhas ativas. Cancele as campanhas antes de excluir o segmento.');
+    }
+    await run(c.env.DB.prepare('DELETE FROM segments WHERE id = ?').bind(segmentId));
+    await auditLog(c.env, c.req.raw, actor.id, 'segment.delete', 'segment', segmentId, {});
+    return c.json({ ok: true });
+  });
+
+  app.post('/api/segments/:id/preview', async (c) => {
+    requirePermission(c, 'segments:read');
+    const segmentId = c.req.param('id');
+    const contacts = await getContactsForSegment(c.env, segmentId);
+    const active = contacts.filter((contact) => contact.status === 'active');
+    return c.json({ ok: true, total: contacts.length, active: active.length, sample: active.slice(0, 5).map((contact) => ({ email: contact.email, name: contact.firstName })) });
   });
 
   app.get('/api/templates', async (c) => {
@@ -3510,9 +2577,23 @@ export const createApp = () => {
         `UPDATE templates
          SET name = ?, subject = ?, preheader = ?, html_content = ?, text_content = ?, variables_json = ?, updated_by_user_id = ?, updated_at = ?
          WHERE id = ?`,
-      ).bind(templateId, body.name.trim(), body.subject.trim(), body.preheader?.trim() || null, body.html, body.text, asJson(variables), actor.id, nowIso(), templateId),
+      ).bind(body.name.trim(), body.subject.trim(), body.preheader?.trim() || null, body.html, body.text, asJson(variables), actor.id, nowIso(), templateId),
     );
     await auditLog(c.env, c.req.raw, actor.id, 'template.update', 'template', templateId, { variables });
+    return c.json({ ok: true });
+  });
+
+  app.delete('/api/templates/:id', async (c) => {
+    const actor = requirePermission(c, 'templates:manage');
+    const templateId = c.req.param('id');
+    const inUse = await first<{ total: number }>(
+      c.env.DB.prepare(`SELECT COUNT(*) AS total FROM campaigns WHERE template_id = ? AND status NOT IN ('cancelled', 'failed')`).bind(templateId),
+    );
+    if ((inUse?.total ?? 0) > 0) {
+      throw new HttpError(409, 'Este template esta em uso por uma ou mais campanhas ativas. Cancele as campanhas antes de excluir o template.');
+    }
+    await run(c.env.DB.prepare('DELETE FROM templates WHERE id = ?').bind(templateId));
+    await auditLog(c.env, c.req.raw, actor.id, 'template.delete', 'template', templateId, {});
     return c.json({ ok: true });
   });
 
@@ -3548,8 +2629,22 @@ export const createApp = () => {
 
   app.get('/api/campaigns', async (c) => {
     requirePermission(c, 'campaigns:read');
-    const rows = await all<CampaignRecord>(c.env.DB.prepare('SELECT * FROM campaigns ORDER BY created_at DESC'));
-    return c.json({ ok: true, campaigns: rows.map((row) => mapCampaign(row)) });
+    const page = Math.max(1, parseInt(c.req.query('page') ?? '1', 10) || 1);
+    const pageSize = Math.min(200, Math.max(1, parseInt(c.req.query('pageSize') ?? '50', 10) || 50));
+    const offset = (page - 1) * pageSize;
+
+    const countRow = await first<{ total: number }>(c.env.DB.prepare('SELECT COUNT(*) AS total FROM campaigns'));
+    const total = countRow?.total ?? 0;
+    const totalPages = Math.ceil(total / pageSize);
+
+    const rows = await all<CampaignRecord>(
+      c.env.DB.prepare('SELECT * FROM campaigns ORDER BY created_at DESC LIMIT ? OFFSET ?').bind(pageSize, offset),
+    );
+    return c.json({
+      ok: true,
+      campaigns: rows.map((row) => mapCampaign(row)),
+      pagination: { page, pageSize, total, totalPages },
+    });
   });
 
   app.get('/api/campaigns/:id', async (c) => {
@@ -3623,102 +2718,6 @@ export const createApp = () => {
       listId: body.listId ?? null,
     });
     return c.json({ ok: true, campaignId });
-  });
-
-  app.post('/api/campaigns/quick-send', async (c) => {
-    const actor = requirePermission(c, 'campaigns:send');
-    const sendingSettings = await readSetting(c.env, 'sending', {
-      batchSize: parseNumber(c.env.SEND_BATCH_SIZE, 25),
-      ratePerMinute: parseNumber(c.env.SEND_RATE_PER_MINUTE, 45),
-      pauseMs: parseNumber(c.env.SEND_PAUSE_MS, 1500),
-      campaignMaxRecipients: parseNumber(c.env.CAMPAIGN_MAX_RECIPIENTS, 5000),
-    });
-    const body = await requireJsonBody<{
-      emails: string[];
-      templateId: string;
-      salutationMode?: 'personalized' | 'generic';
-      campaignName?: string;
-      subject?: string;
-    }>(c.req.raw);
-
-    const normalizedEmails = [...new Set((body.emails ?? []).map((email) => ensureEmail(email)).filter(Boolean))];
-    if (normalizedEmails.length === 0) {
-      throw new HttpError(400, 'Informe ao menos um e-mail de destino para o disparador.');
-    }
-
-    const template = await getTemplate(c.env, body.templateId);
-    const contacts = await all<ContactRecord>(
-      c.env.DB.prepare(
-        `SELECT * FROM contacts
-         WHERE email IN (${normalizedEmails.map(() => '?').join(',')})`,
-      ).bind(...normalizedEmails),
-    );
-
-    const mappedContacts = contacts.map((row) => mapContact(row));
-    const foundEmails = new Set(mappedContacts.map((contact) => normalizeEmail(contact.email)));
-    const missingEmails = normalizedEmails.filter((email) => !foundEmails.has(normalizeEmail(email)));
-    const eligibleContacts = await filterEligibleContacts(c.env, mappedContacts);
-    if (eligibleContacts.length === 0) {
-      throw new HttpError(400, 'Nenhum contato elegivel foi encontrado para este disparo rapido.');
-    }
-
-    const campaignId = generateId('cmp');
-    const campaignName = body.campaignName?.trim() || `Disparo rapido ${new Date().toLocaleString('pt-BR')}`;
-    const subject = body.subject?.trim() || template.subject;
-
-    await run(
-      c.env.DB.prepare(
-        `INSERT INTO campaigns
-          (id, name, subject, preheader, template_id, segment_id, list_id, from_name, from_email, reply_to, status, scheduled_at,
-           send_batch_size, send_rate_per_minute, send_pause_ms, max_recipients, created_by_user_id, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, null, null, ?, ?, ?, 'draft', null, ?, ?, ?, ?, ?, ?, ?)`,
-      ).bind(
-        campaignId,
-        campaignName,
-        subject,
-        template.preheader ?? null,
-        template.id,
-        getConfiguredSenderName(c.env),
-        c.env.GMAIL_SENDER_EMAIL || c.env.DEFAULT_FROM_EMAIL,
-        c.env.DEFAULT_REPLY_TO || null,
-        sendingSettings.batchSize,
-        sendingSettings.ratePerMinute,
-        sendingSettings.pauseMs,
-        sendingSettings.campaignMaxRecipients,
-        actor.id,
-        nowIso(),
-        nowIso(),
-      ),
-    );
-
-    const campaign = await getCampaign(c.env, campaignId);
-    const recipientCount = await queueSpecificRecipients(c.env, campaign, eligibleContacts, {
-      salutationMode: body.salutationMode === 'generic' ? 'generic' : 'personalized',
-    });
-
-    await run(
-      c.env.DB.prepare(
-        `UPDATE campaigns
-         SET status = 'sending', started_at = COALESCE(started_at, ?), updated_at = ?
-         WHERE id = ?`,
-      ).bind(nowIso(), nowIso(), campaignId),
-    );
-
-    const processed = await processCampaignQueue(c.env, c.req.raw, campaignId);
-    await auditLog(c.env, c.req.raw, actor.id, 'campaign.quick_send', 'campaign', campaignId, {
-      recipientCount,
-      missingEmails,
-      salutationMode: body.salutationMode === 'generic' ? 'generic' : 'personalized',
-      templateId: template.id,
-    });
-
-    return c.json({
-      ok: true,
-      campaignId,
-      recipientCount,
-      missingEmails,
-      processed,
-    });
   });
 
   app.put('/api/campaigns/:id', async (c) => {
@@ -3848,6 +2847,55 @@ export const createApp = () => {
     return c.json({ ok: true });
   });
 
+  app.delete('/api/campaigns/:id', async (c) => {
+    const actor = requirePermission(c, 'campaigns:write');
+    const campaignId = c.req.param('id');
+    const campaign = await getCampaign(c.env, campaignId);
+    if (!['draft', 'cancelled', 'failed'].includes(campaign.status)) {
+      throw new HttpError(409, 'Apenas campanhas em rascunho, canceladas ou com falha podem ser excluidas.');
+    }
+    await run(c.env.DB.prepare('DELETE FROM campaign_recipients WHERE campaign_id = ?').bind(campaignId));
+    await run(c.env.DB.prepare('DELETE FROM campaign_links WHERE campaign_id = ?').bind(campaignId));
+    await run(c.env.DB.prepare('DELETE FROM campaigns WHERE id = ?').bind(campaignId));
+    await auditLog(c.env, c.req.raw, actor.id, 'campaign.delete', 'campaign', campaignId, { name: campaign.name });
+    return c.json({ ok: true });
+  });
+
+  app.post('/api/campaigns/:id/duplicate', async (c) => {
+    const actor = requirePermission(c, 'campaigns:write');
+    const campaignId = c.req.param('id');
+    const source = await getCampaign(c.env, campaignId);
+    const newId = generateId('cmp');
+    await run(
+      c.env.DB.prepare(
+        `INSERT INTO campaigns
+          (id, name, subject, preheader, template_id, segment_id, list_id, from_name, from_email, reply_to, status,
+           send_batch_size, send_rate_per_minute, send_pause_ms, max_recipients, created_by_user_id, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(
+        newId,
+        `${source.name} (copia)`,
+        source.subject,
+        source.preheader ?? null,
+        source.template_id,
+        source.segment_id ?? null,
+        source.list_id ?? null,
+        source.from_name,
+        source.from_email,
+        source.reply_to ?? null,
+        source.send_batch_size,
+        source.send_rate_per_minute,
+        source.send_pause_ms,
+        source.max_recipients,
+        actor.id,
+        nowIso(),
+        nowIso(),
+      ),
+    );
+    await auditLog(c.env, c.req.raw, actor.id, 'campaign.duplicate', 'campaign', newId, { sourceCampaignId: campaignId });
+    return c.json({ ok: true, campaignId: newId });
+  });
+
   app.get('/api/campaigns/:id/metrics', async (c) => {
     requirePermission(c, 'reports:read');
     const campaignId = c.req.param('id');
@@ -3870,13 +2918,12 @@ export const createApp = () => {
       email_snapshot: string;
       status: string;
       sent_at: string | null;
-      opened_at: string | null;
       clicked_at: string | null;
       unsubscribed_at: string | null;
       last_error: string | null;
     }>(
       c.env.DB.prepare(
-        `SELECT email_snapshot, status, sent_at, opened_at, clicked_at, unsubscribed_at, last_error
+        `SELECT email_snapshot, status, sent_at, clicked_at, unsubscribed_at, last_error
          FROM campaign_recipients
          WHERE campaign_id = ?
          ORDER BY created_at ASC`,
@@ -3889,14 +2936,10 @@ export const createApp = () => {
         recipients: campaign.total_recipients,
         sent: campaign.total_sent,
         failed: campaign.total_failed,
-        opensTotal: campaign.total_open_events,
-        opensUnique: campaign.total_unique_opens,
-        openedContacts: campaign.total_opened,
         clicksTotal: campaign.total_click_events,
         clicksUnique: campaign.total_unique_clicks,
         clickedContacts: campaign.total_clicked,
         unsubscribed: campaign.total_unsubscribed,
-        openRate: campaign.total_sent ? Number(((campaign.total_unique_opens / campaign.total_sent) * 100).toFixed(2)) : 0,
         ctr: campaign.total_sent ? Number(((campaign.total_unique_clicks / campaign.total_sent) * 100).toFixed(2)) : 0,
         deliveryObservedRate: campaign.total_sent ? Number((campaign.delivery_observed_rate * 100).toFixed(2)) : 0,
       },
@@ -3905,12 +2948,43 @@ export const createApp = () => {
     });
   });
 
+  app.get('/api/campaigns/:id/progress', async (c) => {
+    requirePermission(c, 'campaigns:read');
+    const campaignId = c.req.param('id');
+    const campaign = await getCampaign(c.env, campaignId);
+    const statusRows = await all<{ status: string; total: number }>(
+      c.env.DB.prepare(
+        `SELECT status, COUNT(*) as total FROM campaign_recipients WHERE campaign_id = ? GROUP BY status`,
+      ).bind(campaignId),
+    );
+
+    const counts: Record<string, number> = {};
+    for (const row of statusRows) {
+      counts[row.status] = row.total;
+    }
+
+    const totalRecipients = Object.values(counts).reduce((a, b) => a + b, 0);
+    const sent = counts['sent'] ?? 0;
+    const failed = counts['failed'] ?? 0;
+    const queued = counts['queued'] ?? 0;
+    const percentComplete = totalRecipients > 0 ? Number(((sent + failed) / totalRecipients * 100).toFixed(2)) : 0;
+
+    return c.json({
+      ok: true,
+      status: campaign.status,
+      totalRecipients,
+      sent,
+      failed,
+      queued,
+      percentComplete,
+    });
+  });
+
   app.get('/api/reports/dashboard', async (c) => {
     requirePermission(c, 'dashboard:read');
-    const [campaigns, contacts, opens, clicks, failures, unsubscribes, period] = await Promise.all([
+    const [campaigns, contacts, clicks, failures, unsubscribes, period] = await Promise.all([
       first<{ total: number }>(c.env.DB.prepare('SELECT COUNT(*) AS total FROM campaigns')),
       first<{ total: number }>(c.env.DB.prepare(`SELECT COUNT(*) AS total FROM contacts WHERE status = 'active'`)),
-      first<{ total: number }>(c.env.DB.prepare('SELECT COUNT(*) AS total FROM campaign_open_events')),
       first<{ total: number }>(c.env.DB.prepare('SELECT COUNT(*) AS total FROM campaign_click_events')),
       first<{ total: number }>(c.env.DB.prepare(`SELECT COUNT(*) AS total FROM send_events WHERE status = 'failed'`)),
       first<{ total: number }>(c.env.DB.prepare('SELECT COUNT(*) AS total FROM unsubscribe_events')),
@@ -3931,8 +3005,6 @@ export const createApp = () => {
       metrics: {
         campaignsSent: campaigns?.total ?? 0,
         activeContacts: contacts?.total ?? 0,
-        totalOpens: opens?.total ?? 0,
-        openRate: (totalSentRow?.total ?? 0) > 0 ? Number((((opens?.total ?? 0) / Math.max(totalSentRow?.total ?? 0, 1)) * 100).toFixed(2)) : 0,
         totalClicks: clicks?.total ?? 0,
         ctr: (totalSentRow?.total ?? 0) > 0 ? Number((((clicks?.total ?? 0) / Math.max(totalSentRow?.total ?? 0, 1)) * 100).toFixed(2)) : 0,
         failures: failures?.total ?? 0,
@@ -3944,6 +3016,14 @@ export const createApp = () => {
 
   app.get('/api/audit-logs', async (c) => {
     requirePermission(c, 'audit:read');
+    const page = Math.max(1, parseInt(c.req.query('page') ?? '1', 10) || 1);
+    const pageSize = Math.min(200, Math.max(1, parseInt(c.req.query('pageSize') ?? '50', 10) || 50));
+    const offset = (page - 1) * pageSize;
+
+    const countRow = await first<{ total: number }>(c.env.DB.prepare('SELECT COUNT(*) AS total FROM audit_logs'));
+    const total = countRow?.total ?? 0;
+    const totalPages = Math.ceil(total / pageSize);
+
     const rows = await all<{
       id: string;
       user_id: string | null;
@@ -3962,8 +3042,8 @@ export const createApp = () => {
          FROM audit_logs a
          LEFT JOIN users u ON u.id = a.user_id
          ORDER BY a.created_at DESC
-         LIMIT 300`,
-      ),
+         LIMIT ? OFFSET ?`,
+      ).bind(pageSize, offset),
     );
     return c.json({
       ok: true,
@@ -3979,6 +3059,7 @@ export const createApp = () => {
         userAgent: row.user_agent,
         createdAt: row.created_at,
       })),
+      pagination: { page, pageSize, total, totalPages },
     });
   });
 
@@ -3986,8 +3067,6 @@ export const createApp = () => {
     requirePermission(c, 'settings:manage');
     const checklist = await buildDeliverabilityChecklist(c.env);
     const gmailOauthConnection = await readGmailOAuthConnection(c.env);
-    const metaConnector = await readMetaConnectorSettings(c.env);
-    const googleAdsConnector = await readGoogleAdsConnectorSettings(c.env);
     const sending = await readSetting(c.env, 'sending', {
       batchSize: parseNumber(c.env.SEND_BATCH_SIZE, 25),
       ratePerMinute: parseNumber(c.env.SEND_RATE_PER_MINUTE, 45),
@@ -3998,174 +3077,6 @@ export const createApp = () => {
     const deliverability = await readSetting(c.env, 'deliverability', {});
     const gmailConfigured = Boolean(c.env.GOOGLE_CLIENT_ID && c.env.GOOGLE_CLIENT_SECRET && (gmailOauthConnection?.refreshToken || c.env.GOOGLE_REFRESH_TOKEN));
     const activeGmailConnection = gmailOauthConnection?.refreshToken ? gmailOauthConnection : null;
-    const metaReady = isMetaConfigured(c.env);
-    const metaGraphReady = isMetaGraphConfigured(c.env);
-    const googleAdsReady = isGoogleAdsConfigured(c.env);
-    const latestMetaSync = await first<{ status: string; started_at: string; finished_at: string | null; error: string | null; summary_json: string }>(
-      c.env.DB.prepare(
-        `SELECT status, started_at, finished_at, error, summary_json
-         FROM ad_platform_sync_runs
-         WHERE provider = 'meta'
-         ORDER BY started_at DESC
-         LIMIT 1`,
-      ),
-    );
-    const latestGoogleAdsSync = await first<{ status: string; started_at: string; finished_at: string | null; error: string | null; summary_json: string }>(
-      c.env.DB.prepare(
-        `SELECT status, started_at, finished_at, error, summary_json
-         FROM ad_platform_sync_runs
-         WHERE provider = 'google_ads'
-         ORDER BY started_at DESC
-         LIMIT 1`,
-      ),
-    );
-    const metaCampaignStats = await first<{ total: number; last_synced_at: string | null }>(
-      c.env.DB.prepare(
-        `SELECT COUNT(*) AS total, MAX(synced_at) AS last_synced_at
-         FROM ad_platform_campaign_metrics
-         WHERE provider = 'meta'`,
-      ),
-    );
-    const metaLeadStats = await first<{ total: number; synced_contacts: number; last_lead_at: string | null }>(
-      c.env.DB.prepare(
-        `SELECT COUNT(*) AS total,
-                SUM(CASE WHEN synced_to_contact = 1 THEN 1 ELSE 0 END) AS synced_contacts,
-                MAX(lead_created_at) AS last_lead_at
-         FROM ad_platform_leads
-         WHERE provider = 'meta'`,
-      ),
-    );
-    const googleCampaignStats = await first<{ total: number; last_synced_at: string | null }>(
-      c.env.DB.prepare(
-        `SELECT COUNT(*) AS total, MAX(synced_at) AS last_synced_at
-         FROM ad_platform_campaign_metrics
-         WHERE provider = 'google_ads'`,
-      ),
-    );
-    const googleConversionStats = await first<{ total: number; success_count: number; last_upload_at: string | null }>(
-      c.env.DB.prepare(
-        `SELECT COUNT(*) AS total,
-                SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) AS success_count,
-                MAX(created_at) AS last_upload_at
-         FROM ad_platform_conversion_uploads
-         WHERE provider = 'google_ads'`,
-      ),
-    );
-    let metaStatus = {
-      configured: metaReady,
-      graphConfigured: metaGraphReady,
-      apiVersion: c.env.META_GRAPH_API_VERSION || 'v22.0',
-      pixelId: getMetaPixelId(c.env),
-      pixelName: null as string | null,
-      adAccountId: metaConnector.adAccountId ?? null,
-      leadFormIds: metaConnector.leadFormIds ?? [],
-      autoCreateContacts: metaConnector.autoCreateContacts !== false,
-      lookbackDays: metaConnector.lookbackDays ?? DEFAULT_META_LOOKBACK_DAYS,
-      campaignsIndexed: Number(metaCampaignStats?.total ?? 0),
-      leadsIndexed: Number(metaLeadStats?.total ?? 0),
-      leadsSyncedToContacts: Number(metaLeadStats?.synced_contacts ?? 0),
-      lastLeadAt: metaLeadStats?.last_lead_at ?? null,
-      lastSyncedAt: metaCampaignStats?.last_synced_at ?? null,
-      lastSync: latestMetaSync
-        ? {
-            status: latestMetaSync.status,
-            startedAt: latestMetaSync.started_at,
-            finishedAt: latestMetaSync.finished_at,
-            error: latestMetaSync.error,
-            summary: parseJsonText<Record<string, unknown>>(latestMetaSync.summary_json, {}),
-          }
-        : null,
-      error: null as string | null,
-    };
-    if (metaGraphReady) {
-      try {
-        const pixel = await getMetaPixelSummary(c.env);
-        metaStatus.pixelName = pixel.name;
-      } catch (error) {
-        metaStatus.error = error instanceof Error ? error.message : 'Falha ao validar a Meta.';
-      }
-    }
-
-    let googleAdsStatus = {
-      configured: googleAdsReady,
-      apiVersion: c.env.GOOGLE_ADS_API_VERSION || 'v20',
-      customerId: googleAdsConnector.customerId ?? null,
-      loginCustomerId: googleAdsConnector.loginCustomerId ?? null,
-      conversionAction: googleAdsConnector.conversionAction ?? null,
-      lookbackDays: googleAdsConnector.lookbackDays ?? DEFAULT_GOOGLE_ADS_LOOKBACK_DAYS,
-      autoUploadLeadConversions: googleAdsConnector.autoUploadLeadConversions !== false,
-      conversionValue: googleAdsConnector.conversionValue ?? 1,
-      currencyCode: googleAdsConnector.currencyCode ?? 'BRL',
-      customerName: null as string | null,
-      accessibleCustomers: 0,
-      campaignsIndexed: Number(googleCampaignStats?.total ?? 0),
-      conversionsLogged: Number(googleConversionStats?.total ?? 0),
-      successfulConversions: Number(googleConversionStats?.success_count ?? 0),
-      lastUploadAt: googleConversionStats?.last_upload_at ?? null,
-      lastSyncedAt: googleCampaignStats?.last_synced_at ?? null,
-      lastSync: latestGoogleAdsSync
-        ? {
-            status: latestGoogleAdsSync.status,
-            startedAt: latestGoogleAdsSync.started_at,
-            finishedAt: latestGoogleAdsSync.finished_at,
-            error: latestGoogleAdsSync.error,
-            summary: parseJsonText<Record<string, unknown>>(latestGoogleAdsSync.summary_json, {}),
-          }
-        : null,
-      error: null as string | null,
-    };
-
-    if (googleAdsReady && googleAdsConnector.customerId) {
-      try {
-        const [summary, accessibleCustomers] = await Promise.all([
-          getGoogleAdsCustomerSummary(c.env, googleAdsConnector.customerId),
-          listGoogleAdsAccessibleCustomers(c.env),
-        ]);
-        googleAdsStatus.customerName = summary.descriptiveName;
-        googleAdsStatus.accessibleCustomers = accessibleCustomers.length;
-      } catch (error) {
-        googleAdsStatus.error = error instanceof Error ? error.message : 'Falha ao validar o Google Ads.';
-      }
-    }
-
-    const zohoReady = isZohoConfigured(c.env);
-    let zohoStatus: {
-      configured: boolean;
-      apiDomain: string | null;
-      accountsDomain: string | null;
-      organizationId: string | null;
-      organizationName: string | null;
-      organizationEmail: string | null;
-      scope: string | null;
-      error: string | null;
-    } = {
-      configured: zohoReady,
-      apiDomain: c.env.ZOHO_API_DOMAIN || null,
-      accountsDomain: c.env.ZOHO_ACCOUNTS_DOMAIN || 'https://accounts.zoho.com',
-      organizationId: null,
-      organizationName: null,
-      organizationEmail: null,
-      scope: null,
-      error: null,
-    };
-
-    if (zohoReady) {
-      try {
-        const zoho = await getZohoOrganization(c.env);
-        zohoStatus = {
-          configured: true,
-          apiDomain: zoho.apiDomain,
-          accountsDomain: c.env.ZOHO_ACCOUNTS_DOMAIN || 'https://accounts.zoho.com',
-          organizationId: zoho.organization.id,
-          organizationName: zoho.organization.companyName,
-          organizationEmail: zoho.organization.primaryEmail,
-          scope: zoho.scope,
-          error: null,
-        };
-      } catch (error) {
-        zohoStatus.error = error instanceof Error ? error.message : 'Falha ao validar Zoho CRM.';
-      }
-    }
 
     return c.json({
       ok: true,
@@ -4181,13 +3092,6 @@ export const createApp = () => {
             ? 'cloudflare_secret'
             : null,
       },
-      meta: metaStatus,
-      googleAds: googleAdsStatus,
-      zoho: zohoStatus,
-      connectors: {
-        meta: metaConnector,
-        googleAds: googleAdsConnector,
-      },
       auth: {
         mode: isGoogleOnlyAuth(c.env) ? 'google_only' : 'local_password',
         googleClientConfigured: Boolean(c.env.GOOGLE_AUTH_CLIENT_ID && !c.env.GOOGLE_AUTH_CLIENT_ID.startsWith('REPLACE_WITH')),
@@ -4197,7 +3101,7 @@ export const createApp = () => {
       deliverability,
       checklist,
       notices: {
-        openTracking: await isOpenTrackingEnabled(c.env),
+        openTracking: parseBoolean(c.env.ENABLE_OPEN_TRACKING, false),
         clickTrackingReliable: true,
         inboxPlacementGuaranteed: false,
       },
@@ -4215,24 +3119,19 @@ export const createApp = () => {
   app.put('/api/settings/sending', async (c) => {
     const actor = requirePermission(c, 'settings:manage');
     const body = await requireJsonBody<Record<string, unknown>>(c.req.raw);
+    const errors: string[] = [];
+    const clamp = (key: string, min: number, max: number) => {
+      const v = Number(body[key]);
+      if (body[key] !== undefined && (isNaN(v) || v < min || v > max)) errors.push(`${key} deve ser entre ${min} e ${max}`);
+    };
+    clamp('batchSize', 1, 100);
+    clamp('ratePerMinute', 1, 500);
+    clamp('pauseMs', 0, 30000);
+    clamp('campaignMaxRecipients', 1, 50000);
+    clamp('retryLimit', 0, 10);
+    if (errors.length) throw new HttpError(400, errors.join('; '));
     await writeSetting(c.env, 'sending', body, actor.id);
     await auditLog(c.env, c.req.raw, actor.id, 'settings.sending.update', 'app_settings', 'sending', body);
-    return c.json({ ok: true });
-  });
-
-  app.put('/api/settings/meta', async (c) => {
-    const actor = requirePermission(c, 'settings:manage');
-    const body = await requireJsonBody<Record<string, unknown>>(c.req.raw);
-    await writeSetting(c.env, 'meta_connector', body, actor.id);
-    await auditLog(c.env, c.req.raw, actor.id, 'settings.meta.update', 'app_settings', 'meta_connector', body);
-    return c.json({ ok: true });
-  });
-
-  app.put('/api/settings/google-ads', async (c) => {
-    const actor = requirePermission(c, 'settings:manage');
-    const body = await requireJsonBody<Record<string, unknown>>(c.req.raw);
-    await writeSetting(c.env, 'google_ads_connector', body, actor.id);
-    await auditLog(c.env, c.req.raw, actor.id, 'settings.google_ads.update', 'app_settings', 'google_ads_connector', body);
     return c.json({ ok: true });
   });
 
@@ -4267,245 +3166,6 @@ export const createApp = () => {
       ok: true,
       email: targetEmail,
       providerMessageId: result.id,
-    });
-  });
-
-  app.post('/api/settings/meta/test', async (c) => {
-    const actor = requirePermission(c, 'settings:manage');
-    const metaConnector = await readMetaConnectorSettings(c.env);
-
-    if (!isMetaGraphConfigured(c.env)) {
-      throw new HttpError(400, 'Meta ainda nao foi configurada no Worker com token server-side.');
-    }
-
-    const pixel = await getMetaPixelSummary(c.env);
-    await auditLog(c.env, c.req.raw, actor.id, 'settings.meta.test_connection', 'app_settings', 'meta_connector', {
-      pixelId: pixel.id,
-      pixelName: pixel.name,
-      adAccountId: metaConnector.adAccountId,
-      leadFormIds: metaConnector.leadFormIds,
-    });
-
-    return c.json({
-      ok: true,
-      meta: {
-        pixel,
-        adAccountId: metaConnector.adAccountId,
-        leadFormIds: metaConnector.leadFormIds,
-      },
-    });
-  });
-
-  app.post('/api/settings/meta/sync', async (c) => {
-    const actor = requirePermission(c, 'settings:manage');
-    const metaConnector = await readMetaConnectorSettings(c.env);
-
-    if (!isMetaGraphConfigured(c.env)) {
-      throw new HttpError(400, 'Meta ainda nao foi configurada no Worker com token server-side.');
-    }
-
-    if (!metaConnector.adAccountId && (!metaConnector.leadFormIds || metaConnector.leadFormIds.length === 0)) {
-      throw new HttpError(400, 'Informe ao menos um adAccountId ou leadFormIds na configuracao da Meta.');
-    }
-
-    const syncRunId = await startConnectorSyncRun(c.env, 'meta', 'campaigns_and_leads', metaConnector.adAccountId ?? null);
-    try {
-      let campaignCount = 0;
-      let leadCount = 0;
-      let contactsCreated = 0;
-      const since = new Date(Date.now() - ((metaConnector.lookbackDays ?? DEFAULT_META_LOOKBACK_DAYS) - 1) * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-      const until = new Date().toISOString().slice(0, 10);
-
-      if (metaConnector.adAccountId) {
-        const metrics = await fetchMetaCampaignMetrics(c.env, metaConnector.adAccountId, since, until);
-        for (const metric of metrics) {
-          await upsertAdCampaignMetric(c.env, 'meta', metric.accountId || metaConnector.adAccountId, metric.campaignId, metric.dateStart || metric.dateStop || until, {
-            campaignName: metric.campaignName,
-            campaignStatus: metric.campaignStatus,
-            impressions: metric.impressions,
-            clicks: metric.clicks,
-            interactions: metric.clicks,
-            ctr: metric.ctr,
-            spendAmount: metric.spendAmount,
-            spendCurrency: metric.spendCurrency,
-            conversions: metric.conversions,
-            raw: metric.raw,
-          });
-          campaignCount += 1;
-        }
-        await upsertAdPlatformAccount(c.env, 'meta', metaConnector.adAccountId, 'Meta Ads', 'active', {
-          pixelId: getMetaPixelId(c.env),
-          lookbackDays: metaConnector.lookbackDays,
-        });
-      }
-
-      if (metaConnector.leadFormIds && metaConnector.leadFormIds.length > 0) {
-        const leads = await fetchMetaLeadAds(c.env, metaConnector.leadFormIds);
-        for (const lead of leads) {
-          let contactId: string | null = null;
-          let syncedToContact = false;
-          if (metaConnector.autoCreateContacts && (lead.email || lead.phone)) {
-            const contact = await upsertExternalContact(c.env, {
-              email: lead.email,
-              phone: lead.phone,
-              fullName: lead.fullName,
-              source: 'meta_lead_ads',
-              tags: ['meta', 'meta-lead-ads'],
-              optInStatus: 'pending',
-            });
-            if (contact) {
-              contactId = contact.id;
-              syncedToContact = true;
-              contactsCreated += 1;
-              await syncContactToZoho(c.env, contact);
-            }
-          }
-
-          await recordAdLead(c.env, {
-            provider: 'meta',
-            externalLeadId: lead.id,
-            accountId: metaConnector.adAccountId,
-            formId: lead.formId,
-            campaignId: lead.campaignId,
-            adsetId: lead.adsetId,
-            adId: lead.adId,
-            contactId,
-            email: lead.email,
-            phone: lead.phone,
-            fullName: lead.fullName,
-            leadCreatedAt: lead.createdTime,
-            syncedToContact,
-            raw: lead.raw,
-          });
-          leadCount += 1;
-        }
-      }
-
-      const summary = {
-        campaignCount,
-        leadCount,
-        contactsCreated,
-        adAccountId: metaConnector.adAccountId,
-        leadFormIds: metaConnector.leadFormIds,
-        lookbackDays: metaConnector.lookbackDays,
-      };
-      await finishConnectorSyncRun(c.env, syncRunId, 'success', summary);
-      await auditLog(c.env, c.req.raw, actor.id, 'settings.meta.sync', 'app_settings', 'meta_connector', summary);
-      return c.json({ ok: true, summary });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Falha ao sincronizar Meta.';
-      await finishConnectorSyncRun(c.env, syncRunId, 'error', {}, message);
-      throw new HttpError(502, message);
-    }
-  });
-
-  app.post('/api/settings/google-ads/test', async (c) => {
-    const actor = requirePermission(c, 'settings:manage');
-    const googleAdsConnector = await readGoogleAdsConnectorSettings(c.env);
-    const customerId = googleAdsConnector.customerId;
-
-    if (!isGoogleAdsConfigured(c.env) || !customerId) {
-      throw new HttpError(400, 'Google Ads ainda nao foi configurado com credenciais server-side e customer ID.');
-    }
-
-    const [summary, accessibleCustomers] = await Promise.all([
-      getGoogleAdsCustomerSummary(c.env, customerId),
-      listGoogleAdsAccessibleCustomers(c.env),
-    ]);
-
-    await auditLog(c.env, c.req.raw, actor.id, 'settings.google_ads.test_connection', 'app_settings', 'google_ads_connector', {
-      customerId,
-      customerName: summary.descriptiveName,
-      accessibleCustomers: accessibleCustomers.length,
-    });
-
-    return c.json({
-      ok: true,
-      googleAds: {
-        customer: summary,
-        accessibleCustomers,
-      },
-    });
-  });
-
-  app.post('/api/settings/google-ads/sync', async (c) => {
-    const actor = requirePermission(c, 'settings:manage');
-    const googleAdsConnector = await readGoogleAdsConnectorSettings(c.env);
-    const customerId = googleAdsConnector.customerId;
-
-    if (!isGoogleAdsConfigured(c.env) || !customerId) {
-      throw new HttpError(400, 'Google Ads ainda nao foi configurado com credenciais server-side e customer ID.');
-    }
-
-    const syncRunId = await startConnectorSyncRun(c.env, 'google_ads', 'campaign_metrics', customerId);
-    try {
-      const [summary, metrics] = await Promise.all([
-        getGoogleAdsCustomerSummary(c.env, customerId),
-        fetchGoogleAdsCampaignMetrics(c.env, customerId, googleAdsConnector.lookbackDays ?? DEFAULT_GOOGLE_ADS_LOOKBACK_DAYS),
-      ]);
-
-      await upsertAdPlatformAccount(c.env, 'google_ads', customerId, summary.descriptiveName, 'active', {
-        currencyCode: summary.currencyCode,
-        timeZone: summary.timeZone,
-        lookbackDays: googleAdsConnector.lookbackDays,
-      });
-
-      for (const metric of metrics) {
-        await upsertAdCampaignMetric(c.env, 'google_ads', metric.customerId, metric.campaignId, metric.metricDate, {
-          campaignName: metric.campaignName,
-          campaignStatus: metric.campaignStatus,
-          impressions: metric.impressions,
-          clicks: metric.clicks,
-          interactions: metric.interactions,
-          ctr: metric.ctr,
-          spendAmount: metric.costMicros / 1_000_000,
-          spendCurrency: summary.currencyCode,
-          conversions: metric.conversions,
-          raw: metric.raw,
-        });
-      }
-
-      const summaryPayload = {
-        customerId,
-        customerName: summary.descriptiveName,
-        campaignsIndexed: metrics.length,
-        lookbackDays: googleAdsConnector.lookbackDays,
-      };
-      await finishConnectorSyncRun(c.env, syncRunId, 'success', summaryPayload);
-      await auditLog(c.env, c.req.raw, actor.id, 'settings.google_ads.sync', 'app_settings', 'google_ads_connector', summaryPayload);
-
-      return c.json({
-        ok: true,
-        summary: summaryPayload,
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Falha ao sincronizar Google Ads.';
-      await finishConnectorSyncRun(c.env, syncRunId, 'error', {}, message);
-      throw new HttpError(502, message);
-    }
-  });
-
-  app.post('/api/settings/zoho/test', async (c) => {
-    const actor = requirePermission(c, 'settings:manage');
-    if (!isZohoConfigured(c.env)) {
-      throw new HttpError(400, 'Credenciais do Zoho CRM ainda nao foram configuradas no ambiente.');
-    }
-
-    const zoho = await getZohoOrganization(c.env);
-    await auditLog(c.env, c.req.raw, actor.id, 'settings.zoho.test_connection', 'app_settings', 'zoho_crm', {
-      organizationId: zoho.organization.id,
-      organizationName: zoho.organization.companyName,
-      apiDomain: zoho.apiDomain,
-      scope: zoho.scope,
-    });
-
-    return c.json({
-      ok: true,
-      zoho: {
-        apiDomain: zoho.apiDomain,
-        scope: zoho.scope,
-        organization: zoho.organization,
-      },
     });
   });
 
@@ -4604,59 +3264,6 @@ export const createApp = () => {
     throw new HttpError(404, 'Exportacao nao encontrada.');
   });
 
-  app.get('/o/:trackingToken', async (c) => {
-    const trackingToken = c.req.param('trackingToken');
-    const recipient = await first<RecipientRecord>(c.env.DB.prepare('SELECT * FROM campaign_recipients WHERE tracking_token = ?').bind(trackingToken));
-
-    const headers = new Headers({
-      'content-type': 'image/gif',
-      'cache-control': 'no-store, no-cache, must-revalidate, max-age=0',
-      pragma: 'no-cache',
-    });
-
-    if (recipient) {
-      const recentDuplicate = await first<{ created_at: string }>(
-        c.env.DB.prepare(
-          `SELECT created_at FROM campaign_open_events
-           WHERE recipient_id = ? AND created_at >= ?
-           ORDER BY created_at DESC
-           LIMIT 1`,
-        ).bind(recipient.id, new Date(Date.now() - 15_000).toISOString()),
-      );
-
-      if (!recentDuplicate) {
-        const priorOpen = await first<{ total: number }>(
-          c.env.DB.prepare('SELECT COUNT(*) AS total FROM campaign_open_events WHERE recipient_id = ?').bind(recipient.id),
-        );
-        const isUnique = (priorOpen?.total ?? 0) === 0 ? 1 : 0;
-        await run(
-          c.env.DB.prepare(
-            `INSERT INTO campaign_open_events
-              (id, campaign_id, contact_id, recipient_id, request_ip, user_agent, referer, is_unique, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          ).bind(
-            generateId('opn'),
-            recipient.campaign_id,
-            recipient.contact_id,
-            recipient.id,
-            getRequestIp(c.req.raw),
-            c.req.header('user-agent'),
-            c.req.header('referer'),
-            isUnique,
-            nowIso(),
-          ),
-        );
-        await run(c.env.DB.prepare('UPDATE campaign_recipients SET opened_at = COALESCE(opened_at, ?), updated_at = ? WHERE id = ?').bind(nowIso(), nowIso(), recipient.id));
-        await refreshCampaignStats(c.env, recipient.campaign_id);
-      }
-    }
-
-    return new Response(Uint8Array.from(atob(TRANSPARENT_GIF_BASE64), (char) => char.charCodeAt(0)), {
-      status: 200,
-      headers,
-    });
-  });
-
   app.get('/c/:token', async (c) => {
     const token = c.req.param('token');
     const { trackingToken, linkId } = parseTrackingToken(token);
@@ -4734,6 +3341,5 @@ export const createApp = () => {
 };
 
 export const runScheduledWork = async (env: Env) => {
-  await publishScheduledBlogPosts(env);
   await processCampaignQueue(env);
 };
