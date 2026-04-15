@@ -1,6 +1,6 @@
 # Operacao e deploy
 
-Atualizado em: 2026-04-13
+Atualizado em: 2026-04-15
 
 ## Requisitos
 
@@ -60,6 +60,8 @@ npm run deploy:worker
 No estado atual:
 
 - o GitHub nao publica o site;
+- o workflow de Cloudflare no GitHub fica somente como fallback manual via `workflow_dispatch`;
+- pushes em `main` nao devem mais tentar publicar automaticamente no Cloudflare;
 - o que mantem o site e o CRM publicados e o acesso Cloudflare/Wrangler;
 - o repositório GitHub oficial para versionamento e continuidade deste projeto e `https://github.com/cuiabar/cuiabar-web`.
 
@@ -69,6 +71,7 @@ Estado aplicado em 2026-04-13:
 - `G:\Meu Drive\cuiabar-web` fica como backup, snapshot e base de consulta;
 - o remote `origin` local deve apontar para `https://github.com/cuiabar/cuiabar-web.git`;
 - a publicacao de codigo no GitHub e independente do deploy no Cloudflare;
+- o deploy operacional continua sendo executado localmente por esta maquina, com Wrangler autenticado;
 - os identificadores desta maquina e do bridge local ficaram registrados em `docs/10-AMBIENTE-LOCAL-E-IDS.md`.
 
 ## D1 / banco

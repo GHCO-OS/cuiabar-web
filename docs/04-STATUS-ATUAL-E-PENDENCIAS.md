@@ -90,6 +90,7 @@ A publicacao do site nao depende do GitHub hoje.
 
 Isso significa:
 - o repositorio GitHub nao e o mecanismo de deploy do site;
+- o workflow `deploy-cloudflare.yml` no GitHub fica restrito a disparo manual de contingencia;
 - o que nao pode faltar para publicacao e o acesso de deploy ao Cloudflare;
 - o GitHub continua sendo a base oficial de versionamento e continuidade.
 

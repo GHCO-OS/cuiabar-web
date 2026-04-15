@@ -1,9 +1,6 @@
-name: Deploy Cloudflare
+name: Deploy Cloudflare (manual fallback)
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
