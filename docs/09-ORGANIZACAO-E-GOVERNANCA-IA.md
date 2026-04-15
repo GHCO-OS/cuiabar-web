@@ -1,6 +1,6 @@
 # Organizacao e governanca para manutencao por IA
 
-Atualizado em: 2026-04-13
+Atualizado em: 2026-04-15
 
 ## Diagnostico atual
 
@@ -154,6 +154,21 @@ Nao comece por tentativa e erro. Leia:
 - regra server-side em `worker/` ou `functions/`
 - configuracao operacional em `docs/`
 
+### 2.1. Escolher a linha de produto certa antes de editar
+
+Antes de abrir branch ou editar arquivos, classifique a mudanca em uma destas linhas:
+
+- `GHCO OS`
+  core compartilhado, contratos, entidades comuns, autenticacao, integracoes centrais
+- `Cuiabar Web`
+  site, blog, cardapio, SEO publico e experiencia do cliente final
+- `MeuCuiabar`
+  controle interno, qualidade, HACCP e rotinas da casa
+- `Cuiabar Atende`
+  WhatsApp com IA, reservas, CRM, marketing e fidelidade
+
+Se a mudanca nao estiver claramente em uma linha de produto, ela deve ser tratada como core compartilhado ou infraestrutura.
+
 ### 3. Nao espalhar contexto importante em conversa
 
 Se a mudanca altera funcionamento real, registre no documento certo.
@@ -165,6 +180,20 @@ Tokens, chaves e contas devem ficar restritos ao inventario confidencial.
 ### 5. Nao consolidar gambiarra como padrao
 
 Se algo foi criado como teste, prova, debug ou QA, deve ficar claramente separado.
+
+### 6. Nao usar `Super` como destino final de arquitetura
+
+`Super` deixa de ser nome de produto oficial.
+
+Regra:
+
+- legado `Super` deve ser triado e redistribuido
+- o destino correto e sempre uma destas linhas:
+  - `GHCO OS`
+  - `MeuCuiabar`
+  - `Cuiabar Atende`
+
+Nenhuma nova documentacao, branch permanente ou modulo principal deve nascer com `Super` como identidade oficial.
 
 ## Organizacao alvo da raiz
 

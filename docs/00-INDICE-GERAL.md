@@ -55,6 +55,9 @@ Este diretorio centraliza a documentacao operacional do `GHCO OS`, para que o pr
 - `14-NOMENCLATURA-E-LINHAS-DE-PRODUTO.md`
   Nome do sistema-mãe, linhas de produto, fronteiras funcionais e convencao de naming para branches.
 
+- `15-DERIVACOES-E-TOPOLOGIA-GIT.md`
+  Topologia oficial do Git, destino do legado `Super` e branches-base ativas do sistema.
+
 ## Material complementar
 
 Esses arquivos continuam validos como apoio:

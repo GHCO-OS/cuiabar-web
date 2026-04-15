@@ -46,6 +46,24 @@ Com tres linhas de produto:
 - separacao conceitual entre `Cuiabar Web`, `MeuCuiabar` e `Cuiabar Atende`
 - padrao de branches por linha de produto e por core compartilhado
 
+## Topologia Git atual
+
+Tronco oficial:
+
+- `main`
+
+Branches-base derivadas do sistema:
+
+- `ghco/core`
+- `web/cuiabar-web`
+- `meucuiabar/operacao`
+- `atende/omnicanal`
+
+Decisao estrutural:
+
+- `Super` deixa de ser nome de produto e de linha permanente no Git;
+- qualquer legado associado a `Super` deve ser classificado e redistribuido entre `MeuCuiabar`, `Cuiabar Atende` ou `GHCO OS`.
+
 ## O que merece acompanhamento
 
 - revisar warnings de SSR com `<Navigate>` no build

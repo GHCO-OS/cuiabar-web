@@ -1,6 +1,6 @@
 # Estratégia de branches e módulos
 
-Atualizado em: 2026-04-14
+Atualizado em: 2026-04-15
 
 ## Objetivo
 
@@ -44,6 +44,10 @@ Branch sugerida:
 
 - `web/*`
 
+Branch-base criada:
+
+- `web/cuiabar-web`
+
 ### Linha 2: MeuCuiabar
 
 - controle interno
@@ -61,6 +65,10 @@ Branch sugerida:
 Branch sugerida:
 
 - `meucuiabar/*`
+
+Branch-base criada:
+
+- `meucuiabar/operacao`
 
 Observacao:
 
@@ -91,6 +99,10 @@ Observacao:
 Branch sugerida:
 
 - `atende/*`
+
+Branch-base criada:
+
+- `atende/omnicanal`
 
 ### Frente complementar: Burger Cuiabar
 
@@ -130,6 +142,10 @@ Branch sugerida:
 
 - `ghco/*`
   mudanças de core compartilhado, contratos centrais, entidades comuns e arquitetura do sistema-mãe
+
+Branch-base criada:
+
+- `ghco/core`
 
 - `infra/*`
   deploy, Cloudflare, build, CI, estrutura, segredos e ambiente
@@ -173,3 +189,14 @@ Só vale considerar repositórios separados quando houver:
 - owners diferentes por frente
 - pipelines independentes
 - redução real de acoplamento entre `src/`, `worker/` e `functions/`
+
+## Regra para o legado `Super`
+
+`Super` nao e mais nome de produto nem familia de branch permanente.
+
+Uso correto daqui para frente:
+
+- material de WhatsApp, CRM, reservas, marketing e fidelidade vai para `atende/*`
+- material de controle interno, qualidade, HACCP e rotina da casa vai para `meucuiabar/*`
+- contratos compartilhados e entidades comuns vao para `ghco/*`
+- somente o que for estavel e integrado deve subir para `main`

@@ -6,10 +6,10 @@ Permitir que o projeto seja aberto e continuado em outra maquina ou outro Codex 
 
 ## Passo a passo
 
-1. Abrir a pasta sincronizada:
+1. Clonar ou abrir o repositorio oficial:
 
 ```txt
-G:\Meu Drive\cuiabar-web
+https://github.com/cuiabar/cuiabar-web
 ```
 
 2. Ler nesta ordem:
@@ -17,9 +17,18 @@ G:\Meu Drive\cuiabar-web
 - `START-AQUI.md`
 - `docs/00-INDICE-GERAL.md`
 - `docs/04-STATUS-ATUAL-E-PENDENCIAS.md`
-- `ACESSOS-CHAVES-PROJETO.md`
+- `docs/14-NOMENCLATURA-E-LINHAS-DE-PRODUTO.md`
+- `docs/15-DERIVACOES-E-TOPOLOGIA-GIT.md`
 
-3. Validar ambiente:
+3. Escolher a branch certa antes de editar:
+
+- `main` para leitura do tronco atual
+- `ghco/*` para core compartilhado
+- `web/*` para `Cuiabar Web`
+- `meucuiabar/*` para `MeuCuiabar`
+- `atende/*` para `Cuiabar Atende`
+
+4. Validar ambiente:
 
 ```bash
 npm install
@@ -27,14 +36,14 @@ npm run lint
 npm run build
 ```
 
-4. Se precisar publicar:
+5. Se precisar publicar:
 
 ```bash
 npm run deploy:pages
 npm run deploy:worker
 ```
 
-5. Se o deploy falhar por autenticacao:
+6. Se o deploy falhar por autenticacao:
 
 - verificar login/token do Cloudflare
 - confirmar permissao de Pages e Worker
@@ -44,7 +53,8 @@ npm run deploy:worker
 
 - O projeto usa Vite + React no frontend.
 - O deploy atual e Cloudflare manual via Wrangler.
-- O GitHub nao e parte obrigatoria da publicacao atual.
+- O GitHub e a fonte oficial do codigo e da documentacao.
+- O Google Drive fica apenas como backup operacional e apoio.
 - As configuracoes centrais do negocio ficam principalmente em:
   - `src/data/siteConfig.ts`
   - `src/data/content.ts`
@@ -58,4 +68,4 @@ npm run deploy:worker
 
 ## Objetivo final desta pasta
 
-Esta pasta deve funcionar como a copia mestra operacional do website Cuiabar para continuidade de trabalho entre maquinas e entre sessoes Codex.
+Esta pasta deve funcionar como o guia de continuidade do `GHCO OS` entre maquinas, branches e sessoes Codex.
