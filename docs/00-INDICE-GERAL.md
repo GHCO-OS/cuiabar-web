@@ -58,6 +58,9 @@ Este diretorio centraliza a documentacao operacional do `GHCO OS`, para que o pr
 - `15-DERIVACOES-E-TOPOLOGIA-GIT.md`
   Topologia oficial do Git, destino do legado `Super` e branches-base ativas do sistema.
 
+- `16-CLASSIFICACAO-DE-MODULOS-E-LEGADO.md`
+  Classificacao de pastas, modulos, migracoes e legados entre `GHCO OS`, `Cuiabar Web`, `MeuCuiabar` e `Cuiabar Atende`.
+
 ## Material complementar
 
 Esses arquivos continuam validos como apoio:

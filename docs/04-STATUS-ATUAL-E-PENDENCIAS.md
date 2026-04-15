@@ -45,6 +45,8 @@ Com tres linhas de produto:
 - definicao do sistema-mãe `GHCO OS`
 - separacao conceitual entre `Cuiabar Web`, `MeuCuiabar` e `Cuiabar Atende`
 - padrao de branches por linha de produto e por core compartilhado
+- branches-base oficiais abertas no remoto
+- classificacao operacional do legado em andamento, com matriz publicada em `docs/16-CLASSIFICACAO-DE-MODULOS-E-LEGADO.md`
 
 ## Topologia Git atual
 
@@ -63,6 +65,12 @@ Decisao estrutural:
 
 - `Super` deixa de ser nome de produto e de linha permanente no Git;
 - qualquer legado associado a `Super` deve ser classificado e redistribuido entre `MeuCuiabar`, `Cuiabar Atende` ou `GHCO OS`.
+
+Estado da classificacao:
+
+- `Cuiabar Web` ja possui superficie estavel e identificavel
+- `Cuiabar Atende` ja possui superficie estavel e identificavel
+- `MeuCuiabar` ainda nao tem modulo dedicado estabilizado e fica como linha reservada para extracao progressiva
 
 ## O que merece acompanhamento
 
