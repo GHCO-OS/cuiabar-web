@@ -1,6 +1,6 @@
 # Classificacao de modulos e legado
 
-Atualizado em: 2026-04-15
+Atualizado em: 2026-04-17
 
 ## Objetivo
 
@@ -159,21 +159,24 @@ Responsabilidade:
 
 ### Estado atual
 
-`MeuCuiabar` agora possui um primeiro bloco dedicado no repositorio.
+`MeuCuiabar` agora possui uma superficie operacional dedicada no repositorio.
 
 Isso significa:
 
-- existe uma superficie inicial em `src/meucuiabar/`
-- o produto continua dependendo de extracao progressiva do legado para ganhar profundidade real
+- existe uma superficie dedicada em `src/meucuiabar/`
+- a versao atual do frontend foi transplantada do Base44 para `src/meucuiabar/base44/`
+- o produto ainda depende do Base44 para auth e dados ate a extracao do backend proprio
 
 ### Fonte principal classificada em `MeuCuiabar`
 
-- `src/meucuiabar/pages/MeuCuiabarHubPage.tsx`
-- `src/meucuiabar/pages/MeuCuiabarAuditPage.tsx`
+- `src/meucuiabar/MeuCuiabarApp.tsx`
+- `src/meucuiabar/branding.ts`
+- `src/meucuiabar/base44/`
 
 Observacao:
 
-- a auditoria interna saiu do namespace direto de `src/crm/pages/` e passa a marcar o primeiro bloco real de `MeuCuiabar`.
+- a primeira extracao de auditoria/hub foi substituida pela versao operacional raspada do Base44.
+- o frontend de `MeuCuiabar` agora sobe em app proprio com codigo local, mas ainda consome auth e dados da plataforma Base44.
 
 ### Destino correto para novas extracoes de `MeuCuiabar`
 
@@ -211,6 +214,7 @@ Responsabilidade:
 ### Fonte principal classificada em `Cuiabar Atende`
 
 - `src/crm/`
+- `src/crm/branding.ts`
 - `src/reservations/`
 - `worker/reservations/`
 - `worker/whatsapp/`
@@ -302,7 +306,7 @@ Estado atual:
 
 ### Casos que exigem cuidado especial
 
-- `KIT-PORTABILIDADE/google-service-account-meucuiabar.json`
+- `KIT-PORTABILIDADE/confidencial/google-service-account-meucuiabar.json`
   arquivo sensivel e legado operacional, nao e documentacao oficial nem fonte de edicao
 
 - `ops-artifacts/cloudflare-debug/*`

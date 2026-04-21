@@ -2,6 +2,7 @@ import type { DietaryRestrictionType, DiscoverySource, GuestCountMode, MealPerio
 
 export const RESERVATION_TIMEZONE = 'America/Sao_Paulo';
 export const RESERVATION_DURATION_HOURS = 2;
+export const VILLA_CUIABAR_ADDRESS = 'Villa Cuiabar - Av. Brigadeiro Rafael Tobias de Aguiar, 1121 - Jardim Aurelia - Campinas/SP';
 
 export const RESERVATION_TIME_OPTIONS: Array<{ value: ReservationTime; label: string; mealPeriod: MealPeriod }> = [
   { value: '11:00', label: '11h', mealPeriod: 'lunch' },

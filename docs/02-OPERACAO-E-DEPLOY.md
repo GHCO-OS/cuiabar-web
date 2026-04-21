@@ -1,6 +1,6 @@
 # Operacao e deploy
 
-Atualizado em: 2026-04-15
+Atualizado em: 2026-04-17
 
 ## Requisitos
 
@@ -54,6 +54,9 @@ npm run deploy:worker
 - O Worker principal e `cuiabar-crm`
 - A configuracao esta em `wrangler.jsonc`
 - O deploy usa `wrangler deploy`
+- o token usado para deploy precisa enxergar os recursos de KV/D1/Workers exigidos pelo `wrangler.jsonc`; um token valido para Pages nao basta se nao conseguir listar namespaces KV
+- o binding `WHATSAPP_KV` deve permanecer com `id` explicito no `wrangler.jsonc`; sem isso o Wrangler tenta recriar o namespace e pode falhar mesmo com token correto
+- o host oficial do `MeuCuiabar` passa a ser `meu.cuiabar.com`; o alias legado `crm.cuiabar.com/meucuiabar*` fica apenas como redirect de compatibilidade
 
 ## Conclusao importante sobre GitHub
 
@@ -67,8 +70,8 @@ No estado atual:
 
 Estado aplicado em 2026-04-13:
 
-- a copia operacional principal passou a ser `C:\workspace\cuiabar-web`;
-- `G:\Meu Drive\cuiabar-web` fica como backup, snapshot e base de consulta;
+- a copia operacional principal desta maquina e `C:\cuiabar-web`;
+- o Google Drive fica apenas como destino opcional de backup via `scripts/sync-drive-backup.ps1`;
 - o remote `origin` local deve apontar para `https://github.com/cuiabar/cuiabar-web.git`;
 - a publicacao de codigo no GitHub e independente do deploy no Cloudflare;
 - o deploy operacional continua sendo executado localmente por esta maquina, com Wrangler autenticado;
@@ -91,6 +94,7 @@ Banco configurado em `wrangler.jsonc`:
 ## Riscos operacionais
 
 - Se o token do Cloudflare expirar, o deploy manual para.
+- Se o token do Cloudflare nao tiver permissao de KV/Workers, o Pages pode publicar e o Worker falhar mesmo com autenticacao valida.
 - Se as secrets nao estiverem presentes no ambiente Cloudflare, partes como login Google, e-mail e tracking server-side podem falhar.
 - Existem avisos conhecidos de SSR relacionados a `<Navigate>` em `StaticRouter`; isso nao bloqueia o build, mas merece limpeza futura.
 - Se o runtime local do Baileys perder a sessao, o bridge volta para `qr_ready` e exige novo pareamento manual.

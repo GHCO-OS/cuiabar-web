@@ -1,5 +1,6 @@
 node_modules
 dist
+dist-blog
 .ssr
 .claude/
 .claude/worktrees/
@@ -13,6 +14,7 @@ dist
 .env.*
 services/whatsapp-baileys/.auth/
 blog-options/*/.env
+blog-options/**/.env
 tmp-menu-source.html
 tmp-menu.json
 .codex-*
@@ -20,3 +22,9 @@ vite.config.js
 vite.config.d.ts
 worker/**/*.js
 worker/**/*.d.ts
+ops-artifacts/**
+!ops-artifacts/
+!ops-artifacts/README.md
+.blog-editor-keepalive.pid
+KIT-PORTABILIDADE/confidencial/**
+KIT-PORTABILIDADE/snapshots/**

@@ -85,6 +85,19 @@ type GmailOAuthConnection = {
   source?: 'panel_oauth' | 'cloudflare_secret';
 };
 
+type MeuCuiabarGoogleExchangePayload = {
+  access_token?: string;
+  refresh_token?: string;
+  id_token?: string;
+  scope?: string;
+  error?: string;
+  error_description?: string;
+};
+
+type MeuCuiabarAccessDecision =
+  | { approved: true; userId: string; email: string }
+  | { approved: false; userId: string; email: string; message: string };
+
 type ContactListRow = ContactRecord;
 
 type PublicInteractionPayload = {
@@ -100,6 +113,13 @@ type PublicInteractionPayload = {
 
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 14;
 const GMAIL_OAUTH_STATE_COOKIE_NAME = 'cuiabar_gmail_oauth_state';
+const MEUCUIABAR_GOOGLE_SCOPES = [
+  'openid',
+  'email',
+  'profile',
+  'https://www.googleapis.com/auth/calendar',
+  'https://www.googleapis.com/auth/tasks',
+];
 const RESERVED_TEMPLATE_VARIABLES = ['first_name', 'last_name', 'email', 'unsubscribe_url', 'campaign_name', 'reply_to'];
 const DEFAULT_IFOOD_STORE_URL =
   'https://www.ifood.com.br/delivery/campinas-sp/villa-cuiabar--executivos--pratos-do-dia-jardim-aurelia/1af0e396-a7c8-46e1-b1a5-dd06486bb4ad';
@@ -108,6 +128,7 @@ const CSRF_EXEMPT_PATHS = [
   '/api/auth/login',
   '/api/bootstrap/admin',
   '/api/gmail/oauth/exchange',
+  '/api/meucuiabar/auth/google/exchange',
   '/api/internal/whatsapp/crm/sync',
 ];
 const isCsrfExemptPath = (path: string) => CSRF_EXEMPT_PATHS.includes(path) || path.startsWith('/api/internal/whatsapp/');
@@ -259,6 +280,11 @@ const getSessionBundle = async (env: Env, sessionId: string | undefined) => {
     user_id: string;
     email: string;
     display_name: string;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+    approval_status: 'pending' | 'approved' | 'rejected' | null;
+    google_access_scope: string | null;
     status: string;
     roles: string | null;
   }>(
@@ -270,6 +296,11 @@ const getSessionBundle = async (env: Env, sessionId: string | undefined) => {
         u.id AS user_id,
         u.email,
         u.display_name,
+        u.first_name,
+        u.last_name,
+        u.avatar_url,
+        u.approval_status,
+        u.google_access_scope,
         u.status,
         GROUP_CONCAT(r.name) AS roles
        FROM sessions s
@@ -297,6 +328,11 @@ const getSessionBundle = async (env: Env, sessionId: string | undefined) => {
       displayName: row.display_name,
       status: row.status,
       roles,
+      firstName: row.first_name,
+      lastName: row.last_name,
+      avatarUrl: row.avatar_url,
+      approvalStatus: row.approval_status ?? 'approved',
+      googleAccessScope: row.google_access_scope,
     } satisfies AuthUser,
     session: {
       id: row.session_id,
@@ -365,6 +401,42 @@ const parseEmailSet = (value: string | undefined) =>
       .map((entry) => entry.trim().toLowerCase())
       .filter(Boolean),
   );
+
+const parseGoogleScopeList = (value: string | null | undefined) =>
+  (value ?? '')
+    .split(/\s+/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+const getGoogleOauthClientId = (env: Env) => {
+  const candidate = env.GOOGLE_AUTH_CLIENT_ID ?? env.GOOGLE_CLIENT_ID ?? null;
+  return candidate && !candidate.startsWith('REPLACE_WITH') ? candidate : null;
+};
+
+const getGoogleOauthClientSecret = (env: Env) => {
+  const candidate = env.GOOGLE_AUTH_CLIENT_SECRET ?? env.GOOGLE_CLIENT_SECRET ?? null;
+  return candidate && !candidate.startsWith('REPLACE_WITH') ? candidate : null;
+};
+
+const getMeuCuiabarMasterEmails = (env: Env) => {
+  const configured = parseEmailSet(env.MEUCUIABAR_MASTER_EMAILS);
+  configured.add('leonardo@cuiabar.net');
+  configured.add('cuiabar@cuiabar.net');
+  return configured;
+};
+
+const splitDisplayName = (name: string) => {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return { firstName: null, lastName: null };
+  }
+
+  const parts = trimmed.split(/\s+/);
+  return {
+    firstName: parts[0] ?? null,
+    lastName: parts.length > 1 ? parts.slice(1).join(' ') : null,
+  };
+};
 
 const getConfiguredSenderName = (env: Env) => {
   const explicitSenderName = env.GMAIL_SENDER_NAME?.trim();
@@ -512,6 +584,185 @@ const ensureGoogleUser = async (env: Env, email: string, name: string, subject: 
   );
   await run(env.DB.prepare('INSERT INTO user_roles (user_id, role_id, created_at) VALUES (?, ?, ?)').bind(userId, roleId, nowIso()));
   return userId;
+};
+
+const exchangeMeuCuiabarGoogleCode = async (env: Env, code: string, redirectUri: string) => {
+  const clientId = getGoogleOauthClientId(env);
+  const clientSecret = getGoogleOauthClientSecret(env);
+  if (!clientId || !clientSecret) {
+    throw new HttpError(400, 'As credenciais OAuth do Google para o MeuCuiabar ainda nao foram configuradas.');
+  }
+
+  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code',
+    }),
+  });
+
+  const payload = (await tokenResponse.json()) as MeuCuiabarGoogleExchangePayload;
+  if (!tokenResponse.ok) {
+    throw new HttpError(400, 'Google recusou a troca do codigo OAuth do MeuCuiabar.', payload);
+  }
+  if (!payload.id_token) {
+    throw new HttpError(400, 'O Google nao retornou um id_token para validar o acesso do MeuCuiabar.');
+  }
+
+  const grantedScopes = parseGoogleScopeList(payload.scope);
+  const missingScopes = MEUCUIABAR_GOOGLE_SCOPES.filter(
+    (scope) => !['openid', 'email', 'profile'].includes(scope) && !grantedScopes.includes(scope),
+  );
+  if (missingScopes.length > 0) {
+    throw new HttpError(400, 'A conta Google nao concedeu todas as permissoes obrigatorias do MeuCuiabar.', {
+      missingScopes,
+      grantedScopes,
+    });
+  }
+
+  return payload;
+};
+
+const ensureMeuCuiabarUserRole = async (env: Env, userId: string, roleId: string) => {
+  await run(
+    env.DB.prepare('INSERT OR IGNORE INTO user_roles (user_id, role_id, created_at) VALUES (?, ?, ?)').bind(userId, roleId, nowIso()),
+  );
+};
+
+const approveMeuCuiabarUser = async (env: Env, userId: string, approverEmail: string, roleId = 'role_marketing_operator') => {
+  await run(
+    env.DB.prepare(
+      `UPDATE users
+       SET status = 'active',
+           approval_status = 'approved',
+           approved_by_email = ?,
+           approved_at = ?,
+           updated_at = ?
+       WHERE id = ?`,
+    ).bind(approverEmail, nowIso(), nowIso(), userId),
+  );
+  await ensureMeuCuiabarUserRole(env, userId, roleId);
+};
+
+const upsertMeuCuiabarGoogleUser = async (
+  env: Env,
+  identity: Awaited<ReturnType<typeof verifyGoogleIdToken>>,
+  oauth: MeuCuiabarGoogleExchangePayload,
+): Promise<MeuCuiabarAccessDecision> => {
+  const email = identity.email.toLowerCase();
+  const masters = getMeuCuiabarMasterEmails(env);
+  const { firstName, lastName } = splitDisplayName(identity.name);
+  const existing = await first<{
+    id: string;
+    status: string;
+    approval_status: 'pending' | 'approved' | 'rejected' | null;
+  }>(
+    env.DB.prepare('SELECT id, status, approval_status FROM users WHERE google_subject = ? OR email = ?').bind(identity.subject, email),
+  );
+
+  const approvalStatus = masters.has(email) ? 'approved' : existing?.approval_status ?? 'pending';
+  const accountStatus = approvalStatus === 'approved' ? 'active' : 'disabled';
+  const scopeValue = oauth.scope ?? null;
+  const grantedAt = nowIso();
+
+  if (existing) {
+    await run(
+      env.DB.prepare(
+        `UPDATE users
+         SET email = ?,
+             display_name = ?,
+             first_name = ?,
+             last_name = ?,
+             google_subject = ?,
+             avatar_url = ?,
+             auth_provider = 'google',
+             email_verified = 1,
+             approval_status = ?,
+             status = ?,
+             google_access_scope = ?,
+             google_refresh_token = COALESCE(?, google_refresh_token),
+             google_access_granted_at = ?,
+             requested_at = COALESCE(requested_at, ?),
+             updated_at = ?
+         WHERE id = ?`,
+      ).bind(
+        email,
+        identity.name,
+        firstName,
+        lastName,
+        identity.subject,
+        identity.picture ?? null,
+        approvalStatus,
+        accountStatus,
+        scopeValue,
+        oauth.refresh_token ?? null,
+        grantedAt,
+        grantedAt,
+        nowIso(),
+        existing.id,
+      ),
+    );
+
+    if (approvalStatus === 'approved') {
+      const roleId = masters.has(email) ? 'role_manager' : 'role_marketing_operator';
+      await approveMeuCuiabarUser(env, existing.id, masters.has(email) ? email : email, roleId);
+      return { approved: true, userId: existing.id, email };
+    }
+
+    return {
+      approved: false,
+      userId: existing.id,
+      email,
+      message: 'Seu acesso ao MeuCuiabar foi registrado e agora depende da aprovacao de leonardo@cuiabar.net ou cuiabar@cuiabar.net.',
+    };
+  }
+
+  const placeholderPassword = await hashPassword(randomToken(24));
+  const userId = generateId('usr');
+  await run(
+    env.DB.prepare(
+      `INSERT INTO users
+        (id, email, password_hash, password_salt, password_iterations, display_name, first_name, last_name, status, auth_provider, google_subject, avatar_url, email_verified, approval_status, google_access_scope, google_refresh_token, google_access_granted_at, requested_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'google', ?, ?, 1, ?, ?, ?, ?, ?, ?, ?)`,
+    ).bind(
+      userId,
+      email,
+      placeholderPassword.hash,
+      placeholderPassword.salt,
+      placeholderPassword.iterations,
+      identity.name,
+      firstName,
+      lastName,
+      accountStatus,
+      identity.subject,
+      identity.picture ?? null,
+      approvalStatus,
+      scopeValue,
+      oauth.refresh_token ?? null,
+      grantedAt,
+      grantedAt,
+      nowIso(),
+      nowIso(),
+    ),
+  );
+
+  if (approvalStatus === 'approved') {
+    await approveMeuCuiabarUser(env, userId, email, 'role_manager');
+    return { approved: true, userId, email };
+  }
+
+  return {
+    approved: false,
+    userId,
+    email,
+    message: 'Seu acesso ao MeuCuiabar foi registrado e agora depende da aprovacao de leonardo@cuiabar.net ou cuiabar@cuiabar.net.',
+  };
 };
 
 const mapCampaign = (row: CampaignRecord) => ({
@@ -1592,10 +1843,68 @@ export const createApp = () => {
     c.json({
       ok: true,
       authMode: isGoogleOnlyAuth(c.env) ? 'google_only' : 'local_password',
-      googleClientId: c.env.GOOGLE_AUTH_CLIENT_ID && !c.env.GOOGLE_AUTH_CLIENT_ID.startsWith('REPLACE_WITH') ? c.env.GOOGLE_AUTH_CLIENT_ID : null,
+      googleClientId: getGoogleOauthClientId(c.env),
       allowedEmails: [...parseEmailSet(c.env.GOOGLE_ALLOWED_EMAILS)],
     }),
   );
+
+  app.get('/api/meucuiabar/auth/config', async (c) =>
+    c.json({
+      ok: true,
+      googleClientId: getGoogleOauthClientId(c.env),
+      scopes: MEUCUIABAR_GOOGLE_SCOPES,
+      masterEmails: [...getMeuCuiabarMasterEmails(c.env)],
+    }),
+  );
+
+  app.post('/api/meucuiabar/auth/google/exchange', async (c) => {
+    const body = await requireJsonBody<{ code?: string; redirectUri?: string }>(c.req.raw);
+    const code = body.code?.trim();
+    const redirectUri = body.redirectUri?.trim();
+
+    if (!code || !redirectUri) {
+      throw new HttpError(400, 'Codigo OAuth e redirectUri sao obrigatorios para o login do MeuCuiabar.');
+    }
+
+    const requestOrigin = new URL(c.req.url).origin;
+    if (!redirectUri.startsWith(requestOrigin)) {
+      throw new HttpError(403, 'redirectUri invalido para o login do MeuCuiabar.');
+    }
+
+    const oauth = await exchangeMeuCuiabarGoogleCode(c.env, code, redirectUri);
+    const identity = await verifyGoogleIdToken(c.env, oauth.id_token!, getGoogleOauthClientId(c.env) ?? undefined);
+    const decision = await upsertMeuCuiabarGoogleUser(c.env, identity, oauth);
+
+    if (!decision.approved) {
+      await auditLog(c.env, c.req.raw, decision.userId, 'meucuiabar.access_requested', 'user', decision.userId, {
+        email: decision.email,
+        scope: oauth.scope ?? null,
+      });
+      clearSessionCookies(c);
+      return c.json({
+        ok: true,
+        approved: false,
+        pendingApproval: true,
+        approvalMessage: decision.message,
+      });
+    }
+
+    const { sessionId, csrfToken } = await createSession(c.env, c.req.raw, decision.userId);
+    await run(c.env.DB.prepare('UPDATE users SET last_login_at = ?, updated_at = ? WHERE id = ?').bind(nowIso(), nowIso(), decision.userId));
+    setSessionCookies(c, sessionId, csrfToken);
+    await auditLog(c.env, c.req.raw, decision.userId, 'meucuiabar.auth.google_login', 'session', sessionId, {
+      email: decision.email,
+      scope: oauth.scope ?? null,
+    });
+    const bundle = await getSessionBundle(c.env, sessionId);
+
+    return c.json({
+      ok: true,
+      approved: true,
+      user: bundle.user,
+      csrfToken,
+    });
+  });
 
   app.get('/oauth/gmail/setup', (c) => c.html(gmailOauthSetupHtml(c.env)));
 
@@ -1927,6 +2236,71 @@ export const createApp = () => {
       csrfToken: c.get('session')?.csrfToken ?? null,
     }),
   );
+
+  app.get('/api/meucuiabar/access-requests', async (c) => {
+    requirePermission(c, 'users:manage');
+    const rows = await all<{
+      id: string;
+      email: string;
+      display_name: string;
+      first_name: string | null;
+      last_name: string | null;
+      avatar_url: string | null;
+      requested_at: string | null;
+      google_access_scope: string | null;
+      status: string;
+      approval_status: string | null;
+    }>(
+      c.env.DB.prepare(
+        `SELECT id, email, display_name, first_name, last_name, avatar_url, requested_at, google_access_scope, status, approval_status
+         FROM users
+         WHERE approval_status = 'pending'
+         ORDER BY COALESCE(requested_at, created_at) DESC`,
+      ),
+    );
+
+    return c.json({
+      ok: true,
+      requests: rows.map((row) => ({
+        id: row.id,
+        email: row.email,
+        displayName: row.display_name,
+        firstName: row.first_name,
+        lastName: row.last_name,
+        avatarUrl: row.avatar_url,
+        requestedAt: row.requested_at,
+        scope: parseGoogleScopeList(row.google_access_scope),
+        status: row.status,
+        approvalStatus: row.approval_status ?? 'pending',
+      })),
+    });
+  });
+
+  app.post('/api/meucuiabar/access-requests/:id/approve', async (c) => {
+    const actor = requirePermission(c, 'users:manage');
+    const targetUserId = c.req.param('id');
+    const target = await first<{ id: string; email: string; approval_status: string | null }>(
+      c.env.DB.prepare('SELECT id, email, approval_status FROM users WHERE id = ?').bind(targetUserId),
+    );
+
+    if (!target) {
+      throw new HttpError(404, 'Solicitacao de acesso nao encontrada.');
+    }
+    if ((target.approval_status ?? 'approved') !== 'pending') {
+      throw new HttpError(409, 'Esta solicitacao ja nao esta pendente.');
+    }
+
+    const masters = getMeuCuiabarMasterEmails(c.env);
+    const roleId = masters.has(target.email.toLowerCase()) ? 'role_manager' : 'role_marketing_operator';
+    await approveMeuCuiabarUser(c.env, targetUserId, actor.email, roleId);
+    await auditLog(c.env, c.req.raw, actor.id, 'meucuiabar.access_approved', 'user', targetUserId, {
+      email: target.email,
+      approvedBy: actor.email,
+      roleId,
+    });
+
+    return c.json({ ok: true, userId: targetUserId });
+  });
 
   app.post('/api/auth/change-password', async (c) => {
     const user = requirePermission(c, 'dashboard:read');

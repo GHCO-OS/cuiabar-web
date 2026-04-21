@@ -1,0 +1,18 @@
+[
+  {
+    "recorded_at": "2026-03-09T17:27",
+    "observation": "",
+    "responsible": "Léo Garcia",
+    "temperature": 8,
+    "corrective_action": "Fechamento da porta ",
+    "unit_id": "69af06df716f2a7a52ce32ce",
+    "is_conforming": false,
+    "equipment_id": "69af06f5716f2a7a52ce32de",
+    "id": "69af2d571255eb0b9a43698d",
+    "created_date": "2026-03-09T20:28:07.334000",
+    "updated_date": "2026-03-09T20:28:07.334000",
+    "created_by_id": "69af09430dd488ebe9943a86",
+    "created_by": "leo.garcialds12@gmail.com",
+    "is_sample": false
+  }
+]

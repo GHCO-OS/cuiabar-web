@@ -19,8 +19,8 @@ Importante:
 - Nome: `cuiabar-web`
 - Visibilidade: privada
 - Branch principal local: `main`
-- Workspace local principal: `C:\workspace\cuiabar-web`
-- Backup/snapshot anterior: `G:\Meu Drive\cuiabar-web`
+- Workspace local principal: `C:\cuiabar-web`
+- Backup/snapshot opcional: `G:\Meu Drive\cuiabar-web` via `scripts/sync-drive-backup.ps1`
 
 ## Identidade desta maquina
 

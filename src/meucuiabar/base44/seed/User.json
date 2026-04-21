@@ -1,0 +1,32 @@
+[
+  {
+    "role": "admin",
+    "id": "69af048021462889147356e6",
+    "created_date": "2026-03-09T17:33:52.058000",
+    "updated_date": "2026-03-09T17:33:52.058000",
+    "email": "cuiabar@cuiabar.net",
+    "full_name": "Cuiabar | GHCO LTDA",
+    "disabled": null,
+    "is_verified": true,
+    "force_password_reset": false,
+    "app_id": "69af048021462889147356e5",
+    "is_service": false,
+    "collaborator_role": "editor",
+    "_app_role": "admin"
+  },
+  {
+    "role": "user",
+    "id": "69af09430dd488ebe9943a86",
+    "created_date": "2026-03-09T17:54:11.703000",
+    "updated_date": "2026-03-09T17:54:11.703000",
+    "email": "leo.garcialds12@gmail.com",
+    "full_name": "Léo Garcia",
+    "disabled": null,
+    "is_verified": true,
+    "force_password_reset": false,
+    "app_id": "69af048021462889147356e5",
+    "is_service": false,
+    "collaborator_role": null,
+    "_app_role": "user"
+  }
+]

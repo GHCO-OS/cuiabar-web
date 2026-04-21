@@ -106,3 +106,30 @@ export const sendCustomerReservationCopy = async (env: Env, reservation: Reserva
     },
   });
 };
+
+export const sendReservationCancellationEmail = async (env: Env, reservation: ReservationRecord) => {
+  if (!reservation.email) {
+    return null;
+  }
+
+  return sendViaGmail(env, {
+    fromName: getSenderName(env),
+    fromEmail: getSenderEmail(env),
+    to: reservation.email,
+    subject: 'Sua reserva no Cuiabar foi cancelada',
+    replyTo: env.DEFAULT_REPLY_TO ?? getSenderEmail(env),
+    html: buildHtmlBody(
+      reservation,
+      'Sua reserva foi cancelada conforme atualizacao da nossa equipe. Estaremos esperando voce em uma proxima oportunidade no Cuiabar.',
+    ),
+    text: buildTextBody(
+      reservation,
+      'Sua reserva foi cancelada conforme atualizacao da nossa equipe. Estaremos esperando voce em uma proxima oportunidade no Cuiabar.',
+    ),
+    listUnsubscribeUrl: getReservationBaseUrl(env),
+    headers: {
+      'X-Reservation-Code': reservation.reservationCode,
+      'X-Reservation-Status': 'cancelled',
+    },
+  });
+};

@@ -3,10 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { crmRequest } from '../api';
 import { Button, Field, InputClassName, Panel } from '../components';
 
-export const BootstrapPage = ({ onCompleted }: { onCompleted: () => Promise<void> }) => {
+export const BootstrapPage = ({
+  onCompleted,
+  loginPath = '/login',
+  productLabel = 'Cuiabar Atende',
+  productDescription = 'Use o token de bootstrap definido como secret no Cloudflare para liberar o primeiro acesso administrativo do modulo de atendimento e relacionamento.',
+}: {
+  onCompleted: () => Promise<void>;
+  loginPath?: string;
+  productLabel?: string;
+  productDescription?: string;
+}) => {
   const navigate = useNavigate();
   const [token, setToken] = useState('');
-  const [displayName, setDisplayName] = useState('Gerente CRM');
+  const [displayName, setDisplayName] = useState(`Gerente ${productLabel}`);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +32,7 @@ export const BootstrapPage = ({ onCompleted }: { onCompleted: () => Promise<void
         method: 'POST',
         body: JSON.stringify({ token, displayName, email, password }),
       });
-      navigate('/login');
+      navigate(loginPath);
       await onCompleted();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Falha ao criar o usuario inicial.');
@@ -36,8 +46,8 @@ export const BootstrapPage = ({ onCompleted }: { onCompleted: () => Promise<void
       <Panel className="w-full max-w-2xl space-y-6 border-amber-300/20 bg-slate-950/80 p-8">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-amber-300">Primeira configuracao</p>
-          <h1 className="mt-3 text-3xl font-semibold text-white">Criar gerente inicial do Cuiabar Atende</h1>
-          <p className="mt-2 text-sm text-slate-300">Use o token de bootstrap definido como secret no Cloudflare para liberar o primeiro acesso administrativo do modulo de atendimento e relacionamento.</p>
+          <h1 className="mt-3 text-3xl font-semibold text-white">Criar gerente inicial do {productLabel}</h1>
+          <p className="mt-2 text-sm text-slate-300">{productDescription}</p>
         </div>
 
         <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>

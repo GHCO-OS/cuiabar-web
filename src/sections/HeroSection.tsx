@@ -15,10 +15,10 @@ export const HeroSection = () => (
     <Reveal className="lg:pr-4">
       <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-terracotta">Villa Cuiabar em Campinas</p>
       <h1 className="font-heading text-4xl leading-tight text-cocoa sm:text-5xl">
-        Delivery forte no almoço, noites com música ao vivo e comida brasileira de verdade.
+        Comida brasileira servida forte — todo dia.
       </h1>
       <p className="mt-5 max-w-xl text-lg text-steel">
-        O Villa Cuiabar combina pratos bem servidos, espaço familiar, bar completo e atendimento próximo para quem quer comer bem no Jardim Aurélia.
+        Delivery no almoço, noites com música ao vivo e operação corporativa para empresas em Campinas. Três frentes, um só padrão de casa.
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
         <Link className="btn-primary" to="/menu">Ver menu</Link>

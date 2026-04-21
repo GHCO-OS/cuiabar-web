@@ -68,7 +68,7 @@ export const navItems: NavItem[] = [
   { label: 'Menu', to: '/menu' },
   { label: 'Espetaria', to: '/espetaria' },
   { label: 'Burguer Cuiabar', to: '/burguer', variant: 'highlight' },
-  { label: 'ProRefeição', to: '/prorefeicao' },
+  { label: 'ProRefeição', to: '/prorefeicao', variant: 'outline' },
   { label: 'Reservas', to: '/reservas' },
   { label: 'Vagas', to: '/vagas' },
 ];

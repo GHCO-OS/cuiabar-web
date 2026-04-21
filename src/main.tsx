@@ -3,11 +3,24 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './styles/global.css';
 
-type RuntimeAppKey = 'site' | 'crm' | 'reservas';
+type RuntimeAppKey = 'site' | 'crm' | 'meucuiabar' | 'reservas';
 
 const getRuntimeAppKey = (): RuntimeAppKey => {
   const hostname = window.location.hostname.toLowerCase();
+  const pathname = window.location.pathname.toLowerCase();
   const forcedApp = new URLSearchParams(window.location.search).get('app');
+
+  if (forcedApp === 'meucuiabar') {
+    return 'meucuiabar';
+  }
+
+  if (pathname.startsWith('/meucuiabar')) {
+    return 'meucuiabar';
+  }
+
+  if (hostname === 'meu.cuiabar.com') {
+    return 'meucuiabar';
+  }
 
   if (forcedApp === 'crm' || hostname === 'crm.cuiabar.com') {
     return 'crm';
@@ -25,12 +38,20 @@ const runtimeAppKey = getRuntimeAppKey();
 const RootApp =
   runtimeAppKey === 'crm'
     ? lazy(() => import('./crm/CrmApp').then((module) => ({ default: () => <module.CrmApp /> })))
+    : runtimeAppKey === 'meucuiabar'
+      ? lazy(() => import('./meucuiabar/MeuCuiabarApp').then((module) => ({ default: () => <module.MeuCuiabarApp /> })))
     : runtimeAppKey === 'reservas'
       ? lazy(() => import('./reservations/ReservationsApp').then((module) => ({ default: module.ReservationsApp })))
       : lazy(() => import('./app/App').then((module) => ({ default: module.App })));
 
 const fallbackLabel =
-  runtimeAppKey === 'crm' ? 'Carregando Cuiabar Atende...' : runtimeAppKey === 'reservas' ? 'Carregando reservas...' : 'Carregando Villa Cuiabar...';
+  runtimeAppKey === 'crm'
+    ? 'Carregando Cuiabar Atende...'
+    : runtimeAppKey === 'meucuiabar'
+      ? 'Carregando MeuCuiabar...'
+      : runtimeAppKey === 'reservas'
+        ? 'Carregando reservas...'
+        : 'Carregando Villa Cuiabar...';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

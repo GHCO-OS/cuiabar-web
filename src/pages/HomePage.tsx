@@ -22,15 +22,15 @@ const HomePage = () => {
       <DifferentialsSection />
       <LocalSignalsSection />
       <AgendaPreviewSection />
-      <MenuHighlightsSection />
       <ProRefeicaoSection />
+      <MenuHighlightsSection />
       <section className="container-shell py-12">
         <WhatsAppContactCard
           title="Reservas online no portal oficial"
-          description="Escolha data, horario, quantidade de pessoas e preferencias da mesa em um fluxo proprio, rapido e organizado."
+          description="Escolha data, horário, quantidade de pessoas e preferências da mesa em um fluxo próprio, rápido e organizado."
           href={reservationHref}
           buttonLabel="Reservar online"
-          note="Se precisar ajustar algum detalhe com a equipe, o WhatsApp oficial continua disponivel para apoio."
+          note="Se precisar ajustar algum detalhe com a equipe, o WhatsApp oficial continua disponível para apoio."
         />
       </section>
     </>

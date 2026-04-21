@@ -1,0 +1,21 @@
+[
+  {
+    "start_time": "2026-03-09T15:04",
+    "item": "Alface",
+    "quantity": "3u ",
+    "product_used": "Cloro",
+    "dilution": "50ml por l",
+    "immersion_time_min": 10,
+    "responsible": "Léo Garcia",
+    "batch": "",
+    "end_time": "2026-03-09T15:05",
+    "destination": "Salada",
+    "unit_id": "69af06df716f2a7a52ce32ce",
+    "id": "69af0be67d09b732f5c02297",
+    "created_date": "2026-03-09T18:05:26.574000",
+    "updated_date": "2026-03-09T18:05:26.574000",
+    "created_by_id": "69af09430dd488ebe9943a86",
+    "created_by": "leo.garcialds12@gmail.com",
+    "is_sample": false
+  }
+]

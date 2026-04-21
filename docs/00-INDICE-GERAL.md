@@ -52,6 +52,9 @@ Este diretorio centraliza a documentacao operacional do `GHCO OS`, para que o pr
 - `10-AMBIENTE-LOCAL-E-IDS.md`
   Inventario do PC operacional, bridge local, host IDs e referencias de runtime para suporte e continuidade.
 
+- `17-MAPA-DE-MANUTENCAO-E-BRANCHES.md`
+  Matriz unica de pastas, linhas de produto, branches e status de manutencao.
+
 - `14-NOMENCLATURA-E-LINHAS-DE-PRODUTO.md`
   Nome do sistema-mãe, linhas de produto, fronteiras funcionais e convencao de naming para branches.
 
@@ -65,22 +68,25 @@ Este diretorio centraliza a documentacao operacional do `GHCO OS`, para que o pr
 
 Esses arquivos continuam validos como apoio:
 
-- `README.md`
-- `DEPLOY-CLOUDFLARE.md`
-- `DEPLOY-RESERVAS-CLOUDFLARE.md`
-- `README-RESERVAS.md`
-- `RESERVAS-SETUP.md`
-- `GOOGLE-CALENDAR-SETUP.md`
-- `EMAIL-SETUP.md`
-- `META-CAPI-SETUP.md`
-- `SEO-SETUP.md`
-- `SEO-TECHNICAL-PLAN.md`
+- `../README.md`
+- `guias-legados/README.md`
+- `guias-legados/DEPLOY-CLOUDFLARE.md`
+- `guias-legados/DEPLOY-RESERVAS-CLOUDFLARE.md`
+- `guias-legados/README-RESERVAS.md`
+- `guias-legados/RESERVAS-SETUP.md`
+- `guias-legados/GOOGLE-CALENDAR-SETUP.md`
+- `guias-legados/EMAIL-SETUP.md`
+- `guias-legados/META-CAPI-SETUP.md`
+- `guias-legados/SEO-SETUP.md`
+- `guias-legados/SEO-TECHNICAL-PLAN.md`
+- `../scripts/deploy-blog-option.sh`
 
 ## Credenciais
 
 O inventario de chaves compartilhadas em conversa esta em:
 
-- `../ACESSOS-CHAVES-PROJETO.md`
+- `../ACESSOS-CHAVES-PROJETO.md` quando existir nesta copia local
+- `../KIT-PORTABILIDADE/confidencial/02-APIS-E-CHAVES.md` como baseline portavel
 
 Esse arquivo contem segredos em texto puro e deve ser tratado como confidencial.
 

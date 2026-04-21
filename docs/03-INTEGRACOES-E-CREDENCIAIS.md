@@ -1,13 +1,13 @@
 # Integracoes e credenciais
 
-Atualizado em: 2026-04-15
+Atualizado em: 2026-04-17
 
 ## Onde consultar os segredos
 
 Inventario consolidado de chaves compartilhadas por conversa:
 
-- `../ACESSOS-CHAVES-PROJETO.md`
-- `../KIT-PORTABILIDADE/02-APIS-E-CHAVES.md`
+- `../ACESSOS-CHAVES-PROJETO.md` quando existir nesta copia local
+- `../KIT-PORTABILIDADE/confidencial/02-APIS-E-CHAVES.md`
 
 Esse arquivo deve permanecer restrito.
 
@@ -80,6 +80,22 @@ Referencias operacionais:
 - `docs/07-WHATSAPP-AI-ENDPOINTS.md`
 - `docs/10-AMBIENTE-LOCAL-E-IDS.md`
 
+### WhatsApp Intelligence (Llama + CRM interno)
+
+- worker dedicado: `worker/whatsapp-intelligence/`
+- endpoint inbound: `POST /webhook/baileys`
+- durable object de sessao/saida: `BaileysSessionDO`
+- tabelas operacionais: `customers`, `wa_inbound_events`, `wa_conversations`, `wa_action_logs`, `wa_reservation_requests`
+- segredos esperados (somente em ambiente):
+  - `WEBHOOK_SHARED_SECRET`
+  - `CRM_INTERNAL_SECRET`
+  - `BAILEYS_GATEWAY_TOKEN`
+
+Observacao:
+
+- `create_reservation_request` gera fila de solicitacoes para conciliacao com o fluxo oficial de reservas;
+- evitar escrita direta na tabela `reservations` fora do contrato ja validado no backend principal.
+
 ### GitHub
 
 Usado para:
@@ -96,6 +112,22 @@ Observacao:
 - o GitHub nao substitui o deploy no Cloudflare
 - o inventario desta maquina e do bridge local fica em `docs/10-AMBIENTE-LOCAL-E-IDS.md`
 
+### Base44
+
+Usado para:
+- referencia de UI/UX e features do `MeuCuiabar`
+- fonte do scraping que originou o seed operacional atual do `MeuCuiabar`
+
+Arquivos principais:
+- `src/meucuiabar/base44/`
+- `src/meucuiabar/base44/api/base44Client.js`
+- `src/meucuiabar/base44/seed/`
+- `ops-artifacts/base44-export/`
+
+Observacao:
+- o Base44 deixou de ser runtime de autenticacao do `MeuCuiabar`
+- o seed raspado continua servindo como base local temporaria ate a extracao definitiva para Worker/D1
+
 ### Google
 
 Usado para:
@@ -103,18 +135,24 @@ Usado para:
 - Search Console
 - Calendar
 - Gmail / OAuth
+- Gemini API
 - conta de servico
+- login interno do `MeuCuiabar`
+- consentimento de calendario/agenda e lembretes do `MeuCuiabar`
 
 Documentos de apoio:
-- `SEO-SETUP.md`
-- `GOOGLE-CALENDAR-SETUP.md`
-- `GMAIL-OAUTH-SETUP.md`
-- `EMAIL-SETUP.md`
+- `docs/guias-legados/SEO-SETUP.md`
+- `docs/guias-legados/GOOGLE-CALENDAR-SETUP.md`
+- `docs/guias-legados/GMAIL-OAUTH-SETUP.md`
+- `docs/guias-legados/EMAIL-SETUP.md`
 
 Bindings e secrets recorrentes no Worker:
 
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_AUTH_CLIENT_ID`
+- `GOOGLE_AUTH_CLIENT_SECRET`
+- `MEUCUIABAR_MASTER_EMAILS`
 - `GOOGLE_REFRESH_TOKEN`
 - `GOOGLE_CALENDAR_ID`
 - `GOOGLE_ADS_API_VERSION`
@@ -124,6 +162,13 @@ Bindings e secrets recorrentes no Worker:
 - `GOOGLE_ADS_CLIENT_ID`
 - `GOOGLE_ADS_CLIENT_SECRET`
 - `GOOGLE_ADS_REFRESH_TOKEN`
+- `GOOGLE_GEMINI_API_KEY`
+
+Observacao:
+- o `MeuCuiabar` passa a usar Google OAuth no Worker para coletar nome, sobrenome, e-mail e consentimentos de `calendar` e `tasks`
+- novos usuarios ficam pendentes de aprovacao ate liberacao por `leonardo@cuiabar.net` ou `cuiabar@cuiabar.net`
+- o acesso Gemini foi apenas inventariado nesta copia local e nao esta integrado ao runtime do site, CRM ou Worker neste momento
+- se a Gemini API for ativada depois, preferir guardar a chave no cofre principal e espelhar no runtime apenas por secret com nome estavel
 
 ### Blog editorial
 

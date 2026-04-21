@@ -53,6 +53,11 @@ Aqui e onde as mudancas devem acontecer.
 
 Serve para reaproveitamento externo e continuidade entre maquinas, mas nao substitui `docs/`.
 
+Convencao interna:
+
+- `KIT-PORTABILIDADE/snapshots/` para material historico e exportacoes
+- `KIT-PORTABILIDADE/confidencial/` para itens sensiveis
+
 ### Camada 5: artefatos e saidas
 
 - `dist/`
@@ -207,18 +212,26 @@ A raiz deve funcionar apenas como hall de entrada. O ideal e manter nela:
 
 ## Situacao atual da raiz
 
-Hoje a raiz ainda concentra:
+Depois da consolidacao mais recente, a raiz deve manter apenas:
 
-- arquivos antigos de setup
-- inventario de credenciais
-- docs historicas
+- arquivos de entrada
 - configs legitimas
+- eventuais arquivos confidenciais opcionais
 
-Isso nao precisa ser movido agora, mas precisa obedecer esta hierarquia:
+Os guias antigos de setup e operacao devem ficar em:
+
+- `docs/guias-legados/`
+
+Scripts operacionais soltos devem ficar em:
+
+- `scripts/`
+
+Hierarquia obrigatoria:
 
 1. `AGENTS.md` e `START-AQUI.md` orientam
 2. `docs/` documenta
-3. raiz antiga serve de apoio e historico
+3. `docs/guias-legados/` preserva historico
+4. raiz nao vira deposito operacional
 
 ## Recomendacao de manutencao futura
 
@@ -229,7 +242,7 @@ Sprint de organizacao sugerida, sem quebra:
 3. reduzir novos documentos soltos na raiz
 4. revisar o que e segredo versionado e mover para cofre/secret manager quando possivel
 5. separar melhor material de QA e debug em `ops-artifacts/`
-6. revisar a necessidade de manter `.js` e `.d.ts` gerados dentro de `worker/`
+6. bloquear e remover `.js` e `.d.ts` gerados dentro de `worker/` e `worker/whatsapp/`
 
 ## Regras de fechamento de tarefa
 

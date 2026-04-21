@@ -1,0 +1,90 @@
+[
+  {
+    "name": "Checklist de Abertura",
+    "active": true,
+    "unit_id": "69af06df716f2a7a52ce32ce",
+    "items": [
+      {
+        "category": null,
+        "description": "Verificar temperaturas de todos os equipamentos refrigerados"
+      },
+      {
+        "category": null,
+        "description": "Conferir validade dos produtos em estoque"
+      },
+      {
+        "category": null,
+        "description": "Verificar limpeza das bancadas de preparo"
+      },
+      {
+        "category": null,
+        "description": "Conferir disponibilidade de produtos de limpeza"
+      },
+      {
+        "category": null,
+        "description": "Verificar funcionamento das pias de higienização"
+      },
+      {
+        "category": null,
+        "description": "Checar uniforme completo da equipe"
+      },
+      {
+        "category": null,
+        "description": "Verificar armadilhas contra pragas"
+      },
+      {
+        "category": null,
+        "description": "Conferir estado das lixeiras (tampa e saco)"
+      }
+    ],
+    "shift": "abertura",
+    "id": "69af06f5716f2a7a52ce32dc",
+    "created_date": "2026-03-09T17:44:21.605000",
+    "updated_date": "2026-03-09T17:44:21.605000",
+    "created_by_id": "69af048021462889147356e6",
+    "created_by": "cuiabar@cuiabar.net",
+    "is_sample": false
+  },
+  {
+    "name": "Checklist de Fechamento",
+    "active": true,
+    "unit_id": "69af06df716f2a7a52ce32ce",
+    "items": [
+      {
+        "category": null,
+        "description": "Todas as bancadas foram higienizadas"
+      },
+      {
+        "category": null,
+        "description": "Pisos foram limpos e secos"
+      },
+      {
+        "category": null,
+        "description": "Equipamentos foram desligados/ajustados"
+      },
+      {
+        "category": null,
+        "description": "Lixo foi retirado e lixeiras higienizadas"
+      },
+      {
+        "category": null,
+        "description": "Alimentos foram armazenados corretamente"
+      },
+      {
+        "category": null,
+        "description": "Portas e janelas foram fechadas"
+      },
+      {
+        "category": null,
+        "description": "Temperaturas finais registradas"
+      }
+    ],
+    "shift": "fechamento",
+    "id": "69af06f5716f2a7a52ce32dd",
+    "created_date": "2026-03-09T17:44:21.605000",
+    "updated_date": "2026-03-09T17:44:21.605000",
+    "created_by_id": "69af048021462889147356e6",
+    "created_by": "cuiabar@cuiabar.net",
+    "is_sample": false
+  }
+]

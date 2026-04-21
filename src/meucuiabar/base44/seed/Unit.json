@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Cuiabar - Centro",
+    "active": true,
+    "address": "Rua Principal, 100 - Centro",
+    "id": "69af06df716f2a7a52ce32ce",
+    "created_date": "2026-03-09T17:43:59.921000",
+    "updated_date": "2026-03-09T17:43:59.921000",
+    "created_by_id": "69af048021462889147356e6",
+    "created_by": "cuiabar@cuiabar.net",
+    "is_sample": false
+  },
+  {
+    "name": "Cuiabar - Shopping",
+    "active": true,
+    "address": "Shopping Pantanal, Loja 42",
+    "id": "69af06df716f2a7a52ce32cf",
+    "created_date": "2026-03-09T17:43:59.921000",
+    "updated_date": "2026-03-09T17:43:59.921000",
+    "created_by_id": "69af048021462889147356e6",
+    "created_by": "cuiabar@cuiabar.net",
+    "is_sample": false
+  }
+]

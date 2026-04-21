@@ -28,7 +28,7 @@ Se a tarefa envolver deploy, Cloudflare, CRM ou WhatsApp AI, continue com os doc
 - Organização do repositório e regra para IA: `docs/09-ORGANIZACAO-E-GOVERNANCA-IA.md`
 - Bootstrap para nova máquina/novo agente: `docs/05-USO-EM-OUTRO-CODEX.md`
 - Ambiente local, host IDs e bridge local: `docs/10-AMBIENTE-LOCAL-E-IDS.md`
-- Segredos históricos e inventário confidencial: `ACESSOS-CHAVES-PROJETO.md`
+- Segredos históricos e inventário confidencial, quando presentes localmente: `ACESSOS-CHAVES-PROJETO.md`
 
 ## O que cada pasta significa
 
@@ -122,7 +122,7 @@ Toda IA deve atualizar a documentação mínima conforme o tipo de mudança:
 - não criar novos arquivos com segredos em texto puro no repositório sem necessidade operacional explícita
 - não duplicar token em múltiplos documentos
 - preferir documentar nome da secret e local de armazenamento
-- considerar `ACESSOS-CHAVES-PROJETO.md` e parte do `KIT-PORTABILIDADE/` como material confidencial
+- considerar `ACESSOS-CHAVES-PROJETO.md`, quando presente, e parte do `KIT-PORTABILIDADE/` como material confidencial
 - se um segredo for rotacionado, atualizar só o inventário necessário e evitar espalhar o valor
 
 ## Fluxo padrão de trabalho para IA
@@ -160,4 +160,4 @@ Este repositório deve funcionar assim:
 - `src/`, `worker/` e `functions/` respondem “onde editar”
 - `public/` responde “onde ficam os assets”
 - `scripts/` responde “como operar”
-- `ACESSOS-CHAVES-PROJETO.md` responde “quais acessos existem”, com acesso restrito
+- `ACESSOS-CHAVES-PROJETO.md`, quando presente, responde “quais acessos existem”, com acesso restrito

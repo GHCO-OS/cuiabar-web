@@ -1,0 +1,116 @@
+[
+  {
+    "entity": "Unit",
+    "status": 200,
+    "count": 2,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\Unit.json"
+  },
+  {
+    "entity": "Sector",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\Sector.json"
+  },
+  {
+    "entity": "Equipment",
+    "status": 200,
+    "count": 7,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\Equipment.json"
+  },
+  {
+    "entity": "TemperatureRecord",
+    "status": 200,
+    "count": 1,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\TemperatureRecord.json"
+  },
+  {
+    "entity": "CleaningPlan",
+    "status": 200,
+    "count": 4,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\CleaningPlan.json"
+  },
+  {
+    "entity": "CleaningRecord",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\CleaningRecord.json"
+  },
+  {
+    "entity": "OilChange",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\OilChange.json"
+  },
+  {
+    "entity": "ProduceWashing",
+    "status": 200,
+    "count": 1,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\ProduceWashing.json"
+  },
+  {
+    "entity": "Checklist",
+    "status": 200,
+    "count": 2,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\Checklist.json"
+  },
+  {
+    "entity": "ChecklistResponse",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\ChecklistResponse.json"
+  },
+  {
+    "entity": "NonConformity",
+    "status": 200,
+    "count": 1,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\NonConformity.json"
+  },
+  {
+    "entity": "PlanosHACCP",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\PlanosHACCP.json"
+  },
+  {
+    "entity": "EtapasProcesso",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\EtapasProcesso.json"
+  },
+  {
+    "entity": "PerigosProcesso",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\PerigosProcesso.json"
+  },
+  {
+    "entity": "PCCs",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\PCCs.json"
+  },
+  {
+    "entity": "MonitoramentosPCC",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\MonitoramentosPCC.json"
+  },
+  {
+    "entity": "VerificacoesHACCP",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\VerificacoesHACCP.json"
+  },
+  {
+    "entity": "EquipmentTypeConfig",
+    "status": 200,
+    "count": 0,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\EquipmentTypeConfig.json"
+  },
+  {
+    "entity": "User",
+    "status": 200,
+    "count": 2,
+    "file": "C:\\cuiabar-web\\ops-artifacts\\base44-export\\database\\User.json"
+  }
+]

@@ -75,6 +75,11 @@ export const findReservationByCode = async (env: Env, reservationCode: string) =
   return row ? mapReservationRecord(row) : null;
 };
 
+export const findReservationById = async (env: Env, reservationId: string) => {
+  const row = await first<ReservationListItem>(env.DB.prepare('SELECT * FROM reservations WHERE id = ?').bind(reservationId));
+  return row ? mapReservationRecord(row) : null;
+};
+
 export const insertReservation = async (env: Env, reservation: InsertReservationParams) => {
   const timestamp = nowIso();
   await run(

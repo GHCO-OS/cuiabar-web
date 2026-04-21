@@ -21,8 +21,10 @@ export interface Env {
   FOOD99_STORE_URL?: string;
   AUTH_MODE?: string;
   GOOGLE_AUTH_CLIENT_ID?: string;
+  GOOGLE_AUTH_CLIENT_SECRET?: string;
   GOOGLE_ALLOWED_EMAILS?: string;
   GOOGLE_MANAGER_EMAILS?: string;
+  MEUCUIABAR_MASTER_EMAILS?: string;
   ENABLE_OPEN_TRACKING?: string;
   SEND_BATCH_SIZE?: string;
   SEND_RATE_PER_MINUTE?: string;
@@ -78,6 +80,11 @@ export interface AuthUser {
   displayName: string;
   status: string;
   roles: RoleName[];
+  firstName?: string | null;
+  lastName?: string | null;
+  avatarUrl?: string | null;
+  approvalStatus?: 'pending' | 'approved' | 'rejected';
+  googleAccessScope?: string | null;
 }
 
 export interface SessionRecord {

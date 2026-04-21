@@ -648,8 +648,8 @@
     "/prorefeicao": {
       "title": "ProRefeição | Refeição corporativa em Campinas",
       "description": "Solução de refeição corporativa do Villa Cuiabar para empresas, clínicas, indústrias, obras e operações recorrentes em Campinas.",
-      "image": "https://cuiabar.com/prorefeicao/hero-parmegiana.png",
-      "imageAlt": "Refeição corporativa do ProRefeição com parmegiana, arroz e fritas",
+      "image": "https://cuiabar.com/prorefeicao/marmita-parmegiana.png",
+      "imageAlt": "Marmita corporativa do ProRefeição com parmegiana, arroz, feijão e fritas em embalagem selada",
       "type": "website",
       "changefreq": "weekly",
       "priority": "0.85",

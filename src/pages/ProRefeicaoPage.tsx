@@ -59,27 +59,28 @@ const commercialSteps = [
   'Início da operação com acompanhamento próximo e canal comercial direto.',
 ];
 
+// IMPORTANTE: só podem entrar aqui fotos que seguem a diretriz visual
+// da página ProRefeição — marmita redonda preta selada, fundo branco,
+// estúdio profissional. Regras completas em `/public/prorefeicao/README.md`.
+// Qualquer foto nova passa pelo checklist desse README antes de ser adicionada.
 const showcaseMeals = [
   {
-    src: '/prorefeicao/hero-parmegiana.png',
-    webpSrc: '/prorefeicao/hero-parmegiana.webp',
-    alt: 'Refeição corporativa com parmegiana, arroz e fritas',
+    src: '/prorefeicao/marmita-parmegiana.png',
+    alt: 'Marmita corporativa com parmegiana, arroz, feijão e fritas em embalagem selada',
     width: 520,
     height: 520,
     className: 'pro-immersive-card pro-immersive-card-primary',
   },
   {
-    src: '/prorefeicao/costela.png',
-    webpSrc: '/prorefeicao/costela.webp',
-    alt: 'Refeição corporativa com costela, arroz e mandioca',
+    src: '/prorefeicao/marmita-carne.png',
+    alt: 'Marmita corporativa com carne acebolada, arroz, feijão, fritas e brócolis em embalagem selada',
     width: 520,
     height: 520,
     className: 'pro-immersive-card pro-immersive-card-secondary',
   },
   {
-    src: '/prorefeicao/chorizo.png',
-    webpSrc: '/prorefeicao/chorizo.webp',
-    alt: 'Refeição corporativa com corte grelhado e acompanhamentos',
+    src: '/prorefeicao/marmita-mix.png',
+    alt: 'Três marmitas corporativas em embalagem selada mostrando variedade de cardápios',
     width: 520,
     height: 520,
     className: 'pro-immersive-card pro-immersive-card-tertiary',
@@ -104,11 +105,11 @@ const ProRefeicaoPage = () => {
             </div>
             <div>
               <h1 className="max-w-3xl font-heading text-4xl leading-[1.02] text-white sm:text-5xl lg:text-[3.9rem]">
-                Refeição corporativa com padrão, volume, controle e presença institucional.
+                Refeição corporativa com padrão e rotina previsível.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/78 sm:text-lg">
-                O ProRefeição do Villa Cuiabar atende empresas, clínicas, hospitais, indústrias, obras e operações recorrentes
-                com produção profissional, rotina previsível e apresentação compatível com ambientes corporativos.
+                Almoço e jantar profissionais para escritórios, clínicas, indústrias, obras e equipes externas em Campinas.
+                Embalagem selada, cardápio recorrente e canal comercial direto para sua cotação.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -141,10 +142,15 @@ const ProRefeicaoPage = () => {
             {showcaseMeals.map((meal) => (
               <div key={meal.src} className={meal.className}>
                 <div className="pro-immersive-shell">
-                  <picture>
-                    <source srcSet={meal.webpSrc} type="image/webp" />
-                    <img src={meal.src} alt={meal.alt} width={meal.width} height={meal.height} loading="lazy" decoding="async" className="pro-immersive-image" />
-                  </picture>
+                  <img
+                    src={meal.src}
+                    alt={meal.alt}
+                    width={meal.width}
+                    height={meal.height}
+                    loading="lazy"
+                    decoding="async"
+                    className="pro-immersive-image"
+                  />
                 </div>
               </div>
             ))}
@@ -220,18 +226,28 @@ const ProRefeicaoPage = () => {
               <div className="pro-immersive-aura pro-immersive-aura-soft" />
               <div className="pro-immersive-card pro-immersive-card-packaging-main">
                 <div className="pro-immersive-shell pro-immersive-shell-light">
-                  <picture>
-                    <source srcSet="/prorefeicao/hero-parmegiana.webp" type="image/webp" />
-                    <img src="/prorefeicao/hero-parmegiana.png" alt="Refeição pronta com montagem padronizada" width="520" height="520" loading="lazy" decoding="async" className="pro-immersive-image" />
-                  </picture>
+                  <img
+                    src="/prorefeicao/marmita-parmegiana.png"
+                    alt="Marmita corporativa com parmegiana, arroz, feijão e fritas em embalagem selada"
+                    width="520"
+                    height="520"
+                    loading="lazy"
+                    decoding="async"
+                    className="pro-immersive-image"
+                  />
                 </div>
               </div>
               <div className="pro-immersive-card pro-immersive-card-packaging-support">
                 <div className="pro-immersive-shell pro-immersive-shell-light">
-                  <picture>
-                    <source srcSet="/prorefeicao/costela.webp" type="image/webp" />
-                    <img src="/prorefeicao/costela.png" alt="Refeição com proteína, arroz e acompanhamentos" width="520" height="520" loading="lazy" decoding="async" className="pro-immersive-image" />
-                  </picture>
+                  <img
+                    src="/prorefeicao/marmita-carne.png"
+                    alt="Marmita corporativa com carne acebolada, arroz, feijão, fritas e brócolis em embalagem selada"
+                    width="520"
+                    height="520"
+                    loading="lazy"
+                    decoding="async"
+                    className="pro-immersive-image"
+                  />
                 </div>
               </div>
             </div>

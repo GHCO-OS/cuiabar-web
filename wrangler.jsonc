@@ -22,6 +22,10 @@
       "custom_domain": true
     },
     {
+      "pattern": "meu.cuiabar.com",
+      "custom_domain": true
+    },
+    {
       "pattern": "reservas.cuiabar.com",
       "custom_domain": true
     },
@@ -83,7 +87,8 @@
   },
   "kv_namespaces": [
     {
-      "binding": "WHATSAPP_KV"
+      "binding": "WHATSAPP_KV",
+      "id": "a5a493a1f26f44f3b258b573a3542b5f"
     }
   ],
   "dev": {

@@ -1,5 +1,5 @@
 param(
-  [string]$SourcePath = 'C:\workspace\cuiabar-web',
+  [string]$SourcePath = 'C:\cuiabar-web',
   [string]$BackupPath = 'G:\Meu Drive\cuiabar-web',
   [switch]$Mirror
 )

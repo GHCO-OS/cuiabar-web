@@ -8,8 +8,7 @@ Se voce abriu esta pasta em outro Codex, comece por estes arquivos:
 4. `docs/05-USO-EM-OUTRO-CODEX.md`
 5. `docs/04-STATUS-ATUAL-E-PENDENCIAS.md`
 6. `docs/10-AMBIENTE-LOCAL-E-IDS.md`
-7. `ACESSOS-CHAVES-PROJETO.md`
-8. `KIT-PORTABILIDADE/00-LEIA-ME.md`
+7. `KIT-PORTABILIDADE/00-LEIA-ME.md`
 
 Resumo rapido:
 - Este projeto roda em React + Vite + TypeScript.
@@ -27,5 +26,6 @@ Pastas de referencia:
 - `KIT-PORTABILIDADE/` pacote rapido com APIs, chaves e arquivos reaproveitaveis para outras ferramentas
 
 Observacao:
-- Os arquivos antigos de setup e operacao continuam na raiz.
-- O conjunto organizado e centralizado ficou dentro de `docs/`.
+- A documentacao oficial fica em `docs/`.
+- Guias antigos ficam centralizados em `docs/guias-legados/`.
+- O inventario confidencial pode nao existir nesta copia local; quando presente, ele deve ser tratado como material restrito.

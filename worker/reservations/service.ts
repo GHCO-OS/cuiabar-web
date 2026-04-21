@@ -1,12 +1,13 @@
 import { getRequestIp } from '../lib/http';
 import { generateId } from '../lib/security';
-import { createGoogleCalendarEvent } from '../services/google/calendarService';
+import { createGoogleCalendarEvent, updateGoogleCalendarEvent } from '../services/google/calendarService';
 import { sendAdConversion } from '../services/google/adsService';
 import type { Env } from '../types';
-import { MEAL_PERIOD_LABELS } from './constants';
-import { sendCustomerReservationCopy, sendRestaurantReservationNotification } from './email';
+import { MEAL_PERIOD_LABELS, VILLA_CUIABAR_ADDRESS } from './constants';
+import { sendCustomerReservationCopy, sendReservationCancellationEmail, sendRestaurantReservationNotification } from './email';
 import {
   findReservationByCode,
+  findReservationById,
   insertReservation,
   insertReservationLog,
   listReservations as listReservationRecords,
@@ -81,6 +82,20 @@ const generateReservationCode = (reservationDate: string) => {
 
 const buildCalendarSummary = (customerFullName: string, guestCount: number) => `Reserva Cuiabar - ${customerFullName} - ${guestCount} pessoas`;
 
+const buildStatusAwareCalendarSummary = (reservation: ReservationRecord) => {
+  const baseSummary = buildCalendarSummary(reservation.customerFullName, reservation.guestCount);
+
+  if (reservation.status === 'cancelled') {
+    return `[CANCELADA] ${baseSummary}`;
+  }
+
+  if (reservation.status === 'completed') {
+    return `[CONCLUIDA] ${baseSummary}`;
+  }
+
+  return baseSummary;
+};
+
 const buildCalendarDescription = (reservation: ReservationRecord) =>
   [
     `Codigo da reserva: ${reservation.reservationCode}`,
@@ -100,6 +115,7 @@ const buildCalendarDescription = (reservation: ReservationRecord) =>
     `Origem: ${reservation.discoverySource ?? 'Nao informado'}`,
     `Observacoes: ${reservation.notes ?? 'Sem observacoes adicionais'}`,
     `Politica de tolerancia: ${reservation.tolerancePolicyText}`,
+    `Status interno: ${reservation.status}`,
   ].join('\n');
 
 const generateUniqueReservationCode = async (env: Env, reservationDate: string) => {
@@ -150,6 +166,7 @@ export const createReservation = async (env: Env, request: Request, payload: Res
       summary: buildCalendarSummary(reservation.customerFullName, reservation.guestCount),
       description: buildCalendarDescription(reservation),
       attendeeEmail: reservation.email,
+      location: VILLA_CUIABAR_ADDRESS,
     });
     await updateReservationCalendarEvent(env, reservation.id, calendarEvent.id!);
     await insertReservationLog(env, reservation.id, 'google_calendar.create', 'success', {
@@ -200,4 +217,45 @@ export const changeReservationStatus = async (env: Env, reservationId: string, s
     status,
     actorEmail,
   });
+
+  const reservation = await findReservationById(env, reservationId);
+  if (!reservation) {
+    return;
+  }
+
+  if (reservation.googleCalendarEventId && (status === 'cancelled' || status === 'completed')) {
+    try {
+      await updateGoogleCalendarEvent(env, reservation.googleCalendarEventId, {
+        attendeeEmail: reservation.email,
+        summary: buildStatusAwareCalendarSummary(reservation),
+        description: buildCalendarDescription(reservation),
+        location: VILLA_CUIABAR_ADDRESS,
+        ...(status === 'cancelled' ? { status: 'cancelled' as const } : {}),
+      });
+      await insertReservationLog(env, reservationId, 'google_calendar.status_update', 'success', {
+        googleCalendarEventId: reservation.googleCalendarEventId,
+        reservationStatus: status,
+      });
+    } catch (error) {
+      console.error('reservation_google_calendar_status_error', error);
+      await insertReservationLog(env, reservationId, 'google_calendar.status_update', 'failure', {
+        reservationStatus: status,
+        message: error instanceof Error ? error.message : 'Falha ao atualizar o status do evento no Google Calendar.',
+      });
+    }
+  }
+
+  if (status === 'cancelled' && reservation.email) {
+    try {
+      const result = await sendReservationCancellationEmail(env, reservation);
+      await insertReservationLog(env, reservationId, 'email.customer_cancellation', 'success', {
+        messageId: result?.id ?? null,
+      });
+    } catch (error) {
+      console.error('reservation_customer_cancellation_email_error', error);
+      await insertReservationLog(env, reservationId, 'email.customer_cancellation', 'failure', {
+        message: error instanceof Error ? error.message : 'Falha ao enviar o aviso de cancelamento ao cliente.',
+      });
+    }
+  }
 };

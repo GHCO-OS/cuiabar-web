@@ -1,0 +1,22 @@
+[
+  {
+    "severity": "alta",
+    "source_record_id": null,
+    "sector_id": null,
+    "resolved_at": null,
+    "responsible": "Léo Garcia",
+    "corrective_action": "Fechamento da porta ",
+    "description": "Equipamento: Geladeira Principal. Temperatura: 8°C. Faixa esperada: ?°C a 5°C. Ação: Fechamento da porta ",
+    "source": "temperatura",
+    "photo_url": null,
+    "title": "Temperatura fora da faixa - Geladeira Principal",
+    "unit_id": "69af06df716f2a7a52ce32ce",
+    "status": "aberta",
+    "id": "69af2d570e29786f1c4e0785",
+    "created_date": "2026-03-09T20:28:07.632000",
+    "updated_date": "2026-03-09T20:28:07.632000",
+    "created_by_id": "69af09430dd488ebe9943a86",
+    "created_by": "leo.garcialds12@gmail.com",
+    "is_sample": false
+  }
+]

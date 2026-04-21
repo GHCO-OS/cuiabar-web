@@ -1,6 +1,6 @@
 # Arquitetura e rotas
 
-Atualizado em: 2026-04-15
+Atualizado em: 2026-04-17
 
 ## Sistema e produtos
 
@@ -70,8 +70,14 @@ migrations/
 - `src/crm/`
   Interface principal do `Cuiabar Atende` e area administrativa compartilhada.
 
+- `src/crm/branding.ts`
+  Branding canonico do `Cuiabar Atende`, mantido junto da superficie real do produto.
+
 - `src/meucuiabar/`
-  Primeiro bloco extraido de `MeuCuiabar`, dedicado a governanca operacional e auditoria interna.
+  Superficie propria de `MeuCuiabar`, agora com runtime interno da Cuiabar para login, sessao e operacao do portal.
+
+- `src/meucuiabar/base44/`
+  App operacional atual do `MeuCuiabar`, com UI e modulos transplantados do Base44, mas ja desacoplado da autenticacao do Base44 e rodando com storage local seedado a partir do scraping.
 
 - `src/reservations/`
   Frontend do portal de reservas, ligado ao `Cuiabar Atende`.
@@ -79,11 +85,14 @@ migrations/
 - `worker/`
   Backend principal em Cloudflare Workers: nucleo compartilhado do `GHCO OS`, cobrindo CRM, integracoes, reservas, autenticacao e rotas server-side dedicadas.
 
-- `worker/whatsapp-intelligence/`
-  Worker dedicado/experimental para automacoes de WhatsApp com Llama, auditoria e bridge para gateway Baileys dentro da linha `Cuiabar Atende`.
-
 - `services/whatsapp-baileys/`
   Runtime local da ponte de transporte do WhatsApp Web.
+
+- `migrations/`
+  Banco D1 e evolução de schema.
+
+- `worker/whatsapp-intelligence/`
+  Worker dedicado/experimental para automacoes de WhatsApp com Llama, auditoria e bridge para gateway Baileys dentro da linha `Cuiabar Atende`.
 
 ## Configuracao central
 
@@ -140,8 +149,11 @@ Arquivos mais importantes para operacao:
 - `crm.cuiabar.com`
   Portal principal do `Cuiabar Atende`.
 
+- `meu.cuiabar.com`
+  Host oficial do `MeuCuiabar`, com runtime proprio no frontend. A autenticacao e interna via Google OAuth no Worker, com aprovacao manual de novos usuarios por `leonardo@cuiabar.net` ou `cuiabar@cuiabar.net`.
+
 - `crm.cuiabar.com/meucuiabar*`
-  Primeira superficie interna de `MeuCuiabar`, ainda hospedada sob o shell autenticado do portal interno.
+  Alias legado do `MeuCuiabar`, mantido apenas para compatibilidade e redirecionado para `meu.cuiabar.com`.
 
 - `reservas.cuiabar.com`
   Portal de reservas do `Cuiabar Atende`.
@@ -169,4 +181,15 @@ Arquivos mais importantes para operacao:
 - A configuracao atual de deploy e local/manual via Wrangler, nao por integracao GitHub -> Cloudflare.
 - O modulo de WhatsApp usa um bridge Baileys local para transporte, KV para sessao/cache e Workers AI com fallback para REST da Cloudflare.
 - Para nao quebrar o CRM atual de e-mail marketing, o atendimento WhatsApp grava primeiro em `customer_profiles` e so vincula a `contacts` quando houver match seguro ou e-mail conhecido.
-- `MeuCuiabar` foi aberto inicialmente como modulo proprio em `src/meucuiabar/`, mas ainda compartilha autenticacao e shell do host `crm.cuiabar.com`.
+- `MeuCuiabar` agora possui app proprio no frontend, separado do shell do `Cuiabar Atende`.
+- `MeuCuiabar` passa a ter host oficial proprio em `meu.cuiabar.com`.
+- A versao atual do `MeuCuiabar` foi sobrescrita com a interface operacional raspada do Base44.
+- O login do `MeuCuiabar` deixou de depender do Base44 e passa a usar o Worker interno da Cuiabar com Google OAuth e workflow de aprovacao.
+- Enquanto o backend dedicado em Worker/D1 nao e aberto, os dados operacionais do `MeuCuiabar` rodam em storage local seedado com o dump raspado do Base44.
+- site institucional: `src/pages/`, `src/sections/`, `src/data/`
+- SEO público: `src/data/seo.ts`, `src/data/seoRoutes.json`, `src/lib/seo.ts`
+- analytics/pixels: `src/lib/analytics.ts`, `src/components/AnalyticsTracker.tsx`, `functions/api/meta-conversions.js`
+- burger: `src/pages/BurguerCuiabarPage.tsx`, `src/burger/`, `public/burguer/`
+- CRM: `src/crm/`, `worker/`, `worker/whatsapp-intelligence/`
+- reservas: `src/reservations/`, `worker/reservations/`, `migrations/0004_reservations.sql`
+- blog: `src/blog/`, `blog-options/`, scripts editoriais

@@ -6,6 +6,11 @@ export interface SessionUser {
   displayName: string;
   status: string;
   roles: RoleName[];
+  firstName?: string | null;
+  lastName?: string | null;
+  avatarUrl?: string | null;
+  approvalStatus?: 'pending' | 'approved' | 'rejected';
+  googleAccessScope?: string | null;
 }
 
 export interface SessionPayload {
