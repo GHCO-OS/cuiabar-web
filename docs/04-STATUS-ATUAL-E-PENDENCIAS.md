@@ -1,6 +1,6 @@
 # Status atual e pendencias
 
-Atualizado em: 2026-04-14
+Atualizado em: 2026-04-21
 
 ## Estado geral
 
@@ -31,7 +31,7 @@ Com tres linhas de produto:
 - modulo de reservas
 - CRM/Worker
 - Meta Pixel e camada server-side de CAPI
-- modulo de atendimento WhatsApp com IA no Worker
+- modulo de atendimento WhatsApp com IA preservado em codigo, mas isolado por flag para refinamento
 - ponte local Baileys em `services/whatsapp-baileys`
 - central operacional de WhatsApp dentro do CRM em `/whatsapp`
 - documentacao de governanca em `AGENTS.md` e `docs/09-ORGANIZACAO-E-GOVERNANCA-IA.md`
@@ -87,6 +87,7 @@ Estado da classificacao:
 - acompanhar saude do autostart/watchdog do Baileys em producao
 - criar IDs formais persistentes para `bridge_instance_id` e `machine_instance_id` se isso virar requisito de auditoria
 - decidir o proximo bloco concreto de extracao para `MeuCuiabar` alem da auditoria interna
+- refinar `worker/whatsapp-intelligence` em branch dedicada antes de reativar o webhook em ambiente principal
 
 ## Decisao importante
 
@@ -113,3 +114,4 @@ Isso significa:
 - revisao do modulo de blog
 - refinamento final de QA mobile em paginas especiais
 - refinamento adicional de observabilidade do modulo de WhatsApp
+- hardening do fluxo de webhook, deduplicacao e entrega antes de considerar o modulo WhatsApp como operacional

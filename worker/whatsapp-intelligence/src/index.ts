@@ -14,6 +14,7 @@ export interface Env {
   CRM_INTERNAL_API_BASE: string;
   BAILEYS_GATEWAY_BASE_URL: string;
   ENVIRONMENT: string;
+  WHATSAPP_INTELLIGENCE_ENABLED?: string;
 }
 
 const json = (payload: unknown, status = 200) =>
@@ -23,6 +24,8 @@ const json = (payload: unknown, status = 200) =>
   });
 
 const unauthorized = () => json({ ok: false, error: 'unauthorized' }, 401);
+const serviceUnavailable = (error = 'whatsapp_intelligence_disabled') => json({ ok: false, error }, 503);
+const isWhatsAppEnabled = (env: Env) => env.WHATSAPP_INTELLIGENCE_ENABLED === 'true';
 
 const normalizePhone = (value: string) => {
   const digits = value.replace(/\D/g, '');
@@ -72,10 +75,19 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/health') {
-      return json({ ok: true, service: 'cuiabar-whatsapp-intelligence', env: env.ENVIRONMENT || 'unknown' });
+      return json({
+        ok: true,
+        service: 'cuiabar-whatsapp-intelligence',
+        env: env.ENVIRONMENT || 'unknown',
+        enabled: isWhatsAppEnabled(env),
+      });
     }
 
     if (url.pathname === '/webhook/baileys' && request.method === 'POST') {
+      if (!isWhatsAppEnabled(env)) {
+        return serviceUnavailable();
+      }
+
       const incomingSecret = request.headers.get('x-internal-secret') || '';
       if (!incomingSecret || !secureEqual(incomingSecret, env.WEBHOOK_SHARED_SECRET)) {
         return unauthorized();

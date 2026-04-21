@@ -17,6 +17,7 @@ database_id = "1c8de55c-c5f4-4985-8c5b-5ac1a010214d"
 
 [vars]
 ENVIRONMENT = "production"
+WHATSAPP_INTELLIGENCE_ENABLED = "false"
 CRM_INTERNAL_API_BASE = "https://crm.cuiabar.com"
 BAILEYS_GATEWAY_BASE_URL = "https://baileys-gateway.cuiabar.com"
 
