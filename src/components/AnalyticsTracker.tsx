@@ -25,10 +25,6 @@ const classifyInternalPath = (pathname: string) => {
     return { eventName: normalizedPath === '/agenda' ? 'open_agenda_page' : 'open_agenda_event_page' };
   }
 
-  if (normalizedPath === '/blog' || normalizedPath.startsWith('/blog/')) {
-    return { eventName: normalizedPath === '/blog' ? 'open_blog_page' : 'open_blog_article_page' };
-  }
-
   switch (normalizedPath) {
     case '/links':
       return { eventName: 'open_links_page' };
@@ -56,10 +52,6 @@ const getContentName = (pathname: string) => {
 
   if (normalizedPath === '/agenda' || normalizedPath.startsWith('/agenda/')) {
     return 'agenda_musica_ao_vivo';
-  }
-
-  if (normalizedPath === '/blog' || normalizedPath.startsWith('/blog/')) {
-    return 'conteudo_local_cuiabar';
   }
 
   switch (normalizedPath) {
@@ -96,9 +88,6 @@ export const AnalyticsTracker = () => {
       case '/agenda':
         trackViewContent('agenda_musica_ao_vivo', { content_category: 'agenda' });
         break;
-      case '/blog':
-        trackViewContent('conteudo_local_cuiabar', { content_category: 'editorial' });
-        break;
       case '/burguer':
         trackViewContent('burguer_cuiabar', { content_category: 'burguer' });
         break;
@@ -109,10 +98,6 @@ export const AnalyticsTracker = () => {
         if (normalizedPath.startsWith('/agenda/')) {
           trackViewContent('agenda_event_page', { content_category: 'agenda_event' });
           break;
-        }
-
-        if (normalizedPath.startsWith('/blog/')) {
-          trackViewContent('blog_article_page', { content_category: 'editorial_article' });
         }
         break;
     }

@@ -36,7 +36,7 @@ Com tres linhas de produto:
 - central operacional de WhatsApp dentro do CRM em `/whatsapp`
 - documentacao de governanca em `AGENTS.md` e `docs/09-ORGANIZACAO-E-GOVERNANCA-IA.md`
 - inventario operacional desta maquina e do bridge em `docs/10-AMBIENTE-LOCAL-E-IDS.md`
-- repositorio GitHub oficial em `github.com/cuiabar/cuiabar-web`
+- repositorio GitHub oficial em `github.com/GHCO-OS/cuiabar-web`
 
 ## O que ja foi melhorado nesta organizacao
 
@@ -88,6 +88,7 @@ Estado da classificacao:
 - criar IDs formais persistentes para `bridge_instance_id` e `machine_instance_id` se isso virar requisito de auditoria
 - decidir o proximo bloco concreto de extracao para `MeuCuiabar` alem da auditoria interna
 - refinar `worker/whatsapp-intelligence` em branch dedicada antes de reativar o webhook em ambiente principal
+- polir o projeto editorial/blog apenas na branch `codex/polish-blog`, mantendo o principal sem essa superficie
 
 ## Decisao importante
 
@@ -101,7 +102,7 @@ Isso significa:
 
 ## Estado do GitHub
 
-- o repositorio oficial de versionamento e `cuiabar/cuiabar-web`
+- o repositorio oficial de versionamento e `GHCO-OS/cuiabar-web`
 - o repositorio e privado
 - a copia operacional principal fica em `C:\workspace\cuiabar-web`
 - o Google Drive fica como backup e snapshot, nao como runtime principal
@@ -111,7 +112,7 @@ Isso significa:
 - pipeline automatizado e seguro de deploy sem depender de maquina local
 - centralizacao de secrets em cofre apropriado
 - limpeza de artefatos tecnicos locais
-- revisao do modulo de blog
+- avaliacao futura sobre retorno do blog, mas fora do tronco operacional atual
 - refinamento final de QA mobile em paginas especiais
 - refinamento adicional de observabilidade do modulo de WhatsApp
 - hardening do fluxo de webhook, deduplicacao e entrega antes de considerar o modulo WhatsApp como operacional

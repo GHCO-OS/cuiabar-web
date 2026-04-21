@@ -9,10 +9,10 @@ dist
 .wrangler
 *.err
 *.tsbuildinfo
+*.pid
 .env
 .env.*
 services/whatsapp-baileys/.auth/
-blog-options/*/.env
 tmp-menu-source.html
 tmp-menu.json
 .codex-*

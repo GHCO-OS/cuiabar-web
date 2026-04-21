@@ -24,8 +24,11 @@ jobs:
       - name: Type check
         run: npm run lint
 
+      - name: Test
+        run: npm test
+
       - name: Build
-        run: npm run build
+        run: npm run build:ci
 
       - name: Performance budget
         run: npm run perf:check

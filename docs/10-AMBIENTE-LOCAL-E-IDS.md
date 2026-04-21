@@ -14,7 +14,7 @@ Importante:
 
 ## Repositorio
 
-- Repositorio GitHub alvo: `https://github.com/cuiabar/cuiabar-web`
+- Repositorio GitHub alvo: `https://github.com/GHCO-OS/cuiabar-web`
 - Organizacao/owner: `cuiabar`
 - Nome: `cuiabar-web`
 - Visibilidade: privada

@@ -2,6 +2,7 @@ import { Reveal } from '../components/Reveal';
 import { getRouteSeo } from '../data/seo';
 import { siteConfig } from '../data/siteConfig';
 import { useSeo } from '../hooks/useSeo';
+import '../styles/pro-refeicao.css';
 
 const operationalPillars = [
   {

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { linksPageConfig } from '../data/linksPageConfig';
 import { getRouteSeo } from '../data/seo';
 import { useSeo } from '../hooks/useSeo';
+import '../styles/links.css';
 
 const isInternalRoute = (href: string) => href.startsWith('/');
 const isHashLink = (href: string) => href.startsWith('#');

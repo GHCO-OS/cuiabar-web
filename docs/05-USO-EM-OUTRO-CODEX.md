@@ -9,7 +9,7 @@ Permitir que o projeto seja aberto e continuado em outra maquina ou outro Codex 
 1. Clonar ou abrir o repositorio oficial:
 
 ```txt
-https://github.com/cuiabar/cuiabar-web
+https://github.com/GHCO-OS/cuiabar-web
 ```
 
 2. Ler nesta ordem:

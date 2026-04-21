@@ -1,17 +1,17 @@
 # Arquitetura e rotas
 
-Atualizado em: 2026-04-15
+Atualizado em: 2026-04-21
 
 ## Sistema e produtos
 
-O sistema-mãe do repositorio passa a ser:
+O sistema-mae do repositorio e:
 
 - `GHCO OS`
 
 Linhas de produto dentro dele:
 
 1. `Cuiabar Web`
-   Site, blog e cardapio para o cliente final.
+   Site, cardapio, paginas locais e descoberta organica.
 2. `MeuCuiabar`
    Controle interno, qualidade, HACCP e rotinas da casa.
 3. `Cuiabar Atende`
@@ -42,9 +42,8 @@ src/
   data/           configuracoes e conteudo
   hooks/          SEO, comportamento e utilitarios React
   lib/            analytics e helpers
-  styles/         estilos globais
+  styles/         estilos globais e por superficie
   reservations/   frontend do modulo de reservas
-  blog/           estrutura do blog/editorial
   crm/            portal operacional e administrativo
 
 functions/
@@ -64,7 +63,7 @@ migrations/
 
 ## Mapeamento por modulo
 
-- `src/pages/`, `src/sections/`, `src/blog/`, `src/data/`, `public/`
+- `src/pages/`, `src/sections/`, `src/data/`, `public/`
   Base principal do `Cuiabar Web`.
 
 - `src/crm/`
@@ -77,13 +76,13 @@ migrations/
   Frontend do portal de reservas, ligado ao `Cuiabar Atende`.
 
 - `worker/`
-  Backend principal em Cloudflare Workers: nucleo compartilhado do `GHCO OS`, cobrindo CRM, integracoes, reservas, autenticacao e rotas server-side dedicadas.
+  Backend principal em Cloudflare Workers, cobrindo CRM, integracoes, reservas, autenticacao e rotas server-side dedicadas.
 
 - `worker/whatsapp-intelligence/`
-  Worker dedicado/experimental para automacoes de WhatsApp com Llama, auditoria e bridge para gateway Baileys dentro da linha `Cuiabar Atende`.
+  Worker dedicado e experimental para automacoes de WhatsApp. Hoje esta isolado por flag e fora do fluxo principal.
 
 - `services/whatsapp-baileys/`
-  Runtime local da ponte de transporte do WhatsApp Web.
+  Runtime local da ponte de transporte do WhatsApp Web. O autostart foi desativado e ele deve ser usado apenas sob demanda.
 
 ## Configuracao central
 
@@ -100,7 +99,7 @@ Arquivos mais importantes para operacao:
 ## Rotas principais do site
 
 - `/`
-  Home institucional/comercial.
+  Home institucional e comercial.
 
 - `/menu`
   Cardapio principal do restaurante.
@@ -127,10 +126,13 @@ Arquivos mais importantes para operacao:
   Pagina estilo link-in-bio.
 
 - `/agenda`
-  Agenda/programacao.
+  Agenda e programacao.
 
 - `/reservas`
   Fluxo publico de reservas.
+
+- `/blog` e `/blog/:slug`
+  Rotas legadas que redirecionam para `https://blog.cuiabar.com`.
 
 ## Rotas de infraestrutura
 
@@ -141,16 +143,13 @@ Arquivos mais importantes para operacao:
   Portal principal do `Cuiabar Atende`.
 
 - `crm.cuiabar.com/meucuiabar*`
-  Primeira superficie interna de `MeuCuiabar`, ainda hospedada sob o shell autenticado do portal interno.
+  Superficie interna inicial de `MeuCuiabar`, ainda hospedada sob o shell autenticado do portal interno.
 
 - `reservas.cuiabar.com`
   Portal de reservas do `Cuiabar Atende`.
 
 - `blog.cuiabar.com`
-  Presenca editorial do `Cuiabar Web`.
-
-- `blog.cuiabar.com/editor*`
-  Faixa reservada para editor/blog.
+  Presenca editorial externa ao tronco principal.
 
 - `crm.cuiabar.com/api/internal/whatsapp/*`
   Endpoints internos consumidos pela ponte Baileys local.
@@ -158,15 +157,11 @@ Arquivos mais importantes para operacao:
 - `crm.cuiabar.com/api/admin/whatsapp/*`
   Endpoints administrativos do modulo de WhatsApp.
 
-- `crm.cuiabar.com/api/internal/whatsapp/crm/sync`
-  Camada adaptadora REST para sincronizacao com o CRM.
-
 ## Observacoes relevantes
 
 - O projeto mistura frontend estatico no Pages com Worker para modulos dinamicos.
 - O site principal usa `dist/` como bundle estatico.
 - O Worker usa `worker/index.ts` com assets do `dist`.
-- A configuracao atual de deploy e local/manual via Wrangler, nao por integracao GitHub -> Cloudflare.
-- O modulo de WhatsApp usa um bridge Baileys local para transporte, KV para sessao/cache e Workers AI com fallback para REST da Cloudflare.
-- Para nao quebrar o CRM atual de e-mail marketing, o atendimento WhatsApp grava primeiro em `customer_profiles` e so vincula a `contacts` quando houver match seguro ou e-mail conhecido.
-- `MeuCuiabar` foi aberto inicialmente como modulo proprio em `src/meucuiabar/`, mas ainda compartilha autenticacao e shell do host `crm.cuiabar.com`.
+- A configuracao atual de deploy e local/manual via Wrangler, com caminho de publicacao protegido por checks.
+- O modulo de WhatsApp usa uma ponte Baileys local para transporte, KV para sessao e cache e Workers AI com fallback para REST da Cloudflare.
+- O blog saiu da superficie principal e ficou preservado apenas como redirecionamento legado e branch dedicada de refinamento.

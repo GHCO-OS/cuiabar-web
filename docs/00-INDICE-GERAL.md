@@ -1,10 +1,10 @@
 # Cuiabar Web - indice geral
 
-Atualizado em: 2026-04-14
+Atualizado em: 2026-04-21
 
 ## Objetivo
 
-Este diretorio centraliza a documentacao operacional do `GHCO OS`, para que o projeto possa ser aberto e operado em outros Codex, sem depender de memoria de conversa ou de um unico computador.
+Este diretorio centraliza a documentacao operacional do `GHCO OS`, para que o projeto possa ser aberto e operado em outros Codex sem depender de memoria de conversa ou de um unico computador.
 
 ## Ordem recomendada de leitura
 
@@ -29,52 +29,36 @@ Este diretorio centraliza a documentacao operacional do `GHCO OS`, para que o pr
   Como rodar, buildar e publicar no Cloudflare.
 
 - `03-INTEGRACOES-E-CREDENCIAIS.md`
-  Inventario das integracoes e onde consultar credenciais.
+  Inventario das integracoes, do que esta ativo e do que foi desligado.
 
 - `04-STATUS-ATUAL-E-PENDENCIAS.md`
   O que esta ativo, o que foi descontinuado e o que ainda precisa de atencao.
 
 - `05-USO-EM-OUTRO-CODEX.md`
-  Passo a passo para abrir e continuar o projeto em outra maquina/instancia Codex.
-
-- `09-ORGANIZACAO-E-GOVERNANCA-IA.md`
-  Regra de organizacao do repositorio, mapa de busca e convencao obrigatoria para futuras IAs.
-
-- `06-WHATSAPP-AI-ARQUITETURA.md`
-  Arquitetura detalhada do atendimento por WhatsApp com IA, estrategia de integracao com o CRM atual, schema D1 e estrutura de pastas.
-
-- `07-WHATSAPP-AI-ENDPOINTS.md`
-  Contratos das rotas internas, administrativas e do bridge local do modulo de WhatsApp.
-
-- `08-WHATSAPP-AI-PAYLOADS.md`
-  Exemplos de payloads do bridge Baileys, sync CRM e acoes administrativas.
-
-- `10-AMBIENTE-LOCAL-E-IDS.md`
-  Inventario do PC operacional, bridge local, host IDs e referencias de runtime para suporte e continuidade.
+  Passo a passo para abrir e continuar o projeto em outra maquina ou instancia Codex.
 
 - `14-NOMENCLATURA-E-LINHAS-DE-PRODUTO.md`
-  Nome do sistema-mãe, linhas de produto, fronteiras funcionais e convencao de naming para branches.
-
-- `15-DERIVACOES-E-TOPOLOGIA-GIT.md`
-  Topologia oficial do Git, destino do legado `Super` e branches-base ativas do sistema.
+  Nome do sistema-mae, linhas de produto e fronteiras funcionais.
 
 - `16-CLASSIFICACAO-DE-MODULOS-E-LEGADO.md`
-  Classificacao de pastas, modulos, migracoes e legados entre `GHCO OS`, `Cuiabar Web`, `MeuCuiabar` e `Cuiabar Atende`.
+  Classificacao de pastas, modulos, migracoes e legados.
 
-## Material complementar
+## Runbooks complementares
 
-Esses arquivos continuam validos como apoio:
+Os antigos arquivos operacionais da raiz foram consolidados em `docs/runbooks/`:
 
-- `README.md`
-- `DEPLOY-CLOUDFLARE.md`
-- `DEPLOY-RESERVAS-CLOUDFLARE.md`
-- `README-RESERVAS.md`
-- `RESERVAS-SETUP.md`
-- `GOOGLE-CALENDAR-SETUP.md`
-- `EMAIL-SETUP.md`
-- `META-CAPI-SETUP.md`
-- `SEO-SETUP.md`
-- `SEO-TECHNICAL-PLAN.md`
+- `runbooks/00-INDICE-RUNBOOKS.md`
+- `runbooks/DEPLOY-CLOUDFLARE.md`
+- `runbooks/DEPLOY-RESERVAS-CLOUDFLARE.md`
+- `runbooks/EMAIL-SETUP.md`
+- `runbooks/EMAIL-DELIVERABILITY.md`
+- `runbooks/GMAIL-OAUTH-SETUP.md`
+- `runbooks/GOOGLE-CALENDAR-SETUP.md`
+- `runbooks/META-CAPI-SETUP.md`
+- `runbooks/README-RESERVAS.md`
+- `runbooks/RESERVAS-SETUP.md`
+- `runbooks/SEO-SETUP.md`
+- `runbooks/SEO-TECHNICAL-PLAN.md`
 
 ## Credenciais
 
@@ -90,4 +74,4 @@ Tambem existe um pacote rapido em:
 
 - `../KIT-PORTABILIDADE/00-LEIA-ME.md`
 
-Esse conjunto foi montado para facilitar reutilizacao do projeto em outras ferramentas e outras instancias, incluindo copia da chave da conta de servico Google e snapshot das integracoes principais.
+Esse conjunto foi mantido para portabilidade e continuidade entre ferramentas.

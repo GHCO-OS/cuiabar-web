@@ -1,7 +1,14 @@
 import { BaileysSessionDO } from './BaileysSessionDO';
 import { executeCrmCommands } from './crmCommander';
 import { llamaProcessMessage } from './llamaProcessor';
-import { ensureInboundEvent, getCustomerContext, saveConversation } from './storage';
+import {
+  claimInboundEvent,
+  getCustomerContext,
+  markInboundEventCompleted,
+  markInboundEventDelivered,
+  markInboundEventFailed,
+  saveConversation,
+} from './storage';
 import type { BaileysWebhookPayload, LlamaAction } from './types';
 
 export interface Env {
@@ -93,11 +100,15 @@ export default {
         return unauthorized();
       }
 
+      let inboundMessageId: string | null = null;
+      let deliveryConfirmed = false;
+
       try {
         const payload = await parsePayload(request);
+        inboundMessageId = payload.messageId;
         const normalizedPhone = normalizePhone(payload.phone);
 
-        const firstSeen = await ensureInboundEvent(env.DB, payload.messageId, normalizedPhone, payload.timestamp || null);
+        const firstSeen = await claimInboundEvent(env.DB, payload.messageId, normalizedPhone, payload.timestamp || null);
         if (!firstSeen) {
           return json({ ok: true, deduplicated: true });
         }
@@ -105,22 +116,6 @@ export default {
         const customer = await getCustomerContext(env.DB, normalizedPhone, payload.pushName);
         const llama = await llamaProcessMessage(payload.message, normalizedPhone, customer, env);
         const actions = clampActions(llama.actions);
-
-        await executeCrmCommands(actions, env, {
-          phone: normalizedPhone,
-          customer,
-          originalMessage: payload.message,
-          modelResponse: llama.response,
-        });
-
-        await saveConversation(env.DB, {
-          phone: normalizedPhone,
-          messageId: payload.messageId,
-          messageIn: payload.message,
-          messageOut: llama.response,
-          actions,
-          modelRaw: llama.rawModelResponse || null,
-        });
 
         const sessionName = `session-${normalizedPhone}`;
         const stub = env.BAILEYS_SESSION.get(env.BAILEYS_SESSION.idFromName(sessionName));
@@ -131,12 +126,41 @@ export default {
         });
 
         if (!delivery.ok) {
+          await markInboundEventFailed(env.DB, payload.messageId, 'failed_to_deliver_message');
           return json({ ok: false, error: 'failed_to_deliver_message' }, 502);
         }
+        deliveryConfirmed = true;
+        await markInboundEventDelivered(env.DB, payload.messageId);
+
+        await saveConversation(env.DB, {
+          phone: normalizedPhone,
+          messageId: payload.messageId,
+          messageIn: payload.message,
+          messageOut: llama.response,
+          actions,
+          modelRaw: llama.rawModelResponse || null,
+        });
+
+        await executeCrmCommands(actions, env, {
+          phone: normalizedPhone,
+          customer,
+          originalMessage: payload.message,
+          modelResponse: llama.response,
+        });
+
+        await markInboundEventCompleted(env.DB, payload.messageId);
 
         return json({ ok: true, actionsExecuted: actions.length });
       } catch (error) {
         const message = error instanceof Error ? error.message : 'unknown_error';
+        if (inboundMessageId) {
+          const markFailure = deliveryConfirmed
+            ? markInboundEventDelivered(env.DB, inboundMessageId, message)
+            : markInboundEventFailed(env.DB, inboundMessageId, message);
+
+          await markFailure.catch(() => null);
+        }
+
         return json({ ok: false, error: message }, 400);
       }
     }

@@ -11,7 +11,6 @@ export interface Env {
     DEFAULT_FROM_EMAIL: string;
     DEFAULT_FROM_NAME: string;
     DEFAULT_REPLY_TO: string;
-    BLOG_EDITOR_UPSTREAM_URL?: string;
     IFOOD_STORE_URL?: string;
     FOOD99_STORE_URL?: string;
     AUTH_MODE?: string;
@@ -49,11 +48,22 @@ export interface Env {
     GMAIL_SENDER_NAME?: string;
     RESERVATION_NOTIFICATION_EMAIL?: string;
     RESERVATION_APP_BASE_URL?: string;
+    GOOGLE_ADS_API_VERSION?: string;
+    GOOGLE_ADS_CUSTOMER_ID?: string;
     GOOGLE_ADS_LOGIN_CUSTOMER_ID?: string;
     GOOGLE_ADS_DEVELOPER_TOKEN?: string;
     GOOGLE_ADS_CLIENT_ID?: string;
     GOOGLE_ADS_CLIENT_SECRET?: string;
     GOOGLE_ADS_REFRESH_TOKEN?: string;
+    META_GRAPH_API_VERSION?: string;
+    META_PIXEL_ID?: string;
+    META_ACCESS_TOKEN?: string;
+    META_CAPI_TOKEN?: string;
+    ZOHO_ACCOUNTS_DOMAIN?: string;
+    ZOHO_API_DOMAIN?: string;
+    ZOHO_CLIENT_ID?: string;
+    ZOHO_CLIENT_SECRET?: string;
+    ZOHO_REFRESH_TOKEN?: string;
 }
 export interface AuthUser {
     id: string;
