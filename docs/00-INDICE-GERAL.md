@@ -1,99 +1,86 @@
-# Cuiabar Web - indice geral
+# Índice geral
 
-Atualizado em: 2026-04-14
+Atualizado em: 2026-04-22
 
 ## Objetivo
 
-Este diretorio centraliza a documentacao operacional do `GHCO OS`, para que o projeto possa ser aberto e operado em outros Codex, sem depender de memoria de conversa ou de um unico computador.
+Centralizar a documentação oficial do `GHCO OS` em uma trilha única, estável e legível em português do Brasil.
 
 ## Ordem recomendada de leitura
 
 1. `../AGENTS.md`
-2. `09-ORGANIZACAO-E-GOVERNANCA-IA.md`
-3. `05-USO-EM-OUTRO-CODEX.md`
-4. `01-ARQUITETURA-E-ROTAS.md`
-5. `02-OPERACAO-E-DEPLOY.md`
-6. `03-INTEGRACOES-E-CREDENCIAIS.md`
-7. `04-STATUS-ATUAL-E-PENDENCIAS.md`
-8. `06-WHATSAPP-AI-ARQUITETURA.md`
-9. `07-WHATSAPP-AI-ENDPOINTS.md`
-10. `08-WHATSAPP-AI-PAYLOADS.md`
-11. `10-AMBIENTE-LOCAL-E-IDS.md`
+2. `01-ARQUITETURA-E-ROTAS.md`
+3. `04-STATUS-ATUAL-E-PENDENCIAS.md`
+4. `18-VISAO-GERAL-E-PROPOSITO.md`
+5. `19-TECNOLOGIA-DESIGN-E-INSPIRACOES.md`
+6. `02-OPERACAO-E-DEPLOY.md`
+7. `03-INTEGRACOES-E-CREDENCIAIS.md`
+8. `17-MAPA-DE-MANUTENCAO-E-BRANCHES.md`
+9. `10-AMBIENTE-LOCAL-E-IDS.md`
+10. `runbooks/00-INDICE-RUNBOOKS.md`
 
-## Arquivos centrais
+## Trilha principal
 
 - `01-ARQUITETURA-E-ROTAS.md`
-  Mapa do projeto, stack, pastas e principais rotas.
+  Estrutura do sistema, domínios, rotas e responsabilidades.
 
 - `02-OPERACAO-E-DEPLOY.md`
-  Como rodar, buildar e publicar no Cloudflare.
+  Como instalar, validar, publicar e operar o projeto.
 
 - `03-INTEGRACOES-E-CREDENCIAIS.md`
-  Inventario das integracoes e onde consultar credenciais.
+  Inventário de integrações e nomes de segredos.
 
 - `04-STATUS-ATUAL-E-PENDENCIAS.md`
-  O que esta ativo, o que foi descontinuado e o que ainda precisa de atencao.
+  Estado operacional consolidado, riscos e próximos movimentos.
 
-- `05-USO-EM-OUTRO-CODEX.md`
-  Passo a passo para abrir e continuar o projeto em outra maquina/instancia Codex.
+- `05-CONTINUIDADE-EM-NOVO-AMBIENTE.md`
+  Continuidade em novo ambiente ou nova máquina.
 
 - `09-ORGANIZACAO-E-GOVERNANCA-IA.md`
-  Regra de organizacao do repositorio, mapa de busca e convencao obrigatoria para futuras IAs.
-
-- `06-WHATSAPP-AI-ARQUITETURA.md`
-  Arquitetura detalhada do atendimento por WhatsApp com IA, estrategia de integracao com o CRM atual, schema D1 e estrutura de pastas.
-
-- `07-WHATSAPP-AI-ENDPOINTS.md`
-  Contratos das rotas internas, administrativas e do bridge local do modulo de WhatsApp.
-
-- `08-WHATSAPP-AI-PAYLOADS.md`
-  Exemplos de payloads do bridge Baileys, sync CRM e acoes administrativas.
+  Convenções de manutenção, organização e busca.
 
 - `10-AMBIENTE-LOCAL-E-IDS.md`
-  Inventario do PC operacional, bridge local, host IDs e referencias de runtime para suporte e continuidade.
-
-- `17-MAPA-DE-MANUTENCAO-E-BRANCHES.md`
-  Matriz unica de pastas, linhas de produto, branches e status de manutencao.
+  Identidade do ambiente operacional e do bridge local.
 
 - `14-NOMENCLATURA-E-LINHAS-DE-PRODUTO.md`
-  Nome do sistema-mãe, linhas de produto, fronteiras funcionais e convencao de naming para branches.
+  Nomes oficiais do sistema e das linhas de produto.
 
 - `15-DERIVACOES-E-TOPOLOGIA-GIT.md`
-  Topologia oficial do Git, destino do legado `Super` e branches-base ativas do sistema.
+  Topologia de branches e derivação das linhas de trabalho.
 
 - `16-CLASSIFICACAO-DE-MODULOS-E-LEGADO.md`
-  Classificacao de pastas, modulos, migracoes e legados entre `GHCO OS`, `Cuiabar Web`, `MeuCuiabar` e `Cuiabar Atende`.
+  Distribuição de módulos entre `GHCO OS`, `Cuiabar Web`, `MeuCuiabar` e `Cuiabar Atende`.
 
-## Material complementar
+- `17-MAPA-DE-MANUTENCAO-E-BRANCHES.md`
+  Mapa único de pastas, donos lógicos e branch inicial recomendada.
 
-Esses arquivos continuam validos como apoio:
+- `18-VISAO-GERAL-E-PROPOSITO.md`
+  Visão executiva do projeto, objetivos, funções e público.
 
-- `../README.md`
-- `guias-legados/README.md`
-- `guias-legados/DEPLOY-CLOUDFLARE.md`
-- `guias-legados/DEPLOY-RESERVAS-CLOUDFLARE.md`
-- `guias-legados/README-RESERVAS.md`
-- `guias-legados/RESERVAS-SETUP.md`
-- `guias-legados/GOOGLE-CALENDAR-SETUP.md`
-- `guias-legados/EMAIL-SETUP.md`
-- `guias-legados/META-CAPI-SETUP.md`
-- `guias-legados/SEO-SETUP.md`
-- `guias-legados/SEO-TECHNICAL-PLAN.md`
-- `../scripts/deploy-blog-option.sh`
+- `19-TECNOLOGIA-DESIGN-E-INSPIRACOES.md`
+  Stack, decisões de design, linguagem visual e repertório.
 
-## Credenciais
+## Módulos especializados
 
-O inventario de chaves compartilhadas em conversa esta em:
+- `06-WHATSAPP-AI-ARQUITETURA.md`
+- `07-WHATSAPP-AI-ENDPOINTS.md`
+- `08-WHATSAPP-AI-PAYLOADS.md`
 
-- `../ACESSOS-CHAVES-PROJETO.md` quando existir nesta copia local
-- `../KIT-PORTABILIDADE/confidencial/02-APIS-E-CHAVES.md` como baseline portavel
+## Runbooks
 
-Esse arquivo contem segredos em texto puro e deve ser tratado como confidencial.
+Runbooks operacionais específicos ficam em:
 
-## Kit adicional para outras ferramentas
+- `runbooks/00-INDICE-RUNBOOKS.md`
 
-Tambem existe um pacote rapido em:
+## Base preparada para Wiki
 
-- `../KIT-PORTABILIDADE/00-LEIA-ME.md`
+Enquanto o Wiki remoto não estiver habilitado no GitHub, as páginas-base ficam em:
 
-Esse conjunto foi montado para facilitar reutilizacao do projeto em outras ferramentas e outras instancias, incluindo copia da chave da conta de servico Google e snapshot das integracoes principais.
+- `wiki/Home.md`
+
+## Material histórico e apoio
+
+- `guias-legados/`
+- `../KIT-PORTABILIDADE/`
+
+Esses materiais são úteis para consulta, mas não substituem a trilha principal.

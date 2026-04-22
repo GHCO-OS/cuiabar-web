@@ -1,0 +1,141 @@
+.espetaria-page {
+  background:
+    radial-gradient(circle at top left, rgba(171, 75, 34, 0.18), transparent 24%),
+    radial-gradient(circle at right 12%, rgba(38, 88, 52, 0.18), transparent 26%),
+    linear-gradient(180deg, #fbf1dc 0%, #f7ead0 54%, #f2dfbf 100%);
+}
+
+.espetaria-stage {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+  min-height: 0;
+  padding: 1rem 0 0.5rem;
+}
+
+.espetaria-glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(34px);
+  opacity: 0.7;
+  z-index: 0;
+}
+
+.espetaria-glow-top {
+  top: 1.25rem;
+  right: 6%;
+  width: 12rem;
+  height: 12rem;
+  background: rgba(171, 75, 34, 0.22);
+}
+
+.espetaria-glow-bottom {
+  left: 10%;
+  bottom: 1.25rem;
+  width: 14rem;
+  height: 14rem;
+  background: rgba(38, 88, 52, 0.18);
+}
+
+.espetaria-card {
+  position: relative;
+  z-index: 1;
+  animation: espetaria-float 9s ease-in-out infinite;
+}
+
+.espetaria-card-main {
+  width: min(25rem, 100%);
+  justify-self: end;
+  z-index: 2;
+}
+
+.espetaria-card-side {
+  width: min(18.5rem, 82%);
+  justify-self: start;
+  margin-top: -2.75rem;
+  animation-delay: -3.1s;
+  z-index: 1;
+}
+
+.espetaria-cup-cluster {
+  display: flex;
+  align-items: end;
+  gap: 0.35rem;
+  min-width: 9rem;
+}
+
+.espetaria-cup {
+  display: inline-flex;
+  align-items: end;
+  justify-content: center;
+}
+
+.espetaria-cup-focus {
+  transform: translateY(0.15rem);
+}
+
+.espetaria-cup-backdrop,
+.espetaria-cup-backdrop-second {
+  opacity: 0.82;
+}
+
+.espetaria-cup-backdrop {
+  transform: rotate(-4deg) translateY(0.5rem);
+}
+
+.espetaria-cup-backdrop-second {
+  transform: rotate(6deg) translateY(0.8rem);
+}
+
+.espetaria-leaf {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 2rem;
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.espetaria-leaf-left {
+  left: 1rem;
+}
+
+.espetaria-leaf-right {
+  right: 1rem;
+}
+
+@keyframes espetaria-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(1.2deg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .espetaria-leaf {
+    display: flex;
+  }
+}
+
+@media (max-width: 1023px) {
+  .espetaria-card-side {
+    width: min(22rem, 100%);
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .espetaria-card {
+    animation: none;
+  }
+}

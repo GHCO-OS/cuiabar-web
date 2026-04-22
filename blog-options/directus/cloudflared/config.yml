@@ -1,7 +1,0 @@
-tunnel: ca756fc0-f2d1-4126-8281-bd3ed3ff5089
-credentials-file: /etc/cloudflared/tunnel-credentials.json
-
-ingress:
-  - hostname: blog-editor-origin.cuiabar.com
-    service: http://directus:8055
-  - service: http_status:404

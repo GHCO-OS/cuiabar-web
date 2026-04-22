@@ -29,7 +29,7 @@ Esses arquivos explicam por onde comecar e qual regra seguir.
 - `docs/02-OPERACAO-E-DEPLOY.md`
 - `docs/03-INTEGRACOES-E-CREDENCIAIS.md`
 - `docs/04-STATUS-ATUAL-E-PENDENCIAS.md`
-- `docs/05-USO-EM-OUTRO-CODEX.md`
+- `docs/05-CONTINUIDADE-EM-NOVO-AMBIENTE.md`
 - `docs/06-08-*` para WhatsApp AI
 - `docs/10-AMBIENTE-LOCAL-E-IDS.md` para host, bridge e inventario operacional
 

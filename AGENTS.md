@@ -26,7 +26,7 @@ Se a tarefa envolver deploy, Cloudflare, CRM ou WhatsApp AI, continue com os doc
 - Integrações e nomes de credenciais: `docs/03-INTEGRACOES-E-CREDENCIAIS.md`
 - Estado atual e pendências: `docs/04-STATUS-ATUAL-E-PENDENCIAS.md`
 - Organização do repositório e regra para IA: `docs/09-ORGANIZACAO-E-GOVERNANCA-IA.md`
-- Bootstrap para nova máquina/novo agente: `docs/05-USO-EM-OUTRO-CODEX.md`
+- Continuidade em novo ambiente: `docs/05-CONTINUIDADE-EM-NOVO-AMBIENTE.md`
 - Ambiente local, host IDs e bridge local: `docs/10-AMBIENTE-LOCAL-E-IDS.md`
 - Segredos históricos e inventário confidencial, quando presentes localmente: `ACESSOS-CHAVES-PROJETO.md`
 

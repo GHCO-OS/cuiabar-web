@@ -1,7 +1,14 @@
 import { BaileysSessionDO } from './BaileysSessionDO';
 import { executeCrmCommands } from './crmCommander';
 import { llamaProcessMessage } from './llamaProcessor';
-import { ensureInboundEvent, getCustomerContext, saveConversation } from './storage';
+import {
+  claimInboundEvent,
+  getCustomerContext,
+  markInboundEventCompleted,
+  markInboundEventDelivered,
+  markInboundEventFailed,
+  saveConversation,
+} from './storage';
 import type { BaileysWebhookPayload, LlamaAction } from './types';
 
 export interface Env {
@@ -14,6 +21,7 @@ export interface Env {
   CRM_INTERNAL_API_BASE: string;
   BAILEYS_GATEWAY_BASE_URL: string;
   ENVIRONMENT: string;
+  WHATSAPP_INTELLIGENCE_ENABLED?: string;
 }
 
 const json = (payload: unknown, status = 200) =>
@@ -23,6 +31,8 @@ const json = (payload: unknown, status = 200) =>
   });
 
 const unauthorized = () => json({ ok: false, error: 'unauthorized' }, 401);
+const serviceUnavailable = (error = 'whatsapp_intelligence_disabled') => json({ ok: false, error }, 503);
+const isWhatsAppEnabled = (env: Env) => env.WHATSAPP_INTELLIGENCE_ENABLED === 'true';
 
 const normalizePhone = (value: string) => {
   const digits = value.replace(/\D/g, '');
@@ -72,20 +82,33 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/health') {
-      return json({ ok: true, service: 'cuiabar-whatsapp-intelligence', env: env.ENVIRONMENT || 'unknown' });
+      return json({
+        ok: true,
+        service: 'cuiabar-whatsapp-intelligence',
+        env: env.ENVIRONMENT || 'unknown',
+        enabled: isWhatsAppEnabled(env),
+      });
     }
 
     if (url.pathname === '/webhook/baileys' && request.method === 'POST') {
+      if (!isWhatsAppEnabled(env)) {
+        return serviceUnavailable();
+      }
+
       const incomingSecret = request.headers.get('x-internal-secret') || '';
       if (!incomingSecret || !secureEqual(incomingSecret, env.WEBHOOK_SHARED_SECRET)) {
         return unauthorized();
       }
 
+      let inboundMessageId: string | null = null;
+      let deliveryConfirmed = false;
+
       try {
         const payload = await parsePayload(request);
+        inboundMessageId = payload.messageId;
         const normalizedPhone = normalizePhone(payload.phone);
 
-        const firstSeen = await ensureInboundEvent(env.DB, payload.messageId, normalizedPhone, payload.timestamp || null);
+        const firstSeen = await claimInboundEvent(env.DB, payload.messageId, normalizedPhone, payload.timestamp || null);
         if (!firstSeen) {
           return json({ ok: true, deduplicated: true });
         }
@@ -93,22 +116,6 @@ export default {
         const customer = await getCustomerContext(env.DB, normalizedPhone, payload.pushName);
         const llama = await llamaProcessMessage(payload.message, normalizedPhone, customer, env);
         const actions = clampActions(llama.actions);
-
-        await executeCrmCommands(actions, env, {
-          phone: normalizedPhone,
-          customer,
-          originalMessage: payload.message,
-          modelResponse: llama.response,
-        });
-
-        await saveConversation(env.DB, {
-          phone: normalizedPhone,
-          messageId: payload.messageId,
-          messageIn: payload.message,
-          messageOut: llama.response,
-          actions,
-          modelRaw: llama.rawModelResponse || null,
-        });
 
         const sessionName = `session-${normalizedPhone}`;
         const stub = env.BAILEYS_SESSION.get(env.BAILEYS_SESSION.idFromName(sessionName));
@@ -119,12 +126,41 @@ export default {
         });
 
         if (!delivery.ok) {
+          await markInboundEventFailed(env.DB, payload.messageId, 'failed_to_deliver_message');
           return json({ ok: false, error: 'failed_to_deliver_message' }, 502);
         }
+        deliveryConfirmed = true;
+        await markInboundEventDelivered(env.DB, payload.messageId);
+
+        await saveConversation(env.DB, {
+          phone: normalizedPhone,
+          messageId: payload.messageId,
+          messageIn: payload.message,
+          messageOut: llama.response,
+          actions,
+          modelRaw: llama.rawModelResponse || null,
+        });
+
+        await executeCrmCommands(actions, env, {
+          phone: normalizedPhone,
+          customer,
+          originalMessage: payload.message,
+          modelResponse: llama.response,
+        });
+
+        await markInboundEventCompleted(env.DB, payload.messageId);
 
         return json({ ok: true, actionsExecuted: actions.length });
       } catch (error) {
         const message = error instanceof Error ? error.message : 'unknown_error';
+        if (inboundMessageId) {
+          const markFailure = deliveryConfirmed
+            ? markInboundEventDelivered(env.DB, inboundMessageId, message)
+            : markInboundEventFailed(env.DB, inboundMessageId, message);
+
+          await markFailure.catch(() => null);
+        }
+
         return json({ ok: false, error: message }, 400);
       }
     }

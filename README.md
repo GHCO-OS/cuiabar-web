@@ -1,28 +1,48 @@
 # GHCO OS
 
-Monorepo principal do ecossistema digital do Cuiabar.
+Sistema digital integrado do grupo Cuiabar.
 
-## Linhas de produto
+## Visão geral
+
+O repositório concentra três linhas de produto que compartilham a mesma base operacional:
 
 - `Cuiabar Web`
-  site publico, blog, cardapio e discovery organico
+  Site público, páginas institucionais, cardápio, discovery orgânico e ativos de marca.
 - `MeuCuiabar`
-  controle interno, qualidade, HACCP e rotinas da casa
+  Operação interna, qualidade, HACCP, checklists e rotinas da casa.
 - `Cuiabar Atende`
-  CRM, reservas, WhatsApp com IA, marketing e fidelidade
+  CRM, reservas, atendimento por WhatsApp com IA, marketing e fidelização.
 
-## Comece por aqui
+## Propósito do sistema
+
+O projeto existe para unificar presença digital, operação interna e relacionamento com o cliente em uma arquitetura única, com publicação em Cloudflare e versionamento central em GitHub.
+
+## Estrutura principal
+
+- `src/`
+  Aplicações de frontend, páginas públicas, superfícies internas e módulos de produto.
+- `worker/`
+  Backend principal em Cloudflare Workers, autenticação, reservas, CRM, integrações e rotas internas.
+- `functions/`
+  Pages Functions e middleware do site público.
+- `public/`
+  Assets estáticos versionados.
+- `migrations/`
+  Evolução de schema no D1.
+- `services/`
+  Serviços auxiliares locais, com destaque para a ponte Baileys do WhatsApp.
+- `docs/`
+  Documentação oficial do projeto.
+
+## Leitura inicial
 
 1. `START-AQUI.md`
 2. `AGENTS.md`
 3. `docs/00-INDICE-GERAL.md`
-4. `docs/17-MAPA-DE-MANUTENCAO-E-BRANCHES.md`
+4. `docs/18-VISAO-GERAL-E-PROPOSITO.md`
+5. `docs/19-TECNOLOGIA-DESIGN-E-INSPIRACOES.md`
 
-## Fonte oficial de documentacao
-
-- `docs/`
-
-Documentos mais importantes:
+## Documentação oficial
 
 - `docs/01-ARQUITETURA-E-ROTAS.md`
 - `docs/02-OPERACAO-E-DEPLOY.md`
@@ -32,38 +52,21 @@ Documentos mais importantes:
 - `docs/15-DERIVACOES-E-TOPOLOGIA-GIT.md`
 - `docs/16-CLASSIFICACAO-DE-MODULOS-E-LEGADO.md`
 - `docs/17-MAPA-DE-MANUTENCAO-E-BRANCHES.md`
+- `docs/18-VISAO-GERAL-E-PROPOSITO.md`
+- `docs/19-TECNOLOGIA-DESIGN-E-INSPIRACOES.md`
 
-## Estrutura minima
+## Operação atual
 
-- `src/`
-  frontend e superficies de produto
-- `worker/`
-  backend principal em Cloudflare Workers
-- `functions/`
-  Pages Functions e middleware
-- `services/`
-  bridges e runtimes locais auxiliares
-- `migrations/`
-  historico de schema
-- `scripts/`
-  operacao e automacao
-- `public/`
-  assets versionados
+- Publicação do site público: Cloudflare Pages
+- Publicação do backend: Cloudflare Workers
+- Banco principal: Cloudflare D1
+- Sessão e cache operacional: Cloudflare KV
+- Versionamento: GitHub em `GHCO-OS/cuiabar-web`
 
-## Branches
+## Regras de organização
 
-- `main`
-- `ghco/*`
-- `web/*`
-- `meucuiabar/*`
-- `atende/*`
-- `burger/*`
-- `blog/*`
-- `infra/*`
-
-## Regras de organizacao
-
-- `docs/` e a documentacao oficial
-- `docs/guias-legados/` guarda apoio historico
-- `KIT-PORTABILIDADE/` e apoio externo, nao fonte principal
-- `ops-artifacts/`, `dist/`, `.ssr/` e compilados gerados nao sao origem de manutencao
+- `docs/` é a fonte oficial de documentação.
+- `docs/runbooks/` concentra guias operacionais específicos.
+- `docs/guias-legados/` preserva histórico técnico que não deve voltar para a raiz.
+- `KIT-PORTABILIDADE/` é apoio externo, não fonte primária do sistema.
+- `ops-artifacts/`, `dist/`, `.ssr/` e compilados gerados não são origem de manutenção.

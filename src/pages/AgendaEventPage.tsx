@@ -1,4 +1,5 @@
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { ClientRedirect } from '../components/ClientRedirect';
 import { Reveal } from '../components/Reveal';
 import { getRouteSeo } from '../data/seo';
 import { siteConfig } from '../data/siteConfig';
@@ -10,7 +11,7 @@ const AgendaEventPage = () => {
   const program = getLiveMusicProgramBySlug(eventSlug);
 
   if (!program) {
-    return <Navigate to="/agenda" replace />;
+    return <ClientRedirect to="/agenda" title="Programacao nao encontrada" />;
   }
 
   useSeo(getRouteSeo(`/agenda/${program.slug}`));
@@ -85,8 +86,8 @@ const AgendaEventPage = () => {
             <Link to="/bar-jardim-aurelia-musica-ao-vivo" className="rounded-xl border border-sand/50 bg-white px-4 py-4 text-sm font-semibold text-cocoa transition hover:-translate-y-0.5 hover:shadow-soft">
               Ler o guia local de bar e shows
             </Link>
-            <Link to="/blog/musica-ao-vivo-na-john-boyd-dunlop" className="rounded-xl border border-sand/50 bg-white px-4 py-4 text-sm font-semibold text-cocoa transition hover:-translate-y-0.5 hover:shadow-soft">
-              Ler o conteúdo editorial sobre música ao vivo
+            <Link to="/restaurante-jardim-aurelia-campinas" className="rounded-xl border border-sand/50 bg-white px-4 py-4 text-sm font-semibold text-cocoa transition hover:-translate-y-0.5 hover:shadow-soft">
+              Abrir o guia local do restaurante
             </Link>
           </div>
         </Reveal>

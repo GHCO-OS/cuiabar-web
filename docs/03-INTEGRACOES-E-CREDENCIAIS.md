@@ -1,152 +1,48 @@
-# Integracoes e credenciais
+# Integrações e credenciais
 
-Atualizado em: 2026-04-17
+Atualizado em: 2026-04-22
 
-## Onde consultar os segredos
+## Onde consultar segredos
 
-Inventario consolidado de chaves compartilhadas por conversa:
+O inventário consolidado de segredos fica apenas em materiais restritos, quando presentes localmente:
 
-- `../ACESSOS-CHAVES-PROJETO.md` quando existir nesta copia local
+- `../ACESSOS-CHAVES-PROJETO.md`
 - `../KIT-PORTABILIDADE/confidencial/02-APIS-E-CHAVES.md`
 
-Esse arquivo deve permanecer restrito.
+Neste documento devem permanecer apenas:
 
-## Integracoes principais
+- nomes de integrações
+- nomes de variáveis
+- responsabilidades operacionais
 
-### Cloudflare
+## Cloudflare
 
 Usado para:
-- hosting do site principal
-- Worker do CRM
-- reservas
+
+- Cloudflare Pages
+- Cloudflare Workers
 - D1
-- Workers AI
 - KV
-- Pages Functions
+- Workers AI
 
 Arquivos principais:
+
 - `wrangler.jsonc`
 - `functions/`
 - `worker/`
 
-Referencias operacionais:
-
-- `docs/02-OPERACAO-E-DEPLOY.md`
-- `docs/10-AMBIENTE-LOCAL-E-IDS.md`
-
-### Meta
+## Google
 
 Usado para:
-- Pixel
-- Conversions API
 
-Arquivos principais:
-- `functions/api/meta-conversions.js`
-- `src/lib/analytics.ts`
-- `src/components/AnalyticsTracker.tsx`
-- `index.html`
-
-Bindings e secrets esperados no Worker:
-
-- `META_GRAPH_API_VERSION`
-- `META_PIXEL_ID`
-- `META_ACCESS_TOKEN`
-- `META_CAPI_TOKEN`
-
-### WhatsApp / atendimento AI
-
-Transporte:
-
-- Baileys local em `services/whatsapp-baileys/`
-- runtime local preparado por `scripts/run-baileys-runtime.ps1`
-
-Segredos do bridge local:
-
-- `WHATSAPP_WORKER_BASE_URL`
-- `WHATSAPP_INTERNAL_TOKEN`
-
-Segredos Cloudflare/AI:
-
-- `CLOUDFLARE_ACCOUNT_ID`
-- `CLOUDFLARE_AI_API_TOKEN`
-
-Adaptador CRM:
-
-- `CRM_INTERNAL_TOKEN`
-
-Referencias operacionais:
-
-- `docs/06-WHATSAPP-AI-ARQUITETURA.md`
-- `docs/07-WHATSAPP-AI-ENDPOINTS.md`
-- `docs/10-AMBIENTE-LOCAL-E-IDS.md`
-
-### WhatsApp Intelligence (Llama + CRM interno)
-
-- worker dedicado: `worker/whatsapp-intelligence/`
-- endpoint inbound: `POST /webhook/baileys`
-- durable object de sessao/saida: `BaileysSessionDO`
-- tabelas operacionais: `customers`, `wa_inbound_events`, `wa_conversations`, `wa_action_logs`, `wa_reservation_requests`
-- segredos esperados (somente em ambiente):
-  - `WEBHOOK_SHARED_SECRET`
-  - `CRM_INTERNAL_SECRET`
-  - `BAILEYS_GATEWAY_TOKEN`
-
-Observacao:
-
-- `create_reservation_request` gera fila de solicitacoes para conciliacao com o fluxo oficial de reservas;
-- evitar escrita direta na tabela `reservations` fora do contrato ja validado no backend principal.
-
-### GitHub
-
-Usado para:
-- versionamento principal do codigo
-- continuidade entre maquinas
-- backup externo do workspace operacional
-
-Repositorio principal:
-
-- `https://github.com/GHCO-OS/cuiabar-web`
-
-Observacao:
-
-- o GitHub nao substitui o deploy no Cloudflare
-- o inventario desta maquina e do bridge local fica em `docs/10-AMBIENTE-LOCAL-E-IDS.md`
-
-### Base44
-
-Usado para:
-- referencia de UI/UX e features do `MeuCuiabar`
-- fonte do scraping que originou o seed operacional atual do `MeuCuiabar`
-
-Arquivos principais:
-- `src/meucuiabar/base44/`
-- `src/meucuiabar/base44/api/base44Client.js`
-- `src/meucuiabar/base44/seed/`
-- `ops-artifacts/base44-export/`
-
-Observacao:
-- o Base44 deixou de ser runtime de autenticacao do `MeuCuiabar`
-- o seed raspado continua servindo como base local temporaria ate a extracao definitiva para Worker/D1
-
-### Google
-
-Usado para:
-- Google Ads / tag
-- Search Console
+- login interno
+- Gmail
 - Calendar
-- Gmail / OAuth
+- Search Console
+- Google Ads
 - Gemini API
-- conta de servico
-- login interno do `MeuCuiabar`
-- consentimento de calendario/agenda e lembretes do `MeuCuiabar`
 
-Documentos de apoio:
-- `docs/guias-legados/SEO-SETUP.md`
-- `docs/guias-legados/GOOGLE-CALENDAR-SETUP.md`
-- `docs/guias-legados/GMAIL-OAUTH-SETUP.md`
-- `docs/guias-legados/EMAIL-SETUP.md`
-
-Bindings e secrets recorrentes no Worker:
+Segredos recorrentes:
 
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
@@ -164,33 +60,91 @@ Bindings e secrets recorrentes no Worker:
 - `GOOGLE_ADS_REFRESH_TOKEN`
 - `GOOGLE_GEMINI_API_KEY`
 
-Observacao:
-- o `MeuCuiabar` passa a usar Google OAuth no Worker para coletar nome, sobrenome, e-mail e consentimentos de `calendar` e `tasks`
-- novos usuarios ficam pendentes de aprovacao ate liberacao por `leonardo@cuiabar.net` ou `cuiabar@cuiabar.net`
-- o acesso Gemini foi apenas inventariado nesta copia local e nao esta integrado ao runtime do site, CRM ou Worker neste momento
-- se a Gemini API for ativada depois, preferir guardar a chave no cofre principal e espelhar no runtime apenas por secret com nome estavel
+Observações:
 
-### Blog editorial
+- O `MeuCuiabar` usa Google OAuth no Worker para autenticação e coleta de consentimentos.
+- A integração com Gemini está apenas inventariada. Não há uso ativo dessa API no runtime do site, do CRM ou do Worker neste momento.
+
+## Meta
 
 Usado para:
-- editor protegido em `blog.cuiabar.com/editor`
-- upload e entrega de midia do blog
-- automacao editorial e operacao de assets
 
-Bindings e secrets esperados no Worker:
+- Pixel
+- Conversions API
+
+Segredos esperados:
+
+- `META_GRAPH_API_VERSION`
+- `META_PIXEL_ID`
+- `META_ACCESS_TOKEN`
+- `META_CAPI_TOKEN`
+
+## WhatsApp e atendimento
+
+### Backend canônico
+
+- `worker/whatsapp/`
+
+### Worker dedicado e experimental
+
+- `worker/whatsapp-intelligence/`
+
+### Ponte local
+
+- `services/whatsapp-baileys/`
+
+Segredos recorrentes:
+
+- `WHATSAPP_WORKER_BASE_URL`
+- `WHATSAPP_INTERNAL_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_AI_API_TOKEN`
+- `CRM_INTERNAL_TOKEN`
+
+Segredos do módulo dedicado:
+
+- `WEBHOOK_SHARED_SECRET`
+- `CRM_INTERNAL_SECRET`
+- `BAILEYS_GATEWAY_TOKEN`
+
+## CRM e reservas
+
+Usado para:
+
+- contatos
+- campanhas
+- envio de e-mail
+- reservas
+- integração com calendários
+- atendimento omnichannel
+
+Recursos principais:
+
+- `src/crm/`
+- `src/reservations/`
+- `worker/reservations/`
+- `migrations/`
+
+## Blog e operação editorial
+
+Status atual:
+
+- fora da superfície principal do produto
+- mantido como frente separável
+- runbooks preservados em `docs/runbooks/`
+
+Variáveis recorrentes:
 
 - `BLOG_EDITOR_UPSTREAM_URL`
 - `BLOG_EDITOR_TOKEN`
 - `BLOG_EDITOR_ALLOWED_EMAILS`
 - `BLOG_MEDIA_PUBLIC_BASE_URL`
-- binding R2 `BLOG_MEDIA`
 
-### Zoho
+## Zoho
 
-Usado para:
-- OAuth e integracoes operacionais com Zoho
+Integração legada. Só deve ser retomada quando a demanda exigir.
 
-Bindings e secrets esperados no Worker:
+Segredos históricos:
 
 - `ZOHO_ACCOUNTS_DOMAIN`
 - `ZOHO_API_DOMAIN`
@@ -198,16 +152,11 @@ Bindings e secrets esperados no Worker:
 - `ZOHO_CLIENT_SECRET`
 - `ZOHO_REFRESH_TOKEN`
 
-### Bing
+## Regra prática
 
-Usado para:
-- Bing Webmaster
+Para qualquer novo ambiente:
 
-## Regra pratica
-
-Para qualquer Codex novo:
-
-1. nunca assuma que um token no chat ainda esta valido;
-2. confirme primeiro no provedor;
-3. prefira secrets no Cloudflare/GitHub/cofre em vez de texto puro;
-4. se houver duvida, rotacione o token em vez de insistir num acesso antigo.
+1. não assumir que credenciais antigas continuam válidas;
+2. validar acesso no provedor antes de operar;
+3. preferir secret manager, Cloudflare Secrets ou GitHub Secrets;
+4. documentar nomes de variáveis, nunca valores sensíveis.

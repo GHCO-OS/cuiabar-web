@@ -1,31 +1,36 @@
-# Cuiabar Web - comecar por aqui
+# GHCO OS — ponto de entrada
 
-Se voce abriu esta pasta em outro Codex, comece por estes arquivos:
+Se esta cópia do projeto foi aberta em um novo ambiente, comece por estes arquivos:
 
 1. `AGENTS.md`
 2. `docs/00-INDICE-GERAL.md`
-3. `docs/09-ORGANIZACAO-E-GOVERNANCA-IA.md`
-4. `docs/05-USO-EM-OUTRO-CODEX.md`
-5. `docs/04-STATUS-ATUAL-E-PENDENCIAS.md`
-6. `docs/10-AMBIENTE-LOCAL-E-IDS.md`
-7. `KIT-PORTABILIDADE/00-LEIA-ME.md`
+3. `docs/04-STATUS-ATUAL-E-PENDENCIAS.md`
+4. `docs/05-CONTINUIDADE-EM-NOVO-AMBIENTE.md`
+5. `docs/18-VISAO-GERAL-E-PROPOSITO.md`
+6. `docs/19-TECNOLOGIA-DESIGN-E-INSPIRACOES.md`
+7. `docs/10-AMBIENTE-LOCAL-E-IDS.md`
 
-Resumo rapido:
-- Este projeto roda em React + Vite + TypeScript.
-- A publicacao atual do site nao depende do GitHub para deploy.
-- O repositorio GitHub oficial para versionamento e continuidade e `github.com/GHCO-OS/cuiabar-web`.
-- O deploy principal e feito via Cloudflare com `wrangler pages deploy` e `wrangler deploy`.
-- Existem modulos adicionais no mesmo repositorio, como reservas e CRM.
-- A regra operacional para futuras IAs esta formalizada em `AGENTS.md`.
+## Resumo rápido
 
-Pastas de referencia:
-- `src/` interface principal do site
-- `worker/` backend/worker do CRM e reservas
-- `functions/` funcoes server-side do Pages
-- `docs/` documentacao centralizada
-- `KIT-PORTABILIDADE/` pacote rapido com APIs, chaves e arquivos reaproveitaveis para outras ferramentas
+- O repositório abriga `Cuiabar Web`, `MeuCuiabar` e `Cuiabar Atende`.
+- A publicação operacional continua sendo feita em Cloudflare.
+- O GitHub é a base oficial de versionamento e documentação.
+- O site público e os portais internos compartilham a mesma fundação técnica.
 
-Observacao:
-- A documentacao oficial fica em `docs/`.
-- Guias antigos ficam centralizados em `docs/guias-legados/`.
-- O inventario confidencial pode nao existir nesta copia local; quando presente, ele deve ser tratado como material restrito.
+## Pastas de referência
+
+- `src/`
+  Interfaces e aplicações de produto.
+- `worker/`
+  Backend principal.
+- `functions/`
+  Middleware do site público.
+- `docs/`
+  Documentação oficial.
+- `docs/runbooks/`
+  Guias operacionais específicos.
+
+## Observação
+
+- A documentação do sistema deve permanecer em `docs/`.
+- Materiais confidenciais, quando existirem localmente, devem permanecer fora da trilha pública de documentação.

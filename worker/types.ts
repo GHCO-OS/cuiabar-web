@@ -4,7 +4,6 @@ export interface Env {
   ASSETS: Fetcher;
   DB: D1Database;
   AI?: Ai;
-  BLOG_MEDIA?: R2Bucket;
   WHATSAPP_KV: KVNamespace;
   APP_NAME: string;
   APP_BASE_URL: string;
@@ -13,10 +12,6 @@ export interface Env {
   DEFAULT_FROM_EMAIL: string;
   DEFAULT_FROM_NAME: string;
   DEFAULT_REPLY_TO: string;
-  BLOG_EDITOR_UPSTREAM_URL?: string;
-  BLOG_EDITOR_TOKEN?: string;
-  BLOG_EDITOR_ALLOWED_EMAILS?: string;
-  BLOG_MEDIA_PUBLIC_BASE_URL?: string;
   IFOOD_STORE_URL?: string;
   FOOD99_STORE_URL?: string;
   AUTH_MODE?: string;
