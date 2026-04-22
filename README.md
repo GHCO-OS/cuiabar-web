@@ -4,7 +4,7 @@ Repositorio principal do ecossistema digital do Cuiabar.
 
 Sistema unico que hoje sustenta tres linhas principais:
 
-- `Cuiabar Web` — site, blog e cardapio para o cliente
+- `Cuiabar Web` — site e cardapio para o cliente
 - `MeuCuiabar` — controle interno, qualidade, HACCP e rotinas da casa
 - `Cuiabar Atende` — WhatsApp com IA, reservas, CRM, marketing e fidelidade
 
@@ -17,6 +17,10 @@ Ele concentra:
 - portal de reservas
 - integracoes server-side
 - atendimento por WhatsApp com IA via Baileys + Cloudflare Workers AI
+
+Observacao operacional:
+
+- o projeto editorial/blog foi retirado da superficie principal e preservado para refinamento na branch `codex/polish-blog`
 
 ## Resumo executivo
 
@@ -64,7 +68,7 @@ src/
   components/
   pages/
   reservations/
-  blog/
+  crm/
 
 worker/
   reservations/
@@ -365,6 +369,7 @@ npm run baileys:check
 
 - `AGENTS.md`
 - `docs/00-INDICE-GERAL.md`
+- `docs/runbooks/00-INDICE-RUNBOOKS.md`
 - `docs/09-ORGANIZACAO-E-GOVERNANCA-IA.md`
 - `docs/06-WHATSAPP-AI-ARQUITETURA.md`
 - `docs/07-WHATSAPP-AI-ENDPOINTS.md`

@@ -1,6 +1,6 @@
 # Integracoes e credenciais
 
-Atualizado em: 2026-04-15
+Atualizado em: 2026-04-21
 
 ## Onde consultar os segredos
 
@@ -9,7 +9,7 @@ Inventario consolidado de chaves compartilhadas por conversa:
 - `../ACESSOS-CHAVES-PROJETO.md`
 - `../KIT-PORTABILIDADE/02-APIS-E-CHAVES.md`
 
-Esse arquivo deve permanecer restrito.
+Esse material deve permanecer restrito.
 
 ## Integracoes principais
 
@@ -30,7 +30,6 @@ Arquivos principais:
 - `worker/`
 
 Referencias operacionais:
-
 - `docs/02-OPERACAO-E-DEPLOY.md`
 - `docs/10-AMBIENTE-LOCAL-E-IDS.md`
 
@@ -47,7 +46,6 @@ Arquivos principais:
 - `index.html`
 
 Bindings e secrets esperados no Worker:
-
 - `META_GRAPH_API_VERSION`
 - `META_PIXEL_ID`
 - `META_ACCESS_TOKEN`
@@ -56,26 +54,25 @@ Bindings e secrets esperados no Worker:
 ### WhatsApp / atendimento AI
 
 Transporte:
-
 - Baileys local em `services/whatsapp-baileys/`
 - runtime local preparado por `scripts/run-baileys-runtime.ps1`
 
-Segredos do bridge local:
+Estado operacional atual:
+- autostart do bridge local desligado
+- modulo `worker/whatsapp-intelligence/` isolado por flag para refinamento futuro
 
+Segredos do bridge local:
 - `WHATSAPP_WORKER_BASE_URL`
 - `WHATSAPP_INTERNAL_TOKEN`
 
-Segredos Cloudflare/AI:
-
+Segredos Cloudflare e AI:
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_AI_API_TOKEN`
 
 Adaptador CRM:
-
 - `CRM_INTERNAL_TOKEN`
 
 Referencias operacionais:
-
 - `docs/06-WHATSAPP-AI-ARQUITETURA.md`
 - `docs/07-WHATSAPP-AI-ENDPOINTS.md`
 - `docs/10-AMBIENTE-LOCAL-E-IDS.md`
@@ -88,31 +85,27 @@ Usado para:
 - backup externo do workspace operacional
 
 Repositorio principal:
-
-- `https://github.com/cuiabar/cuiabar-web`
+- `https://github.com/GHCO-OS/cuiabar-web`
 
 Observacao:
-
 - o GitHub nao substitui o deploy no Cloudflare
-- o inventario desta maquina e do bridge local fica em `docs/10-AMBIENTE-LOCAL-E-IDS.md`
 
 ### Google
 
 Usado para:
-- Google Ads / tag
+- Google Ads e tag
 - Search Console
 - Calendar
-- Gmail / OAuth
+- Gmail e OAuth
 - conta de servico
 
 Documentos de apoio:
-- `SEO-SETUP.md`
-- `GOOGLE-CALENDAR-SETUP.md`
-- `GMAIL-OAUTH-SETUP.md`
-- `EMAIL-SETUP.md`
+- `docs/runbooks/SEO-SETUP.md`
+- `docs/runbooks/GOOGLE-CALENDAR-SETUP.md`
+- `docs/runbooks/GMAIL-OAUTH-SETUP.md`
+- `docs/runbooks/EMAIL-SETUP.md`
 
 Bindings e secrets recorrentes no Worker:
-
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_REFRESH_TOKEN`
@@ -125,28 +118,12 @@ Bindings e secrets recorrentes no Worker:
 - `GOOGLE_ADS_CLIENT_SECRET`
 - `GOOGLE_ADS_REFRESH_TOKEN`
 
-### Blog editorial
-
-Usado para:
-- editor protegido em `blog.cuiabar.com/editor`
-- upload e entrega de midia do blog
-- automacao editorial e operacao de assets
-
-Bindings e secrets esperados no Worker:
-
-- `BLOG_EDITOR_UPSTREAM_URL`
-- `BLOG_EDITOR_TOKEN`
-- `BLOG_EDITOR_ALLOWED_EMAILS`
-- `BLOG_MEDIA_PUBLIC_BASE_URL`
-- binding R2 `BLOG_MEDIA`
-
 ### Zoho
 
 Usado para:
-- OAuth e integracoes operacionais com Zoho
+- OAuth e integracoes operacionais legadas com Zoho
 
 Bindings e secrets esperados no Worker:
-
 - `ZOHO_ACCOUNTS_DOMAIN`
 - `ZOHO_API_DOMAIN`
 - `ZOHO_CLIENT_ID`
@@ -158,11 +135,19 @@ Bindings e secrets esperados no Worker:
 Usado para:
 - Bing Webmaster
 
+## Integracoes desligadas do tronco principal
+
+- editor e proxy do blog via Worker
+- assets editoriais e publicacao local do blog
+- autostart do bridge Baileys
+
+Qualquer reativacao desses fluxos deve acontecer primeiro em branch dedicada.
+
 ## Regra pratica
 
 Para qualquer Codex novo:
 
 1. nunca assuma que um token no chat ainda esta valido;
 2. confirme primeiro no provedor;
-3. prefira secrets no Cloudflare/GitHub/cofre em vez de texto puro;
+3. prefira secrets no Cloudflare, GitHub ou cofre em vez de texto puro;
 4. se houver duvida, rotacione o token em vez de insistir num acesso antigo.

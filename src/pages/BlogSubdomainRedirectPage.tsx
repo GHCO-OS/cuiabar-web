@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-const BLOG_PUBLIC_URL = 'https://cuiabar-blog.pages.dev';
+const BLOG_PUBLIC_URL = 'https://blog.cuiabar.com';
 
 const buildBlogUrl = (slug?: string) => {
   if (!slug) {

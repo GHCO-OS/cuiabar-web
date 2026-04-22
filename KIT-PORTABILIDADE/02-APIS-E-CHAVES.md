@@ -27,7 +27,7 @@ Recursos confirmados:
 - Worker principal: `cuiabar-crm`
 - dominio CRM: `crm.cuiabar.com`
 - dominio reservas: `reservas.cuiabar.com`
-- editor blog: `blog.cuiabar.com/editor*`
+- blog publico legado: `blog.cuiabar.com`
 - banco D1:
   `1c8de55c-c5f4-4985-8c5b-5ac1a010214d`
 

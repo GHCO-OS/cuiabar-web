@@ -5,18 +5,18 @@ Camada de automacao para mensagens inbound/outbound de WhatsApp com inferencia p
 ## Fluxo
 
 1. Baileys Gateway publica eventos em `POST /webhook/baileys`.
-2. Worker valida segredo interno e deduplica `messageId`.
+2. Worker valida segredo interno, reclama o `messageId` de forma idempotente e permite retry apenas quando houve falha antes da entrega.
 3. Busca/cria contexto do cliente em `customers`.
 4. Chama `@cf/meta/llama-3.1-8b-instruct` para resposta e `actions`.
-5. Executa comandos permitidos (`create_reservation_request`, `add_loyalty_points`, `send_email_confirmation`, `notify_team`).
-6. Persiste conversa/logs em D1.
-7. Encaminha envio para o gateway de saida via Durable Object (`BaileysSessionDO`).
+5. Encaminha primeiro o envio para o gateway de saida via Durable Object (`BaileysSessionDO`).
+6. So depois da entrega confirmada persiste conversa/logs e executa comandos permitidos (`create_reservation_request`, `add_loyalty_points`, `send_email_confirmation`, `notify_team`).
 
 ## Segredos esperados
 
 - `WEBHOOK_SHARED_SECRET`
 - `CRM_INTERNAL_SECRET`
 - `BAILEYS_GATEWAY_TOKEN`
+- `WHATSAPP_INTELLIGENCE_ENABLED`
 
 Configure com:
 
@@ -25,6 +25,8 @@ wrangler secret put WEBHOOK_SHARED_SECRET
 wrangler secret put CRM_INTERNAL_SECRET
 wrangler secret put BAILEYS_GATEWAY_TOKEN
 ```
+
+Ative o modulo apenas quando o refinamento estiver liberado no ambiente, definindo `WHATSAPP_INTELLIGENCE_ENABLED = "true"` na configuracao do deploy.
 
 ## Observacoes de seguranca
 
@@ -35,6 +37,6 @@ wrangler secret put BAILEYS_GATEWAY_TOKEN
 ## Deploy
 
 ```bash
-wrangler d1 execute cuiabar-reservations --file ./migrations/0005_whatsapp_intelligence.sql
+wrangler d1 migrations apply cuiabar_crm
 wrangler deploy
 ```

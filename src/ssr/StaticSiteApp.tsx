@@ -8,8 +8,7 @@ import PesquisaPage from '../pages/PesquisaPage';
 import ReservasPage from '../pages/ReservasPage';
 import AgendaPage from '../pages/AgendaPage';
 import AgendaEventPage from '../pages/AgendaEventPage';
-import BlogPage from '../pages/BlogPage';
-import BlogPostPage from '../pages/BlogPostPage';
+import BlogSubdomainRedirectPage from '../pages/BlogSubdomainRedirectPage';
 import VagasPage from '../pages/VagasPage';
 import BurguerCuiabarPage from '../pages/BurguerCuiabarPage';
 import EspetariaCuiabarPage from '../pages/EspetariaCuiabarPage';
@@ -22,8 +21,8 @@ export const StaticSiteApp = () => (
       <Route path="/" element={<HomePage />} />
       <Route path="/agenda" element={<AgendaPage />} />
       <Route path="/agenda/:eventSlug" element={<AgendaEventPage />} />
-      <Route path="/blog" element={<BlogPage />} />
-      <Route path="/blog/:slug" element={<BlogPostPage />} />
+      <Route path="/blog" element={<BlogSubdomainRedirectPage />} />
+      <Route path="/blog/:slug" element={<BlogSubdomainRedirectPage />} />
       <Route path="/burguer" element={<BurguerCuiabarPage />} />
       <Route path="/espetaria" element={<EspetariaCuiabarPage />} />
       <Route path="/links" element={<LinksPage />} />

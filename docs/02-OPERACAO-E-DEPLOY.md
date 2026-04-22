@@ -26,7 +26,9 @@ Validacao:
 
 ```bash
 npm run lint
-npm run build
+npm test
+npm run build:ci
+npm run perf:check
 ```
 
 Deploy do site principal no Cloudflare Pages:
@@ -60,16 +62,16 @@ npm run deploy:worker
 No estado atual:
 
 - o GitHub nao publica o site;
-- o workflow de Cloudflare no GitHub fica somente como fallback manual via `workflow_dispatch`;
+- o workflow de Cloudflare no GitHub fica somente como fallback manual via `workflow_dispatch`, travado em `main` e com validacoes obrigatorias;
 - pushes em `main` nao devem mais tentar publicar automaticamente no Cloudflare;
 - o que mantem o site e o CRM publicados e o acesso Cloudflare/Wrangler;
-- o repositório GitHub oficial para versionamento e continuidade deste projeto e `https://github.com/cuiabar/cuiabar-web`.
+- o repositório GitHub oficial para versionamento e continuidade deste projeto e `https://github.com/GHCO-OS/cuiabar-web`.
 
 Estado aplicado em 2026-04-13:
 
 - a copia operacional principal passou a ser `C:\workspace\cuiabar-web`;
 - `G:\Meu Drive\cuiabar-web` fica como backup, snapshot e base de consulta;
-- o remote `origin` local deve apontar para `https://github.com/cuiabar/cuiabar-web.git`;
+- o remote `origin` local deve apontar para `https://github.com/GHCO-OS/cuiabar-web.git`;
 - a publicacao de codigo no GitHub e independente do deploy no Cloudflare;
 - o deploy operacional continua sendo executado localmente por esta maquina, com Wrangler autenticado;
 - os identificadores desta maquina e do bridge local ficaram registrados em `docs/10-AMBIENTE-LOCAL-E-IDS.md`.
@@ -92,5 +94,5 @@ Banco configurado em `wrangler.jsonc`:
 
 - Se o token do Cloudflare expirar, o deploy manual para.
 - Se as secrets nao estiverem presentes no ambiente Cloudflare, partes como login Google, e-mail e tracking server-side podem falhar.
-- Existem avisos conhecidos de SSR relacionados a `<Navigate>` em `StaticRouter`; isso nao bloqueia o build, mas merece limpeza futura.
+- Se o budget de performance falhar, o workflow manual de deploy deve bloquear a publicacao ate o ajuste do build.
 - Se o runtime local do Baileys perder a sessao, o bridge volta para `qr_ready` e exige novo pareamento manual.

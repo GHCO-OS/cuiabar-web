@@ -19,37 +19,6 @@ export type MenuHighlight = {
   image: string;
 };
 
-export type BlogPost = {
-  id: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  readTime: string;
-  date: string;
-  image: string;
-  slug: string;
-};
-
-export type KnowledgeArticleSection = {
-  title: string;
-  body: string;
-};
-
-export type KnowledgeArticle = {
-  id: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  readTime: string;
-  date: string;
-  image: string;
-  slug: string;
-  eyebrow: string;
-  summary: string;
-  keywords: string[];
-  sections: KnowledgeArticleSection[];
-};
-
 export type AgendaHighlight = {
   title: string;
   description: string;

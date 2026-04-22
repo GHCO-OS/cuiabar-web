@@ -3,6 +3,7 @@ import { reservationFaqs } from '../data/content';
 import { getRouteSeo } from '../data/seo';
 import { siteConfig } from '../data/siteConfig';
 import { useSeo } from '../hooks/useSeo';
+import '../styles/reservations.css';
 
 const ReservasPage = () => {
   const reservationsAppUrl = siteConfig.reservationPortalUrl;

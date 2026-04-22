@@ -1,4 +1,4 @@
-import type { BlogPost, FaqItem, Feature, MenuHighlight, Testimonial } from './types';
+import type { FaqItem, Feature, MenuHighlight, Testimonial } from './types';
 
 export const differentiators: Feature[] = [
   { title: 'Espaço familiar', description: 'Ambiente pensado para almoço em família e encontros descontraídos.', icon: '👨‍👩‍👧‍👦' },
@@ -37,49 +37,6 @@ export const menuHighlights: MenuHighlight[] = [
     description: 'Parmegiana de mignon com arroz e fritas.',
     price: 'R$ 59,00',
     image: 'https://static.wixstatic.com/media/f30eee_725e61a60a9a4e8e91766fb2975411a2~mv2.png',
-  },
-];
-
-export const blogPosts: BlogPost[] = [
-  {
-    id: '1',
-    title: 'Onde comer comida brasileira em Campinas: guia local',
-    excerpt: 'Descubra sabores autênticos e pratos imperdíveis para uma experiência regional completa.',
-    category: 'Comida Brasileira',
-    readTime: '6 min',
-    date: '2026-01-12',
-    image: 'https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=80',
-    slug: 'onde-comer-comida-brasileira-em-campinas',
-  },
-  {
-    id: '2',
-    title: 'Música ao vivo em Campinas: noites para curtir no Cuiabar',
-    excerpt: 'Veja como combinar gastronomia e música ao vivo em uma noite memorável.',
-    category: 'Música ao Vivo',
-    readTime: '4 min',
-    date: '2026-01-20',
-    image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=80',
-    slug: 'musica-ao-vivo-em-campinas-no-cuiabar',
-  },
-  {
-    id: '3',
-    title: 'Delivery em Campinas: como manter qualidade até sua mesa',
-    excerpt: 'Entenda os cuidados do Cuiabar para garantir sabor, temperatura e apresentação no delivery.',
-    category: 'Delivery',
-    readTime: '5 min',
-    date: '2026-02-02',
-    image: 'https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&w=900&q=80',
-    slug: 'delivery-em-campinas-com-qualidade',
-  },
-  {
-    id: '4',
-    title: 'Refeição corporativa em Campinas: benefícios para sua empresa',
-    excerpt: 'Conheça o ProRefeição e veja como simplificar a alimentação do seu time.',
-    category: 'ProRefeição',
-    readTime: '7 min',
-    date: '2026-02-14',
-    image: 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=900&q=80',
-    slug: 'refeicao-corporativa-em-campinas',
   },
 ];
 
