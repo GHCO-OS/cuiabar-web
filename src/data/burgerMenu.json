@@ -1,0 +1,87 @@
+{
+  "updatedAt": "2026-04-25",
+  "heroImage": "/burguer/burger-cuiabar-hero.webp",
+  "heroImageAlt": "Burger Cuiabar com cheddar, bacon e fritas em destaque",
+  "ogImage": "/burguer/burger-cuiabar-og.webp",
+  "ogImageAlt": "Burger O Cuiabar do Burger Cuiabar com fritas ao fundo",
+  "instagramUrl": "https://instagram.com/burgercuiabar",
+  "featuredIds": ["o-cuiabar", "o-brabo", "o-colosso"],
+  "burgers": [
+    {
+      "id": "o-raiz",
+      "name": "O Raiz",
+      "tagline": "Classico, direto e sempre funciona.",
+      "description": "Pao brioche, hamburguer sabor picanha, queijo derretido, alface e tomate.",
+      "image": "/burguer/o-raiz.webp",
+      "imageAlt": "Burger O Raiz do Burger Cuiabar"
+    },
+    {
+      "id": "o-cuiabar",
+      "name": "O Cuiabar",
+      "tagline": "Suculento e equilibrado.",
+      "description": "Pao brioche, hamburguer de picanha 120g, queijo derretido, alface, tomate e baconnese da casa.",
+      "image": "/burguer/o-cuiabar.webp",
+      "imageAlt": "Burger O Cuiabar do Burger Cuiabar"
+    },
+    {
+      "id": "o-brabo",
+      "name": "O Brabo",
+      "tagline": "Pesado, intenso e viciante.",
+      "description": "Pao brioche, hamburguer de picanha 120g, cheddar cremoso, bacon crocante, cebola na manteiga e baconnese.",
+      "image": "/burguer/o-brabo.webp",
+      "imageAlt": "Burger O Brabo do Burger Cuiabar"
+    },
+    {
+      "id": "o-crocante",
+      "name": "O Crocante",
+      "tagline": "Crocante por fora, suculento por dentro.",
+      "description": "Pao brioche, frango empanado no tempura, cheddar, alface, tomate e baconnese.",
+      "image": "/burguer/o-crocante.webp",
+      "imageAlt": "Burger O Crocante do Burger Cuiabar"
+    },
+    {
+      "id": "o-parrudo",
+      "name": "O Parrudo",
+      "tagline": "Sabor forte e marcante.",
+      "description": "Pao brioche, hamburguer de costela 120g, cheddar, bacon crocante, cebola na manteiga e molho especial.",
+      "image": "/burguer/o-parrudo.webp",
+      "imageAlt": "Burger O Parrudo do Burger Cuiabar"
+    },
+    {
+      "id": "o-colosso",
+      "name": "O Colosso",
+      "tagline": "Grande, suculento e sem erro.",
+      "description": "Duplo burger de costela, cheddar cremoso, bacon crocante, cebola na manteiga e molho da casa no pao brioche.",
+      "image": "/burguer/o-colosso.webp",
+      "imageAlt": "Burger O Colosso do Burger Cuiabar"
+    },
+    {
+      "id": "o-insano",
+      "name": "O Insano",
+      "tagline": "Crocante, intenso e viciante.",
+      "description": "Duplo frango empanado no tempura, super crocante, cheddar derretido e molho honey mustard no brioche.",
+      "image": "/burguer/o-insano.webp",
+      "imageAlt": "Burger O Insano do Burger Cuiabar"
+    }
+  ],
+  "combos": [
+    {
+      "id": "combo-raiz",
+      "name": "Combo Raiz",
+      "description": "O Raiz + escolha: batata frita ou bebida lata.",
+      "note": "Refeicao leve e rapida."
+    },
+    {
+      "id": "combo-cuiabar",
+      "name": "Combo Cuiabar",
+      "description": "O Cuiabar + escolha: batata frita ou bebida lata.",
+      "note": "Equilibrio entre sabor e custo-beneficio."
+    },
+    {
+      "id": "combo-brabo",
+      "name": "Combo Brabo",
+      "description": "O Brabo + batata frita + bebida lata.",
+      "note": "Combo completo para quem quer tudo."
+    }
+  ]
+}

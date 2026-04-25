@@ -480,8 +480,8 @@
     "/burguer": {
       "title": "Burguer Cuiabar | Hambúrguer no Jardim Aurélia em Campinas",
       "description": "Landing page oficial do Burger Cuiabar com destaque para pedidos no site burger.cuiabar.com e canais de apoio no iFood e 99Food em Campinas.",
-      "image": "https://cuiabar.com/burguer/burger-classico.png",
-      "imageAlt": "Hambúrguer clássico do Burguer Cuiabar",
+      "image": "https://cuiabar.com/burguer/burger-cuiabar-og.webp",
+      "imageAlt": "Burger O Cuiabar do Burger Cuiabar",
       "type": "website",
       "changefreq": "weekly",
       "priority": "0.9",
@@ -500,90 +500,7 @@
         "burger cuiabar 99food",
         "burger.cuiabar.com"
       ],
-      "schema": [
-        {
-          "@context": "https://schema.org",
-          "@type": "Menu",
-          "name": "Cardápio Burguer Cuiabar",
-          "description": "Projeto piloto do Cuiabar com burgers preparados na chapa, carnes selecionadas e combos, com destaque para o canal proprio burger.cuiabar.com e apoio em iFood e 99Food.",
-          "url": "https://burger.cuiabar.com/",
-          "inLanguage": "pt-BR",
-          "hasMenuSection": [
-            {
-              "@type": "MenuSection",
-              "name": "Lanches",
-              "hasMenuItem": [
-                {
-                  "@type": "MenuItem",
-                  "name": "X-Tradicional",
-                  "description": "Pão brioche, hambúrguer Texas sabor picanha, mussarela, alface americana e tomate.",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "22.90",
-                    "priceCurrency": "BRL"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Picanha Clássico",
-                  "description": "Pão brioche, hambúrguer de picanha 120g, mussarela, alface americana, tomate e baconnese.",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "34.40",
-                    "priceCurrency": "BRL"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Picanha Bacon",
-                  "description": "Pão brioche, hambúrguer de picanha 120g, cheddar, bacon, cebola na manteiga e baconnese.",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "40.10",
-                    "priceCurrency": "BRL"
-                  }
-                }
-              ]
-            },
-            {
-              "@type": "MenuSection",
-              "name": "Combos",
-              "hasMenuItem": [
-                {
-                  "@type": "MenuItem",
-                  "name": "Combo X-Tradicional completo",
-                  "description": "X-Tradicional com fritas e bebida lata.",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "36.70",
-                    "priceCurrency": "BRL"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Combo Picanha Clássico completo",
-                  "description": "Picanha Clássico com fritas e bebida lata.",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "48.20",
-                    "priceCurrency": "BRL"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Combo Picanha Bacon completo",
-                  "description": "Picanha Bacon com fritas e bebida lata.",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "53.90",
-                    "priceCurrency": "BRL"
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      "schema": []
     },
     "/espetaria": {
       "title": "Espetaria Cuiabar | Boteco raiz em Campinas",
@@ -978,7 +895,7 @@
     "/burger": {
       "title": "Burguer Cuiabar | Cardápio piloto em Campinas",
       "description": "Atalho para a landing oficial do Burguer Cuiabar com pedido no iFood.",
-      "image": "https://cuiabar.com/burguer/burger-classico.png",
+      "image": "https://cuiabar.com/burguer/burger-cuiabar-og.webp",
       "canonicalPath": "/burguer",
       "robots": "noindex,follow",
       "includeInSitemap": false
@@ -986,7 +903,7 @@
     "/burguer-cuiabar": {
       "title": "Burguer Cuiabar | Cardápio piloto em Campinas",
       "description": "Atalho para a landing oficial do Burguer Cuiabar com pedido no iFood.",
-      "image": "https://cuiabar.com/burguer/burger-classico.png",
+      "image": "https://cuiabar.com/burguer/burger-cuiabar-og.webp",
       "canonicalPath": "/burguer",
       "robots": "noindex,follow",
       "includeInSitemap": false

@@ -8,6 +8,7 @@ Esta pasta agrupa runbooks e guias operacionais que antes ficavam soltos na raiz
 
 ## Conteudo
 
+- `BURGER-CARDAPIO-E-ASSETS.md`
 - `DEPLOY-CLOUDFLARE.md`
 - `DEPLOY-RESERVAS-CLOUDFLARE.md`
 - `EMAIL-DELIVERABILITY.md`

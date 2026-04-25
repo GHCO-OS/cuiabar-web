@@ -2,6 +2,7 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import seoRoutesJson from '../src/data/seoRoutes.json' with { type: 'json' };
+import burgerMenuJson from '../src/data/burgerMenu.json' with { type: 'json' };
 import menuData from '../src/data/menu.json' with { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -9,7 +10,28 @@ const __dirname = path.dirname(__filename);
 const distDir = path.resolve(__dirname, '../dist');
 const ssrDir = path.resolve(__dirname, '../.ssr');
 
-const seoConfig = seoRoutesJson;
+const burgerMenu = burgerMenuJson;
+const seoConfig = structuredClone(seoRoutesJson);
+
+if (seoConfig.routes['/burguer']) {
+  seoConfig.routes['/burguer'] = {
+    ...seoConfig.routes['/burguer'],
+    image: burgerMenu.ogImage,
+    imageAlt: burgerMenu.ogImageAlt,
+    schema: [],
+  };
+}
+
+for (const aliasPath of ['/burger', '/burguer-cuiabar']) {
+  if (seoConfig.routes[aliasPath]) {
+    seoConfig.routes[aliasPath] = {
+      ...seoConfig.routes[aliasPath],
+      image: burgerMenu.ogImage,
+      imageAlt: burgerMenu.ogImageAlt,
+    };
+  }
+}
+
 const siteOrigin = seoConfig.siteOrigin;
 const defaultImage = seoConfig.defaultImage;
 const routeEntries = Object.entries(seoConfig.routes);
@@ -17,6 +39,7 @@ const buildDate = new Date().toISOString().slice(0, 10);
 const siteName = 'Villa Cuiabar';
 const twitterHandle = '@cuiabar';
 const menuSections = menuData;
+const burgerCanonicalUrl = 'https://burger.cuiabar.com/';
 const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION?.trim();
 
 const escapeHtml = (value) =>
@@ -128,9 +151,43 @@ const buildMenuStructuredData = () => {
   };
 };
 
+const buildBurgerStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'Menu',
+  name: 'Cardapio Burger Cuiabar',
+  url: burgerCanonicalUrl,
+  inLanguage: 'pt-BR',
+  description: 'Cardapio atual do Burger Cuiabar com sete burgers e tres combos oficiais.',
+  hasMenuSection: [
+    {
+      '@type': 'MenuSection',
+      name: 'Burgers',
+      hasMenuItem: burgerMenu.burgers.map((item) => ({
+        '@type': 'MenuItem',
+        name: item.name,
+        description: `${item.description} ${item.tagline}`.trim(),
+        image: toAbsoluteUrl(item.image),
+      })),
+    },
+    {
+      '@type': 'MenuSection',
+      name: 'Combos',
+      hasMenuItem: burgerMenu.combos.map((item) => ({
+        '@type': 'MenuItem',
+        name: item.name,
+        description: `${item.description} ${item.note}`.trim(),
+      })),
+    },
+  ],
+});
+
 const buildRouteSpecificSchemas = (routePath) => {
   if (routePath === '/menu') {
     return [buildMenuStructuredData()];
+  }
+
+  if (routePath === '/burguer') {
+    return [buildBurgerStructuredData()];
   }
 
   return [];
