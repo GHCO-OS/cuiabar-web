@@ -5,6 +5,8 @@ export type BurgerMenuItem = {
   name: string;
   tagline: string;
   description: string;
+  storePrice: string;
+  ifoodPrice: string;
   image: string;
   imageAlt: string;
 };
@@ -14,6 +16,8 @@ export type BurgerComboItem = {
   name: string;
   description: string;
   note: string;
+  storePrice: string;
+  ifoodPrice: string;
 };
 
 type BurgerMenuConfig = {

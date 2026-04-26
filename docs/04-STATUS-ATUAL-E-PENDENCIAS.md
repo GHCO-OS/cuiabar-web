@@ -1,6 +1,6 @@
 # Status atual e pendências
 
-Atualizado em: 2026-04-24
+Atualizado em: 2026-04-25
 
 ## Estado geral
 
@@ -37,6 +37,8 @@ O repositório oficial é `GHCO-OS/cuiabar-web`.
 - arquitetura pública reorganizada em três frentes de entrada na raiz do site: `Presencial`, `Expresso` e `Espetaria`, com a home operacional do restaurante movida para `/presencial` e o delivery concentrado em `/expresso`
 - host `burger.cuiabar.com` religado na borda do Cloudflare Worker para eliminar a dependência do origin legado que estava fora do ar
 - cardápio do Burger Cuiabar centralizado em `src/data/burgerMenu.json`, com fotos novas convertidas para WebP e runbook próprio para futuras atualizações sem divergência entre página, SEO e campanhas
+- landing do Burger Cuiabar reestruturada com foco em conversão, escaneabilidade e decisão rápida, com blocos de hero, mais pedidos, combos, curadoria, cardápio completo, diferenciais, FAQ e CTA final
+- preços do Burger sincronizados a partir do PDF precificado de loja e iFood, com exibição principal na landing voltada ao valor direto da loja/site e referência operacional documentada para futuras atualizações
 
 ## Situação do Git
 

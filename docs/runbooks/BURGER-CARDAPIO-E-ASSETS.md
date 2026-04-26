@@ -18,6 +18,7 @@ Esse arquivo concentra:
 - descricoes oficiais do cardapio
 - notas curtas de apoio
 - combos atuais
+- precos de loja/site e referencia de iFood
 - imagem hero
 - imagem OG
 - ordem de destaque na pagina
@@ -42,8 +43,11 @@ As paginas e o SEO do Burger devem refletir esse arquivo.
 
 Material mestre local recebido nesta maquina:
 
-- PDF:
+- PDF de nomes, descricoes e estrutura do cardapio:
   `C:\Users\usuario\Downloads\Super Rede - Dell\cardápio v2 - burger cuiabar.pdf`
+
+- PDF de precos de loja e iFood:
+  `C:\Users\usuario\Downloads\Super Rede - Dell\menu burger - precificado - loja e ifood.pdf`
 
 - Pasta das fotos:
   `C:\Users\usuario\Downloads\Super Rede - Dell\Burgers - MIX PRODUTO\`
@@ -117,42 +121,69 @@ C:\Users\usuario\.cache\codex-runtimes\codex-primary-runtime\dependencies\python
 
 - `O Raiz`
   `Pao brioche, hamburguer sabor picanha, queijo derretido, alface e tomate.`
+  Preco loja/site: `R$ 19,90`
+  Referencia iFood: `R$ 22,88`
 
 - `O Cuiabar`
   `Pao brioche, hamburguer de picanha 120g, queijo derretido, alface, tomate e baconnese da casa.`
+  Preco loja/site: `R$ 29,90`
+  Referencia iFood: `R$ 34,38`
 
 - `O Brabo`
   `Pao brioche, hamburguer de picanha 120g, cheddar cremoso, bacon crocante, cebola na manteiga e baconnese.`
+  Preco loja/site: `R$ 34,90`
+  Referencia iFood: `R$ 40,13`
 
 - `O Crocante`
   `Pao brioche, frango empanado no tempura, cheddar, alface, tomate e baconnese.`
+  Preco loja/site: `R$ 29,90`
+  Referencia iFood: `R$ 34,38`
 
 - `O Parrudo`
   `Pao brioche, hamburguer de costela 120g, cheddar, bacon crocante, cebola na manteiga e molho especial.`
+  Preco loja/site: `R$ 34,90`
+  Referencia iFood: `R$ 40,13`
 
 - `O Colosso`
   `Duplo burger de costela, cheddar cremoso, bacon crocante, cebola na manteiga e molho da casa no pao brioche.`
+  Preco loja/site: `R$ 44,90`
+  Referencia iFood: `R$ 51,63`
 
 - `O Insano`
   `Duplo frango empanado no tempura, super crocante, cheddar derretido e molho honey mustard no brioche.`
+  Preco loja/site: `R$ 36,90`
+  Referencia iFood: `R$ 42,43`
 
 ### Combos
 
 - `Combo Raiz`
   `O Raiz + escolha: batata frita ou bebida lata.`
+  Preco loja/site: `R$ 26,90`
+  Referencia iFood: `R$ 30,93`
 
 - `Combo Cuiabar`
   `O Cuiabar + escolha: batata frita ou bebida lata.`
+  Preco loja/site: `R$ 36,90`
+  Referencia iFood: `R$ 42,43`
 
 - `Combo Brabo`
   `O Brabo + batata frita + bebida lata.`
+  Preco loja/site: `R$ 46,90`
+  Referencia iFood: `R$ 53,93`
+
+## Regra de exibicao de preco na landing
+
+- a landing publica do Burger deve exibir como referencia principal o `storePrice`
+- o texto de apoio da pagina deve deixar claro que esse valor vale para pedido direto na loja ou no site da loja `expresso.cuiabar.com`
+- o campo `ifoodPrice` fica mantido em `src/data/burgerMenu.json` apenas como referencia operacional para futuras comparacoes e atualizacoes
+- se a estrategia comercial mudar e a pagina passar a mostrar preco de app, a documentacao e o schema devem ser revisados na mesma entrega
 
 ## Regra para futuras atualizacoes
 
 Quando houver novo cardapio ou novo pacote de fotos:
 
 1. substituir ou apontar a nova pasta fonte no script
-2. atualizar `src/data/burgerMenu.json`
+2. atualizar `src/data/burgerMenu.json` com nomes, descricoes, `storePrice` e `ifoodPrice`
 3. rodar `scripts/update-burger-assets.py`
 4. validar visualmente a pagina `/burguer`
 5. rodar `npm run lint` e `npm run build`
@@ -162,5 +193,6 @@ Quando houver novo cardapio ou novo pacote de fotos:
 
 - nao editar os nomes dos burgers direto na pagina sem atualizar `src/data/burgerMenu.json`
 - nao trocar imagem publicada sem registrar o mapeamento de origem
+- nao atualizar preco direto na landing sem atualizar primeiro `src/data/burgerMenu.json` e este runbook
 - nao deixar o schema do `/burguer` com itens antigos
 - nao usar screenshots comprimidos como fonte mestra de produto

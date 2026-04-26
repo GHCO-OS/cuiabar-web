@@ -478,8 +478,8 @@
       ]
     },
     "/burguer": {
-      "title": "Burguer Cuiabar | Hambúrguer no Jardim Aurélia em Campinas",
-      "description": "Landing page oficial do Burger Cuiabar com destaque para pedidos no site burger.cuiabar.com e canais de apoio no iFood e 99Food em Campinas.",
+      "title": "Burger Cuiabar | Burgers e combos para pedir agora em Campinas",
+      "description": "Peça burgers e combos do Burger Cuiabar no site oficial, iFood ou 99Food. Escolha rápida para delivery no Jardim Aurelia e em Campinas.",
       "image": "https://cuiabar.com/burguer/burger-cuiabar-og.webp",
       "imageAlt": "Burger O Cuiabar do Burger Cuiabar",
       "type": "website",
@@ -488,14 +488,14 @@
       "canonicalUrl": "https://burger.cuiabar.com/",
       "includeInSitemap": false,
       "keywords": [
-        "hambúrguer em Campinas",
-        "hambúrguer Jardim Aurélia",
+        "hamburguer em Campinas",
+        "hamburguer Jardim Aurelia",
         "burger no Jardim Aurélia",
-        "hambúrguer John Boyd Dunlop",
+        "hamburguer John Boyd Dunlop",
         "burger Cuiabar",
-        "smash burger Campinas",
+        "burger delivery Campinas",
         "iFood burger Cuiabar",
-        "combo hambúrguer Campinas",
+        "combo burger Campinas",
         "pedir burger no iFood Campinas",
         "burger cuiabar 99food",
         "burger.cuiabar.com"
@@ -893,16 +893,16 @@
       "includeInSitemap": false
     },
     "/burger": {
-      "title": "Burguer Cuiabar | Cardápio piloto em Campinas",
-      "description": "Atalho para a landing oficial do Burguer Cuiabar com pedido no iFood.",
+      "title": "Burger Cuiabar | Burgers e combos para pedir agora em Campinas",
+      "description": "Atalho para a landing oficial do Burger Cuiabar com pedido rapido.",
       "image": "https://cuiabar.com/burguer/burger-cuiabar-og.webp",
       "canonicalPath": "/burguer",
       "robots": "noindex,follow",
       "includeInSitemap": false
     },
     "/burguer-cuiabar": {
-      "title": "Burguer Cuiabar | Cardápio piloto em Campinas",
-      "description": "Atalho para a landing oficial do Burguer Cuiabar com pedido no iFood.",
+      "title": "Burger Cuiabar | Burgers e combos para pedir agora em Campinas",
+      "description": "Atalho para a landing oficial do Burger Cuiabar com pedido rapido.",
       "image": "https://cuiabar.com/burguer/burger-cuiabar-og.webp",
       "canonicalPath": "/burguer",
       "robots": "noindex,follow",

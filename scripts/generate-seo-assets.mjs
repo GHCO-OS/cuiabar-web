@@ -157,7 +157,7 @@ const buildBurgerStructuredData = () => ({
   name: 'Cardapio Burger Cuiabar',
   url: burgerCanonicalUrl,
   inLanguage: 'pt-BR',
-  description: 'Cardapio atual do Burger Cuiabar com sete burgers e tres combos oficiais.',
+  description: 'Landing oficial do Burger Cuiabar com burgers, favoritos da casa e combos para pedir agora.',
   hasMenuSection: [
     {
       '@type': 'MenuSection',
@@ -167,6 +167,7 @@ const buildBurgerStructuredData = () => ({
         name: item.name,
         description: `${item.description} ${item.tagline}`.trim(),
         image: toAbsoluteUrl(item.image),
+        offers: buildOffer(normalizePrice(item.storePrice)),
       })),
     },
     {
@@ -176,7 +177,47 @@ const buildBurgerStructuredData = () => ({
         '@type': 'MenuItem',
         name: item.name,
         description: `${item.description} ${item.note}`.trim(),
+        offers: buildOffer(normalizePrice(item.storePrice)),
       })),
+    },
+  ],
+});
+
+const buildBurgerFaqStructuredData = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Onde eu peco Burger Cuiabar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'O pedido pode ser feito no site oficial burger.cuiabar.com, com apoio adicional no iFood e na 99Food.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Quais sao os burgers mais pedidos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'O Cuiabar, O Brabo e O Colosso aparecem como destaques para quem quer decidir rapido.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Tem combo pronto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sim. Combo Raiz e Combo Cuiabar permitem escolher frita ou bebida lata. O Combo Brabo ja vem com frita e bebida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Qual burger escolher se eu quiser frango?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'O Crocante e a opcao direta para frango empanado. O Insano entrega versao dupla com honey mustard para quem quer uma escolha mais intensa.',
+      },
     },
   ],
 });
@@ -187,7 +228,7 @@ const buildRouteSpecificSchemas = (routePath) => {
   }
 
   if (routePath === '/burguer') {
-    return [buildBurgerStructuredData()];
+    return [buildBurgerStructuredData(), buildBurgerFaqStructuredData()];
   }
 
   return [];
