@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { navItems, siteConfig } from '../data/siteConfig';
 
 const whatsAppHref = `https://wa.me/${siteConfig.whatsappNumber}?text=${encodeURIComponent(siteConfig.whatsappMessage)}`;
@@ -10,29 +10,23 @@ type HeaderProps = {
 
 export const Header = ({ hideWhatsAppActions = false }: HeaderProps) => {
   const [open, setOpen] = useState(false);
-  const location = useLocation();
-  const isBurgerRoute = location.pathname.startsWith('/burguer');
-  const brandName = isBurgerRoute ? siteConfig.burguerBrandName : siteConfig.brandShortName;
-  const brandLogo = isBurgerRoute ? siteConfig.burguerLogoUrl : siteConfig.logoUrl;
-  const brandLogoSize = isBurgerRoute ? 56 : 48;
-  const brandHome = isBurgerRoute ? '/expresso' : '/presencial';
   const visibleNavItems = hideWhatsAppActions ? navItems.filter((item) => !item.label.toLowerCase().includes('whatsapp') && !item.to.includes('wa.me')) : navItems;
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-sand/40 bg-cream/90 shadow-[0_12px_40px_rgba(51,35,19,0.08)] backdrop-blur-xl">
       <div className="container-shell flex h-20 items-center justify-between">
-        <Link to={brandHome} className="group flex items-center gap-3 text-cocoa">
-          <span className={`flex items-center justify-center overflow-hidden ${isBurgerRoute ? 'h-14 w-14 rounded-[1.1rem] bg-transparent' : 'h-12 w-12 rounded-full'}`}>
+        <Link to="/presencial" className="group flex items-center gap-3 text-cocoa">
+          <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
             <img
-              src={brandLogo}
+              src={siteConfig.logoUrl}
               alt=""
-              width={brandLogoSize}
-              height={brandLogoSize}
+              width={48}
+              height={48}
               decoding="async"
-              className={`transition duration-500 group-hover:rotate-6 group-hover:scale-105 ${isBurgerRoute ? 'h-full w-full object-contain' : 'h-12 w-12 rounded-full object-cover'}`}
+              className="h-12 w-12 rounded-full object-cover transition duration-500 group-hover:rotate-6 group-hover:scale-105"
             />
           </span>
-          <span className={`font-heading leading-none ${isBurgerRoute ? 'text-lg sm:text-2xl' : 'text-xl sm:text-2xl'}`}>{brandName}</span>
+          <span className="font-heading text-xl leading-none sm:text-2xl">{siteConfig.brandShortName}</span>
         </Link>
         <nav className="hidden items-center gap-6 md:flex">
           {visibleNavItems.map((item) => (

@@ -1,0 +1,185 @@
+{
+  "origin": "https://burgersnsmoke.com",
+  "previewPath": "/burger-n-smoke",
+  "instagramUrl": "https://instagram.com/burgernsmoke",
+  "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Av.+Brigadeiro+Rafael+Tobias+de+Aguiar,+1121,+Jardim+Aurelia,+Campinas,+SP",
+  "whatsappMessage": "Olá! Quero pedir no Burger N' Smoke.",
+  "brand": {
+    "name": "Burger N' Smoke",
+    "shortName": "Smoke",
+    "city": "Campinas",
+    "state": "SP",
+    "neighborhood": "Jardim Aurelia",
+    "wordmark": "/burger-n-smoke/branding/smoke-wordmark.png",
+    "mark": "/burger-n-smoke/branding/smoke-mark.png",
+    "heroImage": "/burger-n-smoke/menu/hero-burger.jpg",
+    "heroImageAlt": "Burger do Burger N' Smoke com blend alto, cheddar e fritas em fundo escuro",
+    "ogImage": "/burger-n-smoke/branding/smoke-wordmark.png",
+    "ogImageAlt": "Wordmark do Burger N' Smoke sobre fundo bordô escuro",
+    "address": "Av. Brigadeiro Rafael Tobias de Aguiar, 1121 - Jardim Aurelia - Campinas/SP",
+    "serviceHours": [
+      "Quarta a sábado, a partir das 18h",
+      "Retirada e delivery noturno em Campinas"
+    ]
+  },
+  "quickFacts": [
+    { "label": "Base", "value": "Campinas / SP" },
+    { "label": "Pegada", "value": "Dark craft burgers" },
+    { "label": "Operacao", "value": "Noite e delivery" }
+  ],
+  "manifesto": [
+    "Carne, fogo e fumaca",
+    "Sem frescura",
+    "Peso no sabor",
+    "Fogo alto",
+    "Bruto e direto",
+    "Campinas / SP"
+  ],
+  "highlights": [
+    "Crosta forte e blend alto",
+    "Combos para decidir rapido",
+    "Entrega noturna em Campinas"
+  ],
+  "stats": [
+    { "value": "6", "label": "Burgers autorais" },
+    { "value": "3", "label": "Combos de ataque" },
+    { "value": "18h+", "label": "Janela noturna" }
+  ],
+  "menuItems": [
+    {
+      "id": "o-bruto",
+      "name": "O Bruto",
+      "description": "Blend 180g, cheddar fundido, cebola caramelizada e molho defumado da casa.",
+      "price": "R$ 32,90",
+      "image": "/burger-n-smoke/menu/o-bruto.webp",
+      "imageAlt": "Burger O Bruto do Burger N' Smoke",
+      "badge": "Top",
+      "category": "Classico da casa"
+    },
+    {
+      "id": "o-defumado",
+      "name": "O Defumado",
+      "description": "Blend 180g, queijo gouda, bacon crocante e maionese de alho negro.",
+      "price": "R$ 36,90",
+      "image": "/burger-n-smoke/menu/o-defumado.webp",
+      "imageAlt": "Burger O Defumado do Burger N' Smoke",
+      "badge": "Smoke",
+      "category": "Assinatura"
+    },
+    {
+      "id": "o-colosso",
+      "name": "O Colosso",
+      "description": "Duplo blend 120g + 120g, duplo cheddar, crispy onion e molho BBQ defumado.",
+      "price": "R$ 44,90",
+      "image": "/burger-n-smoke/menu/o-colosso.webp",
+      "imageAlt": "Burger O Colosso do Burger N' Smoke",
+      "badge": "Destaque",
+      "category": "Mais pedido"
+    },
+    {
+      "id": "o-eletrico",
+      "name": "O Eletrico",
+      "description": "Blend 180g, jalapeno, cream cheese picante e molho sriracha artesanal.",
+      "price": "R$ 34,90",
+      "image": "/burger-n-smoke/menu/o-eletrico.webp",
+      "imageAlt": "Burger O Eletrico do Burger N' Smoke",
+      "badge": "Picante",
+      "category": "Pimenta na medida"
+    },
+    {
+      "id": "o-selado",
+      "name": "O Selado",
+      "description": "Smash alto com queijo americano, picles, dijon e brioche tostado.",
+      "price": "R$ 30,90",
+      "image": "/burger-n-smoke/menu/o-selado.webp",
+      "imageAlt": "Burger O Selado do Burger N' Smoke",
+      "badge": "Smash",
+      "category": "Entrada facil"
+    },
+    {
+      "id": "o-noturno",
+      "name": "O Noturno",
+      "description": "Blend 180g, provolone defumado, cogumelos e maionese trufada.",
+      "price": "R$ 38,90",
+      "image": "/burger-n-smoke/menu/o-noturno.webp",
+      "imageAlt": "Burger O Noturno do Burger N' Smoke",
+      "badge": "Dark",
+      "category": "Sabor marcante"
+    }
+  ],
+  "featuredIds": ["o-bruto", "o-defumado", "o-colosso"],
+  "combos": [
+    {
+      "id": "combo-colosso",
+      "name": "Combo Colosso",
+      "description": "O Colosso + fritas grandes + bebida a escolha. Peso de verdade.",
+      "price": "R$ 54,90",
+      "note": "Mais pedido",
+      "image": "/burger-n-smoke/menu/combo-smoke.png",
+      "imageAlt": "Combo Colosso do Burger N' Smoke com burger, fritas e bebida"
+    },
+    {
+      "id": "combo-bruto",
+      "name": "Combo Bruto",
+      "description": "O Bruto + fritas + bebida para quem quer matar a vontade sem pensar demais.",
+      "price": "R$ 42,90",
+      "note": "Ataque direto"
+    },
+    {
+      "id": "combo-eletrico",
+      "name": "Combo Eletrico",
+      "description": "O Eletrico + fritas temperadas + bebida para fechar a noite com impacto.",
+      "price": "R$ 46,90",
+      "note": "Crosta e calor"
+    }
+  ],
+  "occasions": [
+    {
+      "title": "Quero acertar de primeira",
+      "description": "Va de O Bruto ou O Selado quando a ideia for chegar no pedido sem perder tempo."
+    },
+    {
+      "title": "Quero peso e bacon",
+      "description": "O Defumado e O Colosso puxam a linha mais intensa da casa, com mais gordura e mais impacto."
+    },
+    {
+      "title": "Quero sair do obvio",
+      "description": "O Eletrico e O Noturno entram quando a vontade pede pimenta, profundidade e uma montagem mais escura."
+    }
+  ],
+  "reviews": [
+    {
+      "quote": "Chegou quente, estruturado e com crosta de verdade. Nao parece burger montado sem criterio.",
+      "author": "Rafael M.",
+      "source": "iFood"
+    },
+    {
+      "quote": "O Colosso faz sentido no nome. Pedido forte, bem montado e sem aquela sensacao de lanche desmontado.",
+      "author": "Camila T.",
+      "source": "99Food"
+    },
+    {
+      "quote": "Tem identidade. O sabor e a embalagem passam marca propria, nao mais um burger generico.",
+      "author": "Paulo G.",
+      "source": "Google"
+    }
+  ],
+  "faq": [
+    {
+      "question": "Onde eu peco no Burger N' Smoke?",
+      "answer": "O caminho mais direto e chamar no WhatsApp oficial ou seguir para os canais da marca a partir do proprio site."
+    },
+    {
+      "question": "Quais sao os burgers mais pedidos?",
+      "answer": "O Bruto, O Defumado e O Colosso puxam a frente para quem quer resolver a fome sem pensar demais."
+    },
+    {
+      "question": "Tem retirada no local?",
+      "answer": "Sim. A operacao trabalha com retirada e delivery noturno em Campinas."
+    },
+    {
+      "question": "A marca tambem aparece em apps?",
+      "answer": "Sim. A ideia da landing e organizar a entrada da marca e depois apontar para os canais de pedido ativos."
+    }
+  ]
+}

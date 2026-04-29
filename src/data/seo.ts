@@ -1,5 +1,5 @@
 import seoRoutesJson from './seoRoutes.json';
-import { burgerComboItems, burgerItems, burgerMenu } from './burgerMenu';
+import { burgerNSmokeBrand, burgerNSmokeCombos, burgerNSmokeMenuItems } from './burgerNSmoke';
 
 type SchemaBlock = Record<string, unknown>;
 
@@ -17,6 +17,8 @@ export type RouteSeo = {
   canonicalUrl?: string;
   includeInSitemap?: boolean;
   schema?: SchemaBlock[];
+  siteName?: string;
+  twitterHandle?: string;
 };
 
 type SeoRoutesJson = {
@@ -27,7 +29,16 @@ type SeoRoutesJson = {
 
 const seoRoutes = seoRoutesJson as SeoRoutesJson;
 
-const BURGER_CANONICAL_URL = 'https://burger.cuiabar.com/';
+const normalizeCanonicalPath = (path: string) => {
+  if (path === '/') {
+    return '/';
+  }
+
+  return `${path.replace(/\/+$/, '')}/`;
+};
+
+const buildCanonicalUrl = (routePath: string, route: RouteSeo) =>
+  route.canonicalUrl ?? `${siteOrigin}${normalizeCanonicalPath(route.canonicalPath ?? routePath)}`;
 
 const normalizePrice = (value: string | undefined) => {
   if (!value) {
@@ -51,34 +62,34 @@ const buildOffer = (priceLabel: string | undefined) => {
     : undefined;
 };
 
-const buildBurgerRouteSchema = (): SchemaBlock[] => [
+const buildBurgerNSmokeRouteSchema = (): SchemaBlock[] => [
   {
     '@context': 'https://schema.org',
     '@type': 'Menu',
-    name: 'Cardapio Burger Cuiabar',
-    description: 'Landing oficial do Burger Cuiabar com burgers, favoritos da casa e combos para pedir agora.',
-    url: BURGER_CANONICAL_URL,
+    name: "Cardapio Burger N' Smoke",
+    description: "Landing oficial do Burger N' Smoke com burgers autorais, combos e leitura pensada para pedido rapido.",
+    url: `${burgerNSmokeBrand.origin}/`,
     inLanguage: 'pt-BR',
     hasMenuSection: [
       {
         '@type': 'MenuSection',
         name: 'Burgers',
-        hasMenuItem: burgerItems.map((item) => ({
+        hasMenuItem: burgerNSmokeMenuItems.map((item) => ({
           '@type': 'MenuItem',
           name: item.name,
-          description: `${item.description} ${item.tagline}`.trim(),
-          image: `https://cuiabar.com${item.image}`,
-          offers: buildOffer(item.storePrice),
+          description: `${item.category}. ${item.description}`.trim(),
+          image: `${burgerNSmokeBrand.origin}${item.image}`,
+          offers: buildOffer(item.price),
         })),
       },
       {
         '@type': 'MenuSection',
         name: 'Combos',
-        hasMenuItem: burgerComboItems.map((item) => ({
+        hasMenuItem: burgerNSmokeCombos.map((item) => ({
           '@type': 'MenuItem',
           name: item.name,
-          description: `${item.description} ${item.note}`.trim(),
-          offers: buildOffer(item.storePrice),
+          description: `${item.note}. ${item.description}`.trim(),
+          offers: buildOffer(item.price),
         })),
       },
     ],
@@ -89,10 +100,10 @@ const buildBurgerRouteSchema = (): SchemaBlock[] => [
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'Onde eu peco Burger Cuiabar?',
+        name: "Onde eu peco no Burger N' Smoke?",
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'O pedido pode ser feito no site oficial burger.cuiabar.com, com apoio adicional no iFood e na 99Food.',
+          text: "O caminho mais direto e chamar no WhatsApp oficial ou seguir para os canais da marca a partir do proprio site.",
         },
       },
       {
@@ -100,57 +111,57 @@ const buildBurgerRouteSchema = (): SchemaBlock[] => [
         name: 'Quais sao os burgers mais pedidos?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'O Cuiabar, O Brabo e O Colosso aparecem como destaques para quem quer decidir rapido.',
+          text: 'O Bruto, O Defumado e O Colosso puxam a frente para quem quer resolver a fome sem pensar demais.',
         },
       },
       {
         '@type': 'Question',
-        name: 'Tem combo pronto?',
+        name: 'Tem retirada no local?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sim. Combo Raiz e Combo Cuiabar permitem escolher frita ou bebida lata. O Combo Brabo ja vem com frita e bebida.',
+          text: 'Sim. A operacao trabalha com retirada e delivery noturno em Campinas.',
         },
       },
       {
         '@type': 'Question',
-        name: 'Qual burger escolher se eu quiser frango?',
+        name: 'A marca tambem aparece em apps?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'O Crocante e a opcao direta para frango empanado. O Insano entrega versao dupla com honey mustard para quem quer uma escolha mais intensa.',
+          text: 'Sim. A ideia da landing e organizar a entrada da marca e depois apontar para os canais de pedido ativos.',
         },
       },
     ],
   },
 ];
 
-const enrichBurgerRoute = (route: RouteSeo | undefined): RouteSeo | undefined => {
+const enrichBurgerNSmokeRoute = (route: RouteSeo | undefined): RouteSeo | undefined => {
   if (!route) {
     return route;
   }
 
   return {
     ...route,
-    image: burgerMenu.ogImage,
-    imageAlt: burgerMenu.ogImageAlt,
-    schema: buildBurgerRouteSchema(),
+    image: burgerNSmokeBrand.ogImage,
+    imageAlt: burgerNSmokeBrand.ogImageAlt,
+    siteName: "Burger N' Smoke",
+    twitterHandle: '@burgernsmoke',
+    schema: buildBurgerNSmokeRouteSchema(),
   };
 };
 
-seoRoutes.routes['/burguer'] = enrichBurgerRoute(seoRoutes.routes['/burguer']) as RouteSeo;
-
-for (const aliasPath of ['/burger', '/burguer-cuiabar']) {
-  if (seoRoutes.routes[aliasPath]) {
-    seoRoutes.routes[aliasPath] = {
-      ...seoRoutes.routes[aliasPath],
-      image: burgerMenu.ogImage,
-      imageAlt: burgerMenu.ogImageAlt,
-    };
-  }
+if (seoRoutes.routes['/burger-n-smoke']) {
+  seoRoutes.routes['/burger-n-smoke'] = enrichBurgerNSmokeRoute(seoRoutes.routes['/burger-n-smoke']) as RouteSeo;
 }
 
 export const siteOrigin = seoRoutes.siteOrigin;
 export const defaultSeoImage = seoRoutes.defaultImage;
 export const routeSeo = seoRoutes.routes;
 
-export const getRouteSeo = (path: string): RouteSeo =>
-  routeSeo[path] ?? routeSeo['/'];
+export const getRouteSeo = (path: string): RouteSeo => {
+  const route = routeSeo[path] ?? routeSeo['/'];
+
+  return {
+    ...route,
+    canonicalUrl: buildCanonicalUrl(path, route),
+  };
+};

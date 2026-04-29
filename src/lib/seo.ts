@@ -10,6 +10,8 @@ export type SeoConfig = {
   canonicalUrl?: string;
   keywords?: string[];
   robots?: string;
+  siteName?: string;
+  twitterHandle?: string;
 };
 
 const DEFAULT_IMAGE = defaultSeoImage;
@@ -26,6 +28,8 @@ export const applySeo = ({
   canonicalUrl,
   keywords,
   robots = 'index,follow,max-image-preview:large',
+  siteName = SITE_NAME,
+  twitterHandle = TWITTER_HANDLE,
 }: SeoConfig) => {
   document.title = title;
 
@@ -50,10 +54,10 @@ export const applySeo = ({
   );
   ensureMeta('meta[property="og:image"]', 'property', 'og:image').setAttribute('content', image);
   ensureMeta('meta[property="og:image:alt"]', 'property', 'og:image:alt').setAttribute('content', imageAlt);
-  ensureMeta('meta[property="og:site_name"]', 'property', 'og:site_name').setAttribute('content', SITE_NAME);
+  ensureMeta('meta[property="og:site_name"]', 'property', 'og:site_name').setAttribute('content', siteName);
   ensureMeta('meta[property="og:locale"]', 'property', 'og:locale').setAttribute('content', 'pt_BR');
   ensureMeta('meta[name="twitter:card"]', 'name', 'twitter:card').setAttribute('content', 'summary_large_image');
-  ensureMeta('meta[name="twitter:site"]', 'name', 'twitter:site').setAttribute('content', TWITTER_HANDLE);
+  ensureMeta('meta[name="twitter:site"]', 'name', 'twitter:site').setAttribute('content', twitterHandle);
   ensureMeta('meta[name="twitter:title"]', 'name', 'twitter:title').setAttribute('content', ogTitle ?? title);
   ensureMeta('meta[name="twitter:description"]', 'name', 'twitter:description').setAttribute('content', ogDescription ?? description);
   ensureMeta('meta[name="twitter:image"]', 'name', 'twitter:image').setAttribute('content', image);

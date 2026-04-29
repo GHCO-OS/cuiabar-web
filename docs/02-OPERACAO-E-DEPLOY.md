@@ -1,6 +1,6 @@
 # Operação e deploy
 
-Atualizado em: 2026-04-24
+Atualizado em: 2026-04-27
 
 ## Requisitos
 
@@ -56,13 +56,17 @@ npm run d1:migrate:remote
 - O deploy publica no projeto `cuiabar-site` no Cloudflare Pages.
 - O comando operacional é `wrangler pages deploy`.
 - O subdomínio `prorefeicao.cuiabar.com` consome o artefato público do Pages com roteamento via `functions/_middleware.js`, servindo a landing dedicada do `ProRefeição` na raiz do host.
-- O host `burger.cuiabar.com` é garantido pelo Worker principal via rota `burger.cuiabar.com/*`, servindo a landing oficial do Burger a partir do mesmo `dist/`.
+- `functions/_middleware.js` também aplica os redirecionamentos públicos legados e aposentados, incluindo `blog*`, `agenda*`, `bar-jardim-aurelia-musica-ao-vivo`, `pedidos-online` e aliases de links.
+- O gerador estático de SEO publica `canonical` e `sitemap` usando barra final nas rotas do `cuiabar.com`, para alinhar o HTML com o formato real servido pelo Pages.
+- O host `burgersnsmoke.com` consome o mesmo `dist/` com roteamento dedicado na borda, promovendo a landing `Burger N' Smoke` na raiz do domínio.
+- O host `burger.cuiabar.com` permanece apenas como redirecionamento legado para `https://burgersnsmoke.com/`.
 
 ### Worker principal
 
 - O Worker principal é `cuiabar-crm`.
 - A configuração está em `wrangler.jsonc`.
 - O deploy operacional usa `wrangler deploy`.
+- O Worker também protege `crm.cuiabar.com` contra espelhos públicos indevidos, redirecionando páginas do site principal para seus hosts canônicos.
 
 ## Regras importantes
 
@@ -70,8 +74,10 @@ npm run d1:migrate:remote
 - O binding `WHATSAPP_KV` deve permanecer com `id` explícito no `wrangler.jsonc`.
 - O host oficial do `MeuCuiabar` é `meu.cuiabar.com`.
 - O host oficial do `ProRefeição` é `prorefeicao.cuiabar.com`.
-- O host oficial do Burger é `burger.cuiabar.com`.
+- O host oficial do `Burger N' Smoke` é `burgersnsmoke.com`.
+- `burger.cuiabar.com` deve existir apenas como legado e não pode voltar a servir landing própria sem autorização expressa.
 - `cuiabar.com/prorefeicao` deve permanecer apenas como redirecionamento `301` para o subdomínio dedicado.
+- `cuiabar.com/burger`, `cuiabar.com/burguer` e `cuiabar.com/burguer-cuiabar` devem permanecer apenas como redirecionamentos `301` para `https://burgersnsmoke.com/`.
 - O alias `crm.cuiabar.com/meucuiabar*` deve permanecer apenas como redirecionamento de compatibilidade.
 
 ## Relação com GitHub

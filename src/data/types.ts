@@ -19,26 +19,6 @@ export type MenuHighlight = {
   image: string;
 };
 
-export type AgendaHighlight = {
-  title: string;
-  description: string;
-};
-
-export type LiveMusicProgram = {
-  slug: string;
-  title: string;
-  shortTitle: string;
-  eyebrow: string;
-  summary: string;
-  teaser: string;
-  dayLabel: string;
-  cadenceLabel: string;
-  image: string;
-  highlights: AgendaHighlight[];
-  reservationHint: string;
-  keywords: string[];
-};
-
 export type FaqItem = {
   question: string;
   answer: string;

@@ -1,7 +1,11 @@
 /bio /links 301
 /acessos /links 301
-/burger /burguer 301
-/burguer-cuiabar /burguer 301
+/burger https://burgersnsmoke.com/ 301
+/burger/ https://burgersnsmoke.com/ 301
+/burguer https://burgersnsmoke.com/ 301
+/burguer/ https://burgersnsmoke.com/ 301
+/burguer-cuiabar https://burgersnsmoke.com/ 301
+/burguer-cuiabar/ https://burgersnsmoke.com/ 301
 /marmita /pedidos-online 301
 /delivery /pedidos-online 301
 /online-ordering /pedidos-online 301

@@ -2,17 +2,19 @@ const LEGACY_REDIRECTS = new Map([
   ['/bio', '/links'],
   ['/acessos', '/links'],
   ['/canal', '/links'],
-  ['/burger', '/burguer'],
-  ['/burguer-cuiabar', '/burguer'],
   ['/marmita', '/expresso'],
   ['/delivery', '/expresso'],
   ['/online-ordering', '/expresso'],
+  ['/pedidos-online', '/expresso'],
   ['/services-5', '/expresso'],
   ['/asianrestaurant', '/presencial'],
 ]);
 
 const PROREFEICAO_HOST = 'prorefeicao.cuiabar.com';
-const BURGER_HOST = 'burger.cuiabar.com';
+const BURGER_ARCHIVED_HOST = 'burger.cuiabar.com';
+const BURGER_N_SMOKE_HOST = 'burgersnsmoke.com';
+const BURGER_N_SMOKE_ROOT = `https://${BURGER_N_SMOKE_HOST}/`;
+const BURGER_N_SMOKE_PREVIEW_PATH = '/burger-n-smoke';
 
 const normalizePathname = (pathname) => {
   if (pathname === '/') {
@@ -32,8 +34,8 @@ export async function onRequest(context) {
     return Response.redirect(url.toString(), 301);
   }
 
-  if (url.hostname === 'www.burger.cuiabar.com') {
-    url.hostname = BURGER_HOST;
+  if (url.hostname === 'www.burgersnsmoke.com') {
+    url.hostname = BURGER_N_SMOKE_HOST;
     url.pathname = normalizedPathname;
     return Response.redirect(url.toString(), 301);
   }
@@ -48,12 +50,34 @@ export async function onRequest(context) {
     return Response.redirect(`https://${PROREFEICAO_HOST}/`, 301);
   }
 
+  if (
+    url.hostname === BURGER_ARCHIVED_HOST ||
+    url.hostname === `www.${BURGER_ARCHIVED_HOST}` ||
+    normalizedPathname === '/burguer' ||
+    normalizedPathname === '/burger' ||
+    normalizedPathname === '/burguer-cuiabar'
+  ) {
+    return Response.redirect(BURGER_N_SMOKE_ROOT, 301);
+  }
+
+  if (normalizedPathname === '/blog' || normalizedPathname.startsWith('/blog/')) {
+    return Response.redirect('https://cuiabar.com/presencial/', 301);
+  }
+
+  if (
+    normalizedPathname === '/agenda' ||
+    normalizedPathname.startsWith('/agenda/') ||
+    normalizedPathname === '/bar-jardim-aurelia-musica-ao-vivo'
+  ) {
+    return Response.redirect('https://cuiabar.com/presencial/#agenda-casa', 301);
+  }
+
   if (url.hostname === PROREFEICAO_HOST && normalizedPathname === '/prorefeicao') {
     return Response.redirect(`https://${PROREFEICAO_HOST}/`, 301);
   }
 
-  if (url.hostname === BURGER_HOST && (normalizedPathname === '/burguer' || normalizedPathname === '/burger')) {
-    return Response.redirect(`https://${BURGER_HOST}/`, 301);
+  if (url.hostname === BURGER_N_SMOKE_HOST && normalizedPathname === BURGER_N_SMOKE_PREVIEW_PATH) {
+    return Response.redirect(BURGER_N_SMOKE_ROOT, 301);
   }
 
   if (url.hostname === PROREFEICAO_HOST && normalizedPathname === '/') {
@@ -79,24 +103,34 @@ export async function onRequest(context) {
       .transform(response);
   }
 
-  if (url.hostname === BURGER_HOST && normalizedPathname === '/') {
-    const assetUrl = new URL('/burguer/', url.origin);
+  if (url.hostname === BURGER_N_SMOKE_HOST && normalizedPathname === '/') {
+    const assetUrl = new URL(`${BURGER_N_SMOKE_PREVIEW_PATH}/`, url.origin);
     const response = await context.env.ASSETS.fetch(assetUrl.toString());
 
     return new HTMLRewriter()
       .on('link[rel="canonical"]', {
         element(element) {
-          element.setAttribute('href', `https://${BURGER_HOST}/`);
+          element.setAttribute('href', BURGER_N_SMOKE_ROOT);
         },
       })
       .on('meta[property="og:url"]', {
         element(element) {
-          element.setAttribute('content', `https://${BURGER_HOST}/`);
+          element.setAttribute('content', BURGER_N_SMOKE_ROOT);
         },
       })
       .on('meta[name="twitter:url"]', {
         element(element) {
-          element.setAttribute('content', `https://${BURGER_HOST}/`);
+          element.setAttribute('content', BURGER_N_SMOKE_ROOT);
+        },
+      })
+      .on('meta[property="og:site_name"]', {
+        element(element) {
+          element.setAttribute('content', "Burger N' Smoke");
+        },
+      })
+      .on('meta[name="twitter:site"]', {
+        element(element) {
+          element.setAttribute('content', '@burgernsmoke');
         },
       })
       .transform(response);

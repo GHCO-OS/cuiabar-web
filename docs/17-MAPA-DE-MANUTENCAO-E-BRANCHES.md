@@ -1,6 +1,6 @@
 # Mapa de manutenção e branches
 
-Atualizado em: 2026-04-17
+Atualizado em: 2026-04-28
 
 ## Objetivo
 
@@ -37,6 +37,12 @@ Concentrar em uma página só a resposta para quatro perguntas:
 | `functions/` | `GHCO OS` | `ghco/*` ou `infra/*` | fonte | Pages Functions e middleware |
 | `services/whatsapp-baileys/` | `Cuiabar Atende` | `atende/*` | fonte | bridge local |
 | `public/` | `Cuiabar Web` | `web/*` | fonte | assets versionados |
+| `src/pages/BurgerNSmokePage.tsx` | `Burger N' Smoke` | `codex/burger-n-smoke-site` ou derivadas | fonte | landing pública da nova marca |
+| `src/data/burgerNSmoke.*` | `Burger N' Smoke` | `codex/burger-n-smoke-site` ou derivadas | fonte | conteúdo canônico da nova marca |
+| `public/burger-n-smoke/` | `Burger N' Smoke` | `codex/burger-n-smoke-site` ou derivadas | fonte | branding, fotos e assets publicados |
+| `src/pages/BurguerCuiabarPage.tsx` | arquivo histórico | nenhuma sem autorização | legado | manter preservado e sem manutenção rotineira |
+| `src/data/burgerMenu.*` | arquivo histórico | nenhuma sem autorização | legado | fonte do projeto encerrado |
+| `public/burguer/` | arquivo histórico | nenhuma sem autorização | legado | assets do burger antigo |
 | `migrations/` | depende do domínio | `ghco/*`, `web/*` ou `atende/*` | fonte | não renumerar histórico publicado |
 | `scripts/` | infraestrutura/apoio | `infra/*` ou linha dona | fonte | scripts operacionais |
 | `docs/` | `GHCO OS` | `infra/*` | fonte | documentação oficial |
@@ -57,9 +63,12 @@ Concentrar em uma página só a resposta para quatro perguntas:
 - `burger/cuiabar`
 - `blog/editorial`
 - `infra/organizacao`
+- `codex/burger-n-smoke-site`
 
 ## Regras rápidas
 
 - se a dúvida for entre `ghco/*` e uma linha de produto, prefira `ghco/*` só quando a mudança alterar contrato, runtime ou integração compartilhada
 - `src/atende/` não é mais namespace de manutenção; a superfície canônica do produto fica em `src/crm/`, `src/reservations/` e `src/crm/branding.ts`
 - não abrir mudança nova em `main`
+- a frente `Burger N' Smoke` deve nascer em `codex/burger-n-smoke-site` ou em branches derivadas coerentes
+- o legado `Burger Cuiabar` não deve receber manutenção, deploy ou limpeza sem autorização expressa

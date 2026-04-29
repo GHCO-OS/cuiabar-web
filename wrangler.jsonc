@@ -35,6 +35,14 @@
       "zone_name": "cuiabar.com"
     },
     {
+      "pattern": "burgersnsmoke.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.burgersnsmoke.com",
+      "custom_domain": true
+    },
+    {
       "pattern": "blog.cuiabar.com/editor*",
       "zone_name": "cuiabar.com"
     }
@@ -70,12 +78,12 @@
     "WHATSAPP_AI_MODE": "binding",
     "WHATSAPP_AI_MODEL": "@cf/meta/llama-3.1-8b-instruct",
     "WHATSAPP_MENU_URL": "https://cuiabar.com/menu",
-    "WHATSAPP_BURGER_URL": "https://cuiabar.com/burguer",
+    "WHATSAPP_BURGER_URL": "https://burgersnsmoke.com/",
     "WHATSAPP_DELIVERY_URL": "https://cuiabar.com/delivery",
     "WHATSAPP_EXPRESSO_URL": "https://expresso.cuiabar.com",
     "WHATSAPP_CHANNEL_URL": "https://whatsapp.com/channel/0029VbAcHLXFSAsxCt6lly0a",
     "WHATSAPP_ADDRESS": "Av. Brigadeiro Rafael Tobias de Aguiar, 1121 - Jardim Aurelia - Campinas/SP",
-    "WHATSAPP_HOURS_SUMMARY": "Delivery no almoco todos os dias, delivery a noite de quarta a sabado e atendimento presencial com musica ao vivo as sextas, sabados e domingos.",
+    "WHATSAPP_HOURS_SUMMARY": "Delivery no almoco todos os dias, delivery a noite de quarta a sabado e atendimento presencial na quinta, sexta e sabado.",
     "WHATSAPP_PHONE_DISPLAY": "(19) 3305-8878",
     "WHATSAPP_RESERVATION_BEST_EFFORT_ENABLED": "true"
   },

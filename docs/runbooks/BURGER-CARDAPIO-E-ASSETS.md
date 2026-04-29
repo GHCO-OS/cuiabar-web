@@ -4,7 +4,24 @@ Atualizado em: 2026-04-25
 
 ## Objetivo
 
-Centralizar a fonte de verdade do cardapio do Burger Cuiabar, os nomes corretos dos burgers, a origem das fotos e o fluxo de atualizacao dos assets web.
+Preservar a fonte de verdade historica do cardapio do `Burger Cuiabar`, os nomes corretos dos burgers, a origem das fotos e o fluxo de atualizacao usado antes do arquivamento do projeto.
+
+## Status atual
+
+O `Burger Cuiabar` e um projeto:
+
+- encerrado
+- arquivado por tempo indeterminado
+- fora da frente publica ativa
+
+Regra operacional:
+
+- nao mexer, publicar, excluir ou reaproveitar esse material sem autorizacao expressa do responsavel
+
+Frente ativa atual:
+
+- `Burger N' Smoke`
+- documentacao operacional em `docs/runbooks/BURGER-N-SMOKE-SITE.md`
 
 ## Fonte de verdade atual
 

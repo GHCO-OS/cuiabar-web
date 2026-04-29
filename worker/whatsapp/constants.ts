@@ -26,13 +26,13 @@ export const DEFAULT_BUSINESS_CONTEXT: BusinessContext = {
   restaurantShortName: 'Villa Cuiabar',
   tone: 'comercial, natural, objetivo e util',
   menuUrl: 'https://cuiabar.com/menu',
-  burgerUrl: 'https://cuiabar.com/burguer',
+  burgerUrl: 'https://burgersnsmoke.com/',
   deliveryUrl: 'https://cuiabar.com/delivery',
   expressoUrl: 'https://expresso.cuiabar.com',
   whatsappChannelUrl: 'https://whatsapp.com/channel/0029VbAcHLXFSAsxCt6lly0a',
   address: 'Av. Brigadeiro Rafael Tobias de Aguiar, 1121 - Jardim Aurelia - Campinas/SP',
   hoursSummary:
-    'Delivery no almoco todos os dias, delivery a noite de quarta a sabado e atendimento presencial com musica ao vivo as sextas, sabados e domingos.',
+    'Delivery no almoco todos os dias, delivery a noite de quarta a sabado e atendimento presencial na quinta, sexta e sabado.',
   phoneDisplay: '(19) 3305-8878',
   reservationTimeOptions: ['11:00', '12:00', '13:00', '18:00', '19:00', '20:00'],
 };

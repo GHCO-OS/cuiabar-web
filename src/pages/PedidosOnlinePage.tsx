@@ -22,16 +22,16 @@ const PedidosOnlinePage = () => {
       </Reveal>
       <Reveal
         as="a"
-        href={siteConfig.burguerOrderLinks.ifood}
+        href={siteConfig.burgerNSmokeOrigin}
         target="_blank"
         rel="noreferrer"
         className="card block border-2 border-[rgba(234,83,61,0.28)] bg-[linear-gradient(135deg,rgba(255,251,214,0.96),rgba(252,242,208,0.92))] p-8 transition-transform duration-300 hover:-translate-y-1"
       >
-        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-red">Burger Cuiabar</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-red">Burger N&apos; Smoke</p>
         <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="font-heading text-4xl text-brand-ink">Burger Cuiabar no iFood</h2>
-            <p className="mt-2 max-w-2xl text-steel">Peça direto na loja do Burger Cuiabar. Disponível de quarta a sábado, a partir das 18h.</p>
+            <h2 className="font-heading text-4xl text-brand-ink">Burger N&apos; Smoke</h2>
+            <p className="mt-2 max-w-2xl text-steel">Abra a nova marca da hamburgueria com landing própria, canal direto e operação noturna a partir das 18h.</p>
           </div>
           <span className="inline-flex w-fit items-center rounded-full bg-brand-red px-4 py-2 text-sm font-semibold text-white">
             A partir das 18h

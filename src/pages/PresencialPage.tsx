@@ -1,9 +1,9 @@
 import { WhatsAppChannelPopup } from '../components/WhatsAppChannelPopup';
 import { WhatsAppContactCard } from '../components/WhatsAppContactCard';
+import { GoogleCalendarEmbed } from '../components/GoogleCalendarEmbed';
 import { siteConfig } from '../data/siteConfig';
 import { getRouteSeo } from '../data/seo';
 import { useSeo } from '../hooks/useSeo';
-import { AgendaPreviewSection } from '../sections/AgendaPreviewSection';
 import { DifferentialsSection } from '../sections/DifferentialsSection';
 import { HeroSection } from '../sections/HeroSection';
 import { LocalSignalsSection } from '../sections/LocalSignalsSection';
@@ -21,7 +21,13 @@ const PresencialPage = () => {
       <HeroSection />
       <DifferentialsSection />
       <LocalSignalsSection />
-      <AgendaPreviewSection />
+      <section id="agenda-casa" className="container-shell py-12">
+        <GoogleCalendarEmbed
+          src={siteConfig.calendarEmbedUrl}
+          title="Calendario oficial da casa"
+          description="Use o calendario oficial do Google para consultar a programacao publicada pela equipe da casa."
+        />
+      </section>
       <ProRefeicaoSection />
       <MenuHighlightsSection />
       <section className="container-shell py-12">

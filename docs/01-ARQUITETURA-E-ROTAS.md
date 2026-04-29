@@ -1,6 +1,6 @@
 # Arquitetura e rotas
 
-Atualizado em: 2026-04-24
+Atualizado em: 2026-04-27
 
 ## Estrutura do sistema
 
@@ -87,8 +87,11 @@ migrations/
 - `https://prorefeicao.cuiabar.com`
   Host oficial da frente `ProRefeição`.
 
+- `https://burgersnsmoke.com`
+  Host oficial da frente `Burger N' Smoke`.
+
 - `https://burger.cuiabar.com`
-  Host público do Burger Cuiabar, servido na borda do Worker a partir da landing oficial em `/burguer`.
+  Host legado do burger antigo, mantido apenas como redirecionamento permanente para `https://burgersnsmoke.com/`.
 
 - `https://crm.cuiabar.com`
   Portal oficial do `Cuiabar Atende`.
@@ -112,19 +115,18 @@ migrations/
 - `/presencial`
   Home pública principal do restaurante, com hero institucional, destaque promocional do almoço presencial e acesso para menu, WhatsApp e reservas.
 - `/expresso`
-  Frente canônica de delivery e operação rápida, concentrando marmitaria, Burger Cuiabar e os canais oficiais de pedido.
+  Frente canônica de delivery e operação rápida, concentrando marmitaria, `Burger N' Smoke` e os canais oficiais de pedido.
 - `/menu`
 - `/pedidos-online`
   Atalho legado, hoje redirecionado para `/expresso`.
 - `/delivery`
   Atalho legado, hoje redirecionado para `/expresso`.
-- `/burguer`
-- `/burger`
+- `/burger-n-smoke`
+  Preview interno da landing dedicada da nova marca, publicado no site principal apenas para operação e QA.
 - `/espetaria`
 - `/vagas`
 - `/links`
   Hub leve de links oficiais, com foco em reservas, pedido direto, atendimento e horários operacionais da casa.
-- `/agenda`
 - `/reservas`
 
 ## Redirecionamentos legados relevantes
@@ -134,6 +136,20 @@ migrations/
 
 - `https://www.prorefeicao.cuiabar.com`
   Redireciona permanentemente para `https://prorefeicao.cuiabar.com/`.
+
+- `https://cuiabar.com/blog*`
+  Frente desativada. Redireciona permanentemente para `https://cuiabar.com/presencial/`.
+
+- `https://cuiabar.com/agenda*`
+  Frente desativada. Redireciona permanentemente para `https://cuiabar.com/presencial/#agenda-casa`.
+
+- `https://cuiabar.com/bar-jardim-aurelia-musica-ao-vivo`
+  Página local desativada. Redireciona permanentemente para `https://cuiabar.com/presencial/#agenda-casa`.
+
+- `https://cuiabar.com/burger`
+- `https://cuiabar.com/burguer`
+- `https://cuiabar.com/burguer-cuiabar`
+  Aliases legados do burger. Redirecionam permanentemente para `https://burgersnsmoke.com/`.
 
 ## Rotas internas e de infraestrutura
 
@@ -153,8 +169,12 @@ migrations/
 
 - O projeto combina assets estáticos do Pages com backend dinâmico em Workers.
 - A navegação pública agora foi reorganizada por experiência: a raiz funciona como hub, enquanto o conteúdo institucional do restaurante opera em `/presencial` e a frente de delivery em `/expresso`.
+- O bloco de agenda pública e o blog foram retirados da superfície principal. A referência de programação da casa passou a existir apenas como embed do Google Calendar dentro de `/presencial`.
 - A frente `ProRefeição` deixou de ser página principal em `cuiabar.com/prorefeicao` e passou a operar no subdomínio dedicado `prorefeicao.cuiabar.com`, com a rota antiga preservada apenas como `301`.
-- O host `burger.cuiabar.com` é atendido por rota de Worker no edge e serve a mesma landing pública do `Burger Cuiabar`, reduzindo dependência do origin legado.
+- O host `burgersnsmoke.com` é atendido por Pages + Worker, usando a mesma base de build do repositório com uma landing dedicada da nova marca.
+- O host `burger.cuiabar.com` foi rebaixado a legado e deve existir apenas como redirecionamento permanente para `https://burgersnsmoke.com/`.
+- As canonicals públicas do `cuiabar.com` passaram a seguir o formato com barra final, alinhadas ao formato realmente servido pelos diretórios estáticos do Pages.
+- Espelhos públicos indevidos em `crm.cuiabar.com` passaram a redirecionar para suas URLs canônicas no site principal ou nos subdomínios oficiais.
 - O `MeuCuiabar` já tem host próprio, mas ainda usa parte do frontend transplantado do Base44.
 - O módulo `worker/whatsapp-intelligence/` segue isolado por feature flag e não substitui a arquitetura canônica de `worker/whatsapp/`.
-- O blog foi retirado da superfície principal e preservado apenas como frente separável.
+- O blog permanece apenas como faixa editorial protegida em `blog.cuiabar.com/editor*`.

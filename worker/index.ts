@@ -5,11 +5,15 @@ const app = createApp();
 const BLOG_EDITOR_PATH = '/editor';
 const MEUCUIABAR_LEGACY_PATH = '/meucuiabar';
 const MEUCUIABAR_HOST = 'meu.cuiabar.com';
-const BURGER_HOST = 'burger.cuiabar.com';
-const BURGER_ROOT = `https://${BURGER_HOST}/`;
+const BURGER_ARCHIVED_HOST = 'burger.cuiabar.com';
+const BURGER_N_SMOKE_HOST = 'burgersnsmoke.com';
+const BURGER_N_SMOKE_ROOT = `https://${BURGER_N_SMOKE_HOST}/`;
+const BURGER_N_SMOKE_PREVIEW_PATH = '/burger-n-smoke';
+const MAIN_SITE_ORIGIN = 'https://cuiabar.com';
 
 const isEditorRequest = (url: URL) => url.hostname === 'blog.cuiabar.com' && (url.pathname === BLOG_EDITOR_PATH || url.pathname.startsWith(`${BLOG_EDITOR_PATH}/`));
 const isInternalPortalHost = (hostname: string) => hostname === 'crm.cuiabar.com' || hostname === MEUCUIABAR_HOST;
+const normalizePathname = (pathname: string) => (pathname === '/' ? '/' : pathname.replace(/\/+$/, '') || '/');
 
 const stripEditorPrefix = (pathname: string) => {
   const nextPath = pathname.slice(BLOG_EDITOR_PATH.length);
@@ -91,6 +95,60 @@ const redirectLegacyMeuCuiabarRoute = (url: URL) => {
   return Response.redirect(destination.toString(), 308);
 };
 
+const buildPublicSiteRedirect = (url: URL) => {
+  const normalizedPath = normalizePathname(url.pathname);
+
+  if (normalizedPath === '/burger' || normalizedPath === '/burguer' || normalizedPath === '/burguer-cuiabar') {
+    return BURGER_N_SMOKE_ROOT;
+  }
+
+  if (normalizedPath === '/blog' || normalizedPath.startsWith('/blog/')) {
+    return 'https://cuiabar.com/presencial/';
+  }
+
+  if (
+    normalizedPath === '/agenda' ||
+    normalizedPath.startsWith('/agenda/') ||
+    normalizedPath === '/bar-jardim-aurelia-musica-ao-vivo'
+  ) {
+    return 'https://cuiabar.com/presencial/#agenda-casa';
+  }
+
+  if (normalizedPath === '/prorefeicao') {
+    return 'https://prorefeicao.cuiabar.com/';
+  }
+
+  const mirroredPublicPaths = new Set([
+    '/menu',
+    '/reservas',
+    '/vagas',
+    '/links',
+    '/presencial',
+    '/expresso',
+    '/espetaria',
+    '/delivery',
+    '/marmita',
+    '/online-ordering',
+    '/pedidos-online',
+    '/services-5',
+    '/bio',
+    '/acessos',
+    '/canal',
+    '/asianrestaurant',
+    '/restaurante-jardim-aurelia-campinas',
+    '/restaurante-perto-do-enxuto-dunlop',
+  ]);
+
+  if (!mirroredPublicPaths.has(normalizedPath)) {
+    return null;
+  }
+
+  const destination = new URL(MAIN_SITE_ORIGIN);
+  destination.pathname = normalizedPath === '/' ? '/' : `${normalizedPath}/`;
+  destination.search = url.search;
+  return destination.toString();
+};
+
 const withInternalPortalHeaders = async (request: Request, env: Env) => {
   const assetResponse = await env.ASSETS.fetch(request);
   const headers = new Headers(assetResponse.headers);
@@ -107,9 +165,18 @@ const withInternalPortalHeaders = async (request: Request, env: Env) => {
 const serveBurgerHost = async (request: Request, env: Env) => {
   const url = new URL(request.url);
 
-  if (url.pathname === '/burger' || url.pathname === '/burguer') {
-    url.pathname = '/';
+  if (url.hostname === `www.${BURGER_N_SMOKE_HOST}`) {
+    url.hostname = BURGER_N_SMOKE_HOST;
+    url.pathname = url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '') || '/';
     return Response.redirect(url.toString(), 301);
+  }
+
+  if (url.hostname === BURGER_ARCHIVED_HOST || url.hostname === `www.${BURGER_ARCHIVED_HOST}`) {
+    return Response.redirect(BURGER_N_SMOKE_ROOT, 301);
+  }
+
+  if (url.pathname === BURGER_N_SMOKE_PREVIEW_PATH) {
+    return Response.redirect(BURGER_N_SMOKE_ROOT, 301);
   }
 
   if (url.pathname !== '/') {
@@ -117,24 +184,34 @@ const serveBurgerHost = async (request: Request, env: Env) => {
   }
 
   const assetUrl = new URL(request.url);
-  assetUrl.pathname = '/burguer/';
+  assetUrl.pathname = `${BURGER_N_SMOKE_PREVIEW_PATH}/`;
   const assetRequest = new Request(assetUrl.toString(), request);
   const assetResponse = await env.ASSETS.fetch(assetRequest);
 
   return new HTMLRewriter()
     .on('link[rel="canonical"]', {
       element(element) {
-        element.setAttribute('href', BURGER_ROOT);
+        element.setAttribute('href', BURGER_N_SMOKE_ROOT);
       },
     })
     .on('meta[property="og:url"]', {
       element(element) {
-        element.setAttribute('content', BURGER_ROOT);
+        element.setAttribute('content', BURGER_N_SMOKE_ROOT);
       },
     })
     .on('meta[name="twitter:url"]', {
       element(element) {
-        element.setAttribute('content', BURGER_ROOT);
+        element.setAttribute('content', BURGER_N_SMOKE_ROOT);
+      },
+    })
+    .on('meta[property="og:site_name"]', {
+      element(element) {
+        element.setAttribute('content', "Burger N' Smoke");
+      },
+    })
+    .on('meta[name="twitter:site"]', {
+      element(element) {
+        element.setAttribute('content', '@burgernsmoke');
       },
     })
     .transform(assetResponse);
@@ -153,6 +230,14 @@ export default {
       return redirectLegacyMeuCuiabarRoute(url);
     }
 
+    if (url.hostname === 'crm.cuiabar.com') {
+      const publicSiteRedirect = buildPublicSiteRedirect(url);
+
+      if (publicSiteRedirect) {
+        return Response.redirect(publicSiteRedirect, 301);
+      }
+    }
+
     if (
       pathname.startsWith('/api/') ||
       pathname.startsWith('/c/') ||
@@ -165,7 +250,7 @@ export default {
       return app.fetch(request, env, ctx);
     }
 
-    if (url.hostname === BURGER_HOST) {
+    if (url.hostname === BURGER_ARCHIVED_HOST || url.hostname === `www.${BURGER_ARCHIVED_HOST}` || url.hostname === BURGER_N_SMOKE_HOST || url.hostname === `www.${BURGER_N_SMOKE_HOST}`) {
       return serveBurgerHost(request, env);
     }
 

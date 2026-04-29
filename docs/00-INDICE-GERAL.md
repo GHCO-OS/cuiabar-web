@@ -1,6 +1,6 @@
 # Índice geral
 
-Atualizado em: 2026-04-22
+Atualizado em: 2026-04-28
 
 ## Objetivo
 
@@ -59,6 +59,9 @@ Centralizar a documentação oficial do `GHCO OS` em uma trilha única, estável
 
 - `19-TECNOLOGIA-DESIGN-E-INSPIRACOES.md`
   Stack, decisões de design, linguagem visual e repertório.
+
+- `20-BURGER-N-SMOKE-E-ARQUIVAMENTO.md`
+  Arquivamento do burger legado, regras de preservação e frente ativa da nova marca.
 
 ## Módulos especializados
 

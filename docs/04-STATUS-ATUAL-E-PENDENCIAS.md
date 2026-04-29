@@ -1,6 +1,6 @@
 # Status atual e pendências
 
-Atualizado em: 2026-04-25
+Atualizado em: 2026-04-27
 
 ## Estado geral
 
@@ -16,7 +16,7 @@ O repositório oficial é `GHCO-OS/cuiabar-web`.
 
 - site principal
 - menu e pedidos online
-- páginas especiais do Burger, Espetaria e ProRefeição
+- páginas especiais de `Burger N' Smoke`, Espetaria e ProRefeição
 - página de vagas
 - portal de reservas
 - CRM
@@ -35,10 +35,12 @@ O repositório oficial é `GHCO-OS/cuiabar-web`.
 - carregamento do `MeuCuiabar` quebrado por página para reduzir o bundle inicial da aplicação
 - frente `ProRefeição` migrada para o host dedicado `prorefeicao.cuiabar.com`, com a rota `cuiabar.com/prorefeicao` mantida apenas como redirecionamento permanente
 - arquitetura pública reorganizada em três frentes de entrada na raiz do site: `Presencial`, `Expresso` e `Espetaria`, com a home operacional do restaurante movida para `/presencial` e o delivery concentrado em `/expresso`
-- host `burger.cuiabar.com` religado na borda do Cloudflare Worker para eliminar a dependência do origin legado que estava fora do ar
-- cardápio do Burger Cuiabar centralizado em `src/data/burgerMenu.json`, com fotos novas convertidas para WebP e runbook próprio para futuras atualizações sem divergência entre página, SEO e campanhas
-- landing do Burger Cuiabar reestruturada com foco em conversão, escaneabilidade e decisão rápida, com blocos de hero, mais pedidos, combos, curadoria, cardápio completo, diferenciais, FAQ e CTA final
-- preços do Burger sincronizados a partir do PDF precificado de loja e iFood, com exibição principal na landing voltada ao valor direto da loja/site e referência operacional documentada para futuras atualizações
+- `Burger Cuiabar` rebaixado a projeto encerrado e arquivado por tempo indeterminado, com regra explícita de não alterar, publicar ou excluir sem autorização expressa
+- nova frente `Burger N' Smoke` implementada com dados próprios, assets próprios, SEO dedicado, preview interno em `/burger-n-smoke` e domínio oficial `https://burgersnsmoke.com/`
+- aliases legados do burger em `cuiabar.com` e o host `burger.cuiabar.com` convertidos para redirecionamento permanente da nova marca
+- correção estrutural de canonicalização nas rotas públicas do `cuiabar.com`, com `canonical` e sitemap alinhados ao formato com barra final realmente servido no Pages
+- blog público, páginas de agenda e guia local de bar com música removidos da superfície principal; a programação da casa ficou reduzida ao embed oficial do Google Calendar dentro de `/presencial`
+- espelhos públicos indevidos em `crm.cuiabar.com` passaram a redirecionar para as URLs canônicas do site principal e dos subdomínios oficiais
 
 ## Situação do Git
 
@@ -53,6 +55,8 @@ O repositório oficial é `GHCO-OS/cuiabar-web`.
 - revisar warnings de SSR com `<Navigate>`
 - continuar a extração do backend próprio do `MeuCuiabar`
 - criar a operação de SEO própria do `ProRefeição` no Search Console e acompanhar a indexação do novo host
+- iniciar a indexação e o acompanhamento de descoberta orgânica de `https://burgersnsmoke.com/` como marca separada
+- acompanhar no Search Console a queda dos relatórios de canonical conflitante e de URLs alternativas de `blog`, `agenda`, `crm.cuiabar.com` e aliases antigos
 - concluir a documentação institucional e o espelhamento no Wiki do GitHub
 - ativar o Wiki do repositório no GitHub para publicar as páginas já preparadas em `docs/wiki/`
 - manter a política de segredos fora da árvore pública do repositório
@@ -64,3 +68,4 @@ O repositório oficial é `GHCO-OS/cuiabar-web`.
 - publicar a documentação oficial no Wiki do repositório
 - concluir o merge da branch de consolidação na `main`
 - evoluir o portal de entrada da marca com refinamento visual e acompanhamento dos sinais de navegação e indexação nas novas rotas `/presencial` e `/expresso`
+- operar `Burger N' Smoke` como frente separada, mantendo o burger legado apenas como arquivo histórico

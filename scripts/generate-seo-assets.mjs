@@ -2,7 +2,7 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import seoRoutesJson from '../src/data/seoRoutes.json' with { type: 'json' };
-import burgerMenuJson from '../src/data/burgerMenu.json' with { type: 'json' };
+import burgerNSmokeJson from '../src/data/burgerNSmoke.json' with { type: 'json' };
 import menuData from '../src/data/menu.json' with { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -10,26 +10,23 @@ const __dirname = path.dirname(__filename);
 const distDir = path.resolve(__dirname, '../dist');
 const ssrDir = path.resolve(__dirname, '../.ssr');
 
-const burgerMenu = burgerMenuJson;
 const seoConfig = structuredClone(seoRoutesJson);
+const burgerNSmokeBrand = {
+  ...burgerNSmokeJson.brand,
+  origin: burgerNSmokeJson.origin,
+  instagramUrl: burgerNSmokeJson.instagramUrl,
+};
+const burgerNSmokeCombos = burgerNSmokeJson.combos;
+const burgerNSmokeMenuItems = burgerNSmokeJson.menuItems;
 
-if (seoConfig.routes['/burguer']) {
-  seoConfig.routes['/burguer'] = {
-    ...seoConfig.routes['/burguer'],
-    image: burgerMenu.ogImage,
-    imageAlt: burgerMenu.ogImageAlt,
-    schema: [],
+if (seoConfig.routes['/burger-n-smoke']) {
+  seoConfig.routes['/burger-n-smoke'] = {
+    ...seoConfig.routes['/burger-n-smoke'],
+    image: burgerNSmokeBrand.ogImage,
+    imageAlt: burgerNSmokeBrand.ogImageAlt,
+    siteName: "Burger N' Smoke",
+    twitterHandle: '@burgernsmoke',
   };
-}
-
-for (const aliasPath of ['/burger', '/burguer-cuiabar']) {
-  if (seoConfig.routes[aliasPath]) {
-    seoConfig.routes[aliasPath] = {
-      ...seoConfig.routes[aliasPath],
-      image: burgerMenu.ogImage,
-      imageAlt: burgerMenu.ogImageAlt,
-    };
-  }
 }
 
 const siteOrigin = seoConfig.siteOrigin;
@@ -39,7 +36,6 @@ const buildDate = new Date().toISOString().slice(0, 10);
 const siteName = 'Villa Cuiabar';
 const twitterHandle = '@cuiabar';
 const menuSections = menuData;
-const burgerCanonicalUrl = 'https://burger.cuiabar.com/';
 const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION?.trim();
 
 const escapeHtml = (value) =>
@@ -76,8 +72,16 @@ const toAbsoluteUrl = (value) => {
   return `${siteOrigin}${value.startsWith('/') ? value : `/${value}`}`;
 };
 
+const normalizeCanonicalPath = (value) => {
+  if (value === '/') {
+    return '/';
+  }
+
+  return `${String(value).replace(/\/+$/, '')}/`;
+};
+
 const buildCanonicalUrl = (routePath, routeSeo) =>
-  routeSeo.canonicalUrl ?? `${siteOrigin}${routeSeo.canonicalPath ?? (routePath === '/' ? '/' : routePath)}`;
+  routeSeo.canonicalUrl ?? `${siteOrigin}${normalizeCanonicalPath(routeSeo.canonicalPath ?? routePath)}`;
 
 const normalizePrice = (value) => {
   if (!value) {
@@ -151,48 +155,48 @@ const buildMenuStructuredData = () => {
   };
 };
 
-const buildBurgerStructuredData = () => ({
+const buildBurgerNSmokeStructuredData = () => ({
   '@context': 'https://schema.org',
   '@type': 'Menu',
-  name: 'Cardapio Burger Cuiabar',
-  url: burgerCanonicalUrl,
+  name: "Cardapio Burger N' Smoke",
+  url: `${burgerNSmokeBrand.origin}/`,
   inLanguage: 'pt-BR',
-  description: 'Landing oficial do Burger Cuiabar com burgers, favoritos da casa e combos para pedir agora.',
+  description: "Landing oficial do Burger N' Smoke com burgers autorais, combos e leitura pensada para pedido rapido.",
   hasMenuSection: [
     {
       '@type': 'MenuSection',
       name: 'Burgers',
-      hasMenuItem: burgerMenu.burgers.map((item) => ({
+      hasMenuItem: burgerNSmokeMenuItems.map((item) => ({
         '@type': 'MenuItem',
         name: item.name,
-        description: `${item.description} ${item.tagline}`.trim(),
-        image: toAbsoluteUrl(item.image),
-        offers: buildOffer(normalizePrice(item.storePrice)),
+        description: `${item.category}. ${item.description}`.trim(),
+        image: `${burgerNSmokeBrand.origin}${item.image}`,
+        offers: buildOffer(normalizePrice(item.price)),
       })),
     },
     {
       '@type': 'MenuSection',
       name: 'Combos',
-      hasMenuItem: burgerMenu.combos.map((item) => ({
+      hasMenuItem: burgerNSmokeCombos.map((item) => ({
         '@type': 'MenuItem',
         name: item.name,
-        description: `${item.description} ${item.note}`.trim(),
-        offers: buildOffer(normalizePrice(item.storePrice)),
+        description: `${item.note}. ${item.description}`.trim(),
+        offers: buildOffer(normalizePrice(item.price)),
       })),
     },
   ],
 });
 
-const buildBurgerFaqStructuredData = () => ({
+const buildBurgerNSmokeFaqStructuredData = () => ({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'Onde eu peco Burger Cuiabar?',
+      name: "Onde eu peco no Burger N' Smoke?",
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'O pedido pode ser feito no site oficial burger.cuiabar.com, com apoio adicional no iFood e na 99Food.',
+        text: "O caminho mais direto e chamar no WhatsApp oficial ou seguir para os canais da marca a partir do proprio site.",
       },
     },
     {
@@ -200,23 +204,23 @@ const buildBurgerFaqStructuredData = () => ({
       name: 'Quais sao os burgers mais pedidos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'O Cuiabar, O Brabo e O Colosso aparecem como destaques para quem quer decidir rapido.',
+        text: 'O Bruto, O Defumado e O Colosso puxam a frente para quem quer resolver a fome sem pensar demais.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Tem combo pronto?',
+      name: 'Tem retirada no local?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sim. Combo Raiz e Combo Cuiabar permitem escolher frita ou bebida lata. O Combo Brabo ja vem com frita e bebida.',
+        text: 'Sim. A operacao trabalha com retirada e delivery noturno em Campinas.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Qual burger escolher se eu quiser frango?',
+      name: 'A marca tambem aparece em apps?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'O Crocante e a opcao direta para frango empanado. O Insano entrega versao dupla com honey mustard para quem quer uma escolha mais intensa.',
+        text: 'Sim. A ideia da landing e organizar a entrada da marca e depois apontar para os canais de pedido ativos.',
       },
     },
   ],
@@ -227,8 +231,8 @@ const buildRouteSpecificSchemas = (routePath) => {
     return [buildMenuStructuredData()];
   }
 
-  if (routePath === '/burguer') {
-    return [buildBurgerStructuredData(), buildBurgerFaqStructuredData()];
+  if (routePath === '/burger-n-smoke') {
+    return [buildBurgerNSmokeStructuredData(), buildBurgerNSmokeFaqStructuredData()];
   }
 
   return [];
@@ -288,6 +292,8 @@ const injectRouteMetadata = (html, routePath, routeSeo, prerenderedMarkup = '') 
   const canonicalUrl = buildCanonicalUrl(routePath, routeSeo);
   const ogType = routeSeo.type || 'website';
   const robots = routeSeo.robots || 'index,follow,max-image-preview:large';
+  const routeSiteName = routeSeo.siteName || siteName;
+  const routeTwitterHandle = routeSeo.twitterHandle || twitterHandle;
   const schemas = [
     buildWebPageSchema(routePath, routeSeo),
     ...buildRouteSpecificSchemas(routePath),
@@ -306,11 +312,11 @@ const injectRouteMetadata = (html, routePath, routeSeo, prerenderedMarkup = '') 
   output = upsertTag(output, /<meta\s+property="og:image"\s+content=".*?"\s*\/?>/i, `<meta property="og:image" content="${escapeHtml(image)}" />`);
   output = upsertTag(output, /<meta\s+property="og:image:alt"\s+content=".*?"\s*\/?>/i, `<meta property="og:image:alt" content="${escapeHtml(imageAlt)}" />`);
   output = upsertTag(output, /<meta\s+property="og:image:secure_url"\s+content=".*?"\s*\/?>/i, `<meta property="og:image:secure_url" content="${escapeHtml(image)}" />`);
-  output = upsertTag(output, /<meta\s+property="og:site_name"\s+content=".*?"\s*\/?>/i, `<meta property="og:site_name" content="${escapeHtml(siteName)}" />`);
+  output = upsertTag(output, /<meta\s+property="og:site_name"\s+content=".*?"\s*\/?>/i, `<meta property="og:site_name" content="${escapeHtml(routeSiteName)}" />`);
   output = upsertTag(output, /<meta\s+property="og:type"\s+content=".*?"\s*\/?>/i, `<meta property="og:type" content="${escapeHtml(ogType)}" />`);
   output = upsertTag(output, /<meta\s+property="og:url"\s+content=".*?"\s*\/?>/i, `<meta property="og:url" content="${escapeHtml(canonicalUrl)}" />`);
   output = upsertTag(output, /<meta\s+name="twitter:card"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:card" content="summary_large_image" />`);
-  output = upsertTag(output, /<meta\s+name="twitter:site"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:site" content="${escapeHtml(twitterHandle)}" />`);
+  output = upsertTag(output, /<meta\s+name="twitter:site"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:site" content="${escapeHtml(routeTwitterHandle)}" />`);
   output = upsertTag(output, /<meta\s+name="twitter:title"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:title" content="${escapeHtml(title)}" />`);
   output = upsertTag(output, /<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:description" content="${escapeHtml(description)}" />`);
   output = upsertTag(output, /<meta\s+name="twitter:image"\s+content=".*?"\s*\/?>/i, `<meta name="twitter:image" content="${escapeHtml(image)}" />`);

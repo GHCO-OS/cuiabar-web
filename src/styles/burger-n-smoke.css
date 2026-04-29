@@ -1,0 +1,769 @@
+@font-face {
+  font-family: 'Ganky';
+  src: url('/burger-n-smoke/fonts/Ganky-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+:root {
+  --smoke-bg: #360b0d;
+  --smoke-bg-soft: #511215;
+  --smoke-bg-deep: #120708;
+  --smoke-panel: rgba(20, 8, 9, 0.86);
+  --smoke-panel-soft: rgba(255, 251, 214, 0.06);
+  --smoke-border: rgba(255, 251, 214, 0.12);
+  --smoke-border-strong: rgba(194, 83, 67, 0.42);
+  --smoke-text: #fffbd6;
+  --smoke-text-soft: rgba(255, 251, 214, 0.74);
+  --smoke-text-muted: rgba(255, 251, 214, 0.56);
+  --smoke-accent: #b13931;
+  --smoke-accent-soft: #7a2020;
+  --smoke-shadow: 0 34px 80px -48px rgba(0, 0, 0, 0.82);
+}
+
+.smoke-page {
+  min-height: 100vh;
+  color: var(--smoke-text);
+  background:
+    radial-gradient(circle at top left, rgba(177, 57, 49, 0.2), transparent 26%),
+    radial-gradient(circle at 85% 12%, rgba(255, 251, 214, 0.08), transparent 20%),
+    linear-gradient(180deg, #360b0d 0%, #220809 52%, #0f0607 100%);
+}
+
+.smoke-shell {
+  width: min(1200px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.smoke-wordmark {
+  width: min(100%, 28rem);
+  height: auto;
+}
+
+.smoke-nav {
+  position: sticky;
+  top: 1rem;
+  z-index: 50;
+  padding-top: 1rem;
+}
+
+.smoke-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--smoke-border);
+  border-radius: 1.35rem;
+  background: rgba(12, 6, 7, 0.76);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--smoke-shadow);
+}
+
+.smoke-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--smoke-text-muted);
+}
+
+.smoke-nav-links a:hover {
+  color: var(--smoke-text);
+}
+
+.smoke-link-button,
+.smoke-cta,
+.smoke-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.8rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.smoke-cta {
+  color: var(--smoke-text);
+  background: linear-gradient(135deg, #b13931 0%, #7a2020 100%);
+  border: 1px solid rgba(194, 83, 67, 0.55);
+  box-shadow: 0 20px 44px -28px rgba(177, 57, 49, 0.7);
+}
+
+.smoke-ghost {
+  color: var(--smoke-text);
+  background: rgba(255, 251, 214, 0.04);
+  border: 1px solid var(--smoke-border);
+}
+
+.smoke-link-button:hover,
+.smoke-cta:hover,
+.smoke-ghost:hover {
+  transform: translateY(-2px);
+}
+
+.smoke-cta:hover {
+  background: linear-gradient(135deg, #cf4d44 0%, #8b2725 100%);
+}
+
+.smoke-ghost:hover,
+.smoke-link-button:hover {
+  border-color: rgba(255, 251, 214, 0.24);
+  background: rgba(255, 251, 214, 0.08);
+}
+
+.smoke-hero {
+  padding: 2.5rem 0 3rem;
+}
+
+.smoke-hero-card,
+.smoke-panel,
+.smoke-statement,
+.smoke-footer {
+  border: 1px solid var(--smoke-border);
+  border-radius: 2rem;
+  background: var(--smoke-panel);
+  box-shadow: var(--smoke-shadow);
+}
+
+.smoke-hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.smoke-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--smoke-text-muted);
+}
+
+.smoke-eyebrow::before {
+  content: '';
+  width: 2rem;
+  height: 2px;
+  background: var(--smoke-accent);
+}
+
+.smoke-display {
+  font-family: 'Ganky', 'Trebuchet MS', sans-serif;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+}
+
+.smoke-hero-title {
+  max-width: 12ch;
+  font-size: clamp(3.4rem, 11vw, 7rem);
+  line-height: 0.88;
+}
+
+.smoke-hero-copy p,
+.smoke-section-copy p,
+.smoke-card-copy p,
+.smoke-location-copy p,
+.smoke-faq-item p,
+.smoke-review p,
+.smoke-footer p {
+  max-width: 60ch;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--smoke-text-soft);
+}
+
+.smoke-pill-row,
+.smoke-actions,
+.smoke-stat-grid,
+.smoke-info-grid,
+.smoke-location-actions,
+.smoke-footer-links,
+.smoke-delivery-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.smoke-pill {
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--smoke-border);
+  border-radius: 999px;
+  background: rgba(255, 251, 214, 0.04);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--smoke-text);
+}
+
+.smoke-actions {
+  margin-top: 2rem;
+}
+
+.smoke-disclaimer {
+  margin-top: 1.5rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--smoke-border-strong);
+  border-radius: 1.25rem;
+  background: rgba(177, 57, 49, 0.14);
+}
+
+.smoke-disclaimer strong {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--smoke-text);
+}
+
+.smoke-disclaimer p {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--smoke-text-soft);
+}
+
+.smoke-hero-visual {
+  display: grid;
+  gap: 1rem;
+}
+
+.smoke-hero-image-frame {
+  position: relative;
+  overflow: hidden;
+  min-height: 26rem;
+  border: 1px solid var(--smoke-border);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at center, rgba(177, 57, 49, 0.32), transparent 52%),
+    linear-gradient(180deg, rgba(255, 251, 214, 0.02), rgba(0, 0, 0, 0.22));
+}
+
+.smoke-hero-image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.smoke-hero-note {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  max-width: 15rem;
+  padding: 1rem;
+  border: 1px solid var(--smoke-border);
+  border-radius: 1.2rem;
+  background: rgba(8, 4, 5, 0.84);
+}
+
+.smoke-hero-note strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--smoke-text);
+}
+
+.smoke-hero-note span {
+  display: block;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--smoke-text-soft);
+}
+
+.smoke-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.smoke-stat-card {
+  padding: 1rem;
+  border: 1px solid var(--smoke-border);
+  border-radius: 1.35rem;
+  background: rgba(255, 251, 214, 0.05);
+}
+
+.smoke-stat-value {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-family: 'Ganky', 'Trebuchet MS', sans-serif;
+  font-size: clamp(1.65rem, 4vw, 2.5rem);
+  line-height: 1;
+  color: var(--smoke-text);
+}
+
+.smoke-stat-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--smoke-text-muted);
+}
+
+.smoke-strip {
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 251, 214, 0.08);
+  border-bottom: 1px solid rgba(255, 251, 214, 0.08);
+  background: rgba(81, 18, 21, 0.68);
+}
+
+.smoke-strip-track {
+  display: flex;
+  gap: 2.5rem;
+  min-width: max-content;
+  padding: 1rem 0;
+  animation: smoke-marquee 28s linear infinite;
+}
+
+.smoke-strip-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--smoke-text);
+}
+
+.smoke-strip-item::before {
+  content: '•';
+  color: var(--smoke-accent);
+}
+
+.smoke-section {
+  padding: 4.5rem 0;
+}
+
+.smoke-section-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 1.5rem;
+}
+
+.smoke-panel {
+  padding: 1.75rem;
+}
+
+.smoke-panel--image {
+  overflow: hidden;
+  min-height: 100%;
+}
+
+.smoke-panel--image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.smoke-section-title {
+  max-width: 14ch;
+  font-size: clamp(2.35rem, 5vw, 4rem);
+  line-height: 0.94;
+}
+
+.smoke-section-copy + .smoke-info-grid,
+.smoke-section-copy + .smoke-menu-grid {
+  margin-top: 1.6rem;
+}
+
+.smoke-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.smoke-info-card {
+  padding: 1rem;
+  border: 1px solid var(--smoke-border);
+  border-radius: 1.25rem;
+  background: rgba(255, 251, 214, 0.04);
+}
+
+.smoke-info-card strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--smoke-text);
+}
+
+.smoke-info-card span {
+  display: block;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--smoke-text-soft);
+}
+
+.smoke-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.smoke-menu-card {
+  overflow: hidden;
+  border: 1px solid var(--smoke-border);
+  border-radius: 1.6rem;
+  background: rgba(11, 5, 6, 0.86);
+}
+
+.smoke-menu-image {
+  position: relative;
+  aspect-ratio: 4 / 3.5;
+  overflow: hidden;
+}
+
+.smoke-menu-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.smoke-badge {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(177, 57, 49, 0.88);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--smoke-text);
+}
+
+.smoke-card-copy {
+  padding: 1.25rem;
+}
+
+.smoke-card-kicker {
+  display: block;
+  margin-bottom: 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--smoke-text-muted);
+}
+
+.smoke-card-title {
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  line-height: 0.98;
+}
+
+.smoke-card-copy p {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.smoke-price {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0.65rem 0.95rem;
+  border: 1px solid var(--smoke-border-strong);
+  border-radius: 999px;
+  background: rgba(177, 57, 49, 0.12);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--smoke-text);
+}
+
+.smoke-combo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 1rem;
+}
+
+.smoke-combo-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+  gap: 1rem;
+  padding: 1.4rem;
+}
+
+.smoke-combo-hero-image {
+  overflow: hidden;
+  border-radius: 1.5rem;
+  min-height: 20rem;
+  background: rgba(255, 251, 214, 0.04);
+}
+
+.smoke-combo-hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.smoke-combo-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.smoke-side-card {
+  padding: 1.2rem;
+}
+
+.smoke-side-card p,
+.smoke-occasion-card p,
+.smoke-faq-item p,
+.smoke-location-item span,
+.smoke-location-copy p,
+.smoke-footer small {
+  margin-top: 0.65rem;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--smoke-text-soft);
+}
+
+.smoke-occasion-grid,
+.smoke-review-grid,
+.smoke-faq-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.smoke-occasion-card,
+.smoke-review,
+.smoke-faq-item {
+  padding: 1.35rem;
+}
+
+.smoke-review strong {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--smoke-text-muted);
+}
+
+.smoke-stars {
+  color: #f7c34a;
+  letter-spacing: 0.24em;
+}
+
+.smoke-statement {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.smoke-statement h2 {
+  max-width: 14ch;
+  margin: 0 auto;
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  line-height: 0.9;
+}
+
+.smoke-statement p {
+  max-width: 46rem;
+  margin: 1rem auto 0;
+}
+
+.smoke-location-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+  gap: 1rem;
+}
+
+.smoke-location-card {
+  min-height: 100%;
+  padding: 1.75rem;
+}
+
+.smoke-location-items {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.smoke-location-item {
+  padding: 1rem;
+  border: 1px solid var(--smoke-border);
+  border-radius: 1.15rem;
+  background: rgba(255, 251, 214, 0.04);
+}
+
+.smoke-location-item strong {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--smoke-text);
+}
+
+.smoke-location-actions,
+.smoke-footer-links {
+  margin-top: 1.5rem;
+}
+
+.smoke-map-card {
+  overflow: hidden;
+  min-height: 100%;
+  padding: 0;
+}
+
+.smoke-map-visual {
+  position: relative;
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at center, rgba(177, 57, 49, 0.22), transparent 35%),
+    linear-gradient(145deg, rgba(28, 12, 13, 0.98), rgba(51, 11, 13, 0.92));
+}
+
+.smoke-map-visual::before,
+.smoke-map-visual::after {
+  content: '';
+  position: absolute;
+  inset: 1rem;
+  border: 1px solid rgba(255, 251, 214, 0.08);
+  border-radius: 1.4rem;
+}
+
+.smoke-map-visual::after {
+  inset: auto 1.8rem 1.8rem;
+  height: 5rem;
+  border: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.38));
+}
+
+.smoke-map-copy {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.smoke-map-copy h3 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.95;
+}
+
+.smoke-map-copy p {
+  max-width: 26rem;
+  margin: 0.9rem auto 0;
+}
+
+.smoke-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 4rem auto 0;
+  padding: 1.4rem 1.5rem;
+}
+
+.smoke-footer small {
+  margin-top: 0;
+}
+
+@keyframes smoke-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 1100px) {
+  .smoke-nav-links {
+    display: none;
+  }
+
+  .smoke-hero-card,
+  .smoke-section-grid,
+  .smoke-combo-grid,
+  .smoke-location-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .smoke-combo-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .smoke-menu-grid,
+  .smoke-review-grid,
+  .smoke-faq-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .smoke-info-grid,
+  .smoke-occasion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .smoke-shell {
+    width: min(100% - 1rem, 1200px);
+  }
+
+  .smoke-hero-card,
+  .smoke-panel,
+  .smoke-statement,
+  .smoke-location-card,
+  .smoke-footer {
+    border-radius: 1.4rem;
+  }
+
+  .smoke-hero-card,
+  .smoke-panel,
+  .smoke-location-card {
+    padding: 1.15rem;
+  }
+
+  .smoke-hero-image-frame {
+    min-height: 18rem;
+  }
+
+  .smoke-stat-grid,
+  .smoke-menu-grid,
+  .smoke-review-grid,
+  .smoke-faq-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .smoke-hero-note {
+    position: static;
+    margin: 1rem;
+  }
+
+  .smoke-footer {
+    justify-content: flex-start;
+  }
+}

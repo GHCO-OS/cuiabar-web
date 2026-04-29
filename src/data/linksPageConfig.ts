@@ -13,7 +13,7 @@ export const linksPageConfig = {
   institutionalIntro:
     'Uma página direta, oficial e pensada para quem quer resolver rápido: reservar, pedir, falar com a equipe ou confirmar horários.',
   featuredChannelLabel: 'Canal em destaque',
-  featuredChannelNote: 'Receba promoções, agenda, novidades da casa e avisos importantes em primeira mão.',
+  featuredChannelNote: 'Receba promoções, novidades da casa e avisos importantes em primeira mão.',
   whatsappChannelUrl: 'https://whatsapp.com/channel/0029VbAcHLXFSAsxCt6lly0a',
   restaurantWhatsappUrl: 'https://wa.me/551933058878',
   directOrderUrl: 'https://expresso.cuiabar.com',
@@ -69,7 +69,7 @@ export const linksPageConfig = {
       emoji: '📣',
       eyebrow: 'Novidades',
       title: 'Entrar no canal do WhatsApp',
-      subtitle: 'Promoções, avisos, eventos e atualizações oficiais.',
+      subtitle: 'Promoções, avisos e atualizações oficiais.',
       href: 'https://whatsapp.com/channel/0029VbAcHLXFSAsxCt6lly0a',
       isFeatured: true,
     },

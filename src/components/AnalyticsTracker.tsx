@@ -26,8 +26,8 @@ const classifyInternalPath = (pathname: string) => {
     return { eventName: 'open_prorefeicao_page' };
   }
 
-  if (normalizedPath === '/agenda' || normalizedPath.startsWith('/agenda/')) {
-    return { eventName: normalizedPath === '/agenda' ? 'open_agenda_page' : 'open_agenda_event_page' };
+  if ((hostname === 'burgersnsmoke.com' || hostname === 'www.burgersnsmoke.com') && normalizedPath === '/') {
+    return { eventName: 'open_burger_n_smoke_page' };
   }
 
   switch (normalizedPath) {
@@ -37,8 +37,8 @@ const classifyInternalPath = (pathname: string) => {
       return { eventName: 'open_menu_page' };
     case '/pesquisa':
       return { eventName: 'open_pesquisa_page' };
-    case '/burguer':
-      return { eventName: 'open_burguer_page' };
+    case '/burger-n-smoke':
+      return { eventName: 'open_burger_n_smoke_page' };
     case '/prorefeicao':
       return { eventName: 'open_prorefeicao_page' };
     case '/reservas':
@@ -60,13 +60,13 @@ const getContentName = (pathname: string) => {
     return 'prorefeicao';
   }
 
-  if (normalizedPath === '/agenda' || normalizedPath.startsWith('/agenda/')) {
-    return 'agenda_musica_ao_vivo';
+  if ((hostname === 'burgersnsmoke.com' || hostname === 'www.burgersnsmoke.com') && normalizedPath === '/') {
+    return 'burger_n_smoke';
   }
 
   switch (normalizedPath) {
-    case '/burguer':
-      return 'burguer_cuiabar';
+    case '/burger-n-smoke':
+      return 'burger_n_smoke';
     case '/prorefeicao':
       return 'prorefeicao';
     case '/menu':
@@ -81,6 +81,9 @@ export const AnalyticsTracker = () => {
   const normalizedPath = normalizePathname(location.pathname);
   const isProRefeicaoHost =
     typeof window !== 'undefined' && window.location.hostname.toLowerCase() === 'prorefeicao.cuiabar.com';
+  const isBurgerNSmokeHost =
+    typeof window !== 'undefined' &&
+    ['burgersnsmoke.com', 'www.burgersnsmoke.com'].includes(window.location.hostname.toLowerCase());
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -98,27 +101,25 @@ export const AnalyticsTracker = () => {
       return;
     }
 
+    if (isBurgerNSmokeHost && normalizedPath === '/') {
+      trackViewContent('burger_n_smoke', { content_category: 'hamburgueria' });
+      return;
+    }
+
     switch (normalizedPath) {
       case '/menu':
         trackViewContent('menu_villa_cuiabar', { content_category: 'menu' });
         break;
-      case '/agenda':
-        trackViewContent('agenda_musica_ao_vivo', { content_category: 'agenda' });
-        break;
-      case '/burguer':
-        trackViewContent('burguer_cuiabar', { content_category: 'burguer' });
+      case '/burger-n-smoke':
+        trackViewContent('burger_n_smoke', { content_category: 'hamburgueria' });
         break;
       case '/prorefeicao':
         trackViewContent('prorefeicao', { content_category: 'corporativo' });
         break;
       default:
-        if (normalizedPath.startsWith('/agenda/')) {
-          trackViewContent('agenda_event_page', { content_category: 'agenda_event' });
-          break;
-        }
         break;
     }
-  }, [isProRefeicaoHost, normalizedPath]);
+  }, [isBurgerNSmokeHost, isProRefeicaoHost, normalizedPath]);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {

@@ -17,13 +17,13 @@ const expressFronts = [
     note: 'Ativa todos os dias, das 11h às 14:30.',
   },
   {
-    title: 'Burger Cuiabar',
+    title: "Burger N' Smoke",
     eyebrow: 'Hamburgueria',
-    description: 'Linha própria para smash e burgers da casa, com loja dedicada, acesso ao iFood e operação noturna.',
-    primaryLabel: 'Ver página do burger',
-    primaryHref: '/burguer',
-    secondaryLabel: 'Pedir no iFood',
-    secondaryHref: siteConfig.burguerOrderLinks.ifood,
+    description: 'Marca própria da hamburgueria, com identidade separada, landing dedicada e operação noturna.',
+    primaryLabel: 'Abrir site da marca',
+    primaryHref: siteConfig.burgerNSmokeOrigin,
+    secondaryLabel: 'Abrir Instagram',
+    secondaryHref: siteConfig.burgerNSmokeOrderLinks.instagram,
     note: 'Operação noturna de quarta a sábado, a partir das 18h.',
   },
 ];
@@ -32,8 +32,8 @@ const deliveryChannels = [
   { name: 'Site próprio', href: siteConfig.orderLinks.direct, note: 'Canal direto da marmitaria e pratos do dia.' },
   { name: 'iFood', href: siteConfig.orderLinks.ifood, note: 'Loja principal da casa no delivery.' },
   { name: '99Food', href: siteConfig.orderLinks.food99, note: 'Alternativa adicional de pedido online.' },
-  { name: 'Burger Cuiabar', href: siteConfig.burguerOrderLinks.direct, note: 'Loja própria da hamburgueria.' },
-  { name: 'Burger no iFood', href: siteConfig.burguerOrderLinks.ifood, note: 'Acesso rápido ao burger na plataforma.' },
+  { name: "Burger N' Smoke", href: siteConfig.burgerNSmokeOrigin, note: 'Site e vitrine própria da hamburgueria.' },
+  { name: 'Instagram do Burger N\' Smoke', href: siteConfig.burgerNSmokeOrderLinks.instagram, note: 'Canal direto da marca para novidades e contato.' },
 ];
 
 const serviceWindows = [
@@ -58,16 +58,16 @@ const ExpressoPage = () => {
               Delivery organizado por frente e por canal.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-steel sm:text-lg">
-              A entrada do Expresso reúne marmitaria, hamburgueria e todos os canais ativos de pedido para quem quer sair do clique e ir
-              direto para a conversão.
+              A entrada do Expresso reúne marmitaria, a nova frente Burger N&apos; Smoke e os canais ativos de pedido para quem quer sair do
+              clique e ir direto para a conversão.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a className="btn-primary" href={siteConfig.orderLinks.direct}>
                 Pedir marmitaria
               </a>
-              <Link className="btn-secondary" to="/burguer">
-                Abrir burger
-              </Link>
+              <a className="btn-secondary" href={siteConfig.burgerNSmokeOrigin}>
+                Abrir Burger N&apos; Smoke
+              </a>
             </div>
           </div>
 

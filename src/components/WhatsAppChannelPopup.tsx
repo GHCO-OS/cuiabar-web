@@ -90,7 +90,7 @@ export const WhatsAppChannelPopup = ({ href }: WhatsAppChannelPopupProps) => {
         </div>
         <div className="space-y-5 px-6 py-6 sm:px-8 sm:py-8">
           <p className="text-lg leading-relaxed text-cocoa/80">
-            Receba no celular promoções, descontos, ofertas, cardápio e a agenda de eventos do restaurante.
+            Receba no celular promocoes, descontos, ofertas, cardapio e avisos oficiais do restaurante.
           </p>
           <div className="rounded-[1.5rem] border border-cocoa/10 bg-white/70 p-4 text-base text-cocoa/75">
             🔥 Avisos rápidos, sem precisar procurar no Instagram ou no cardápio.

@@ -17,7 +17,7 @@ export const GoogleCalendarEmbed = ({ src, title, description }: GoogleCalendarE
           <iframe
             src={src}
             className="absolute inset-0 h-full w-full"
-            title="Agenda de shows Villa Cuiabar"
+            title="Calendario da casa Villa Cuiabar"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />
@@ -25,10 +25,10 @@ export const GoogleCalendarEmbed = ({ src, title, description }: GoogleCalendarE
       ) : (
         <div className="flex min-h-64 items-center justify-center bg-sand/15 px-6 py-12 text-center">
           <div className="max-w-xl">
-            <p className="font-heading text-2xl text-cocoa">Agenda de shows em atualização</p>
+            <p className="font-heading text-2xl text-cocoa">Calendario em atualizacao</p>
             <p className="mt-3 text-steel">
               Defina uma URL publica do Google Calendar em <code>src/data/siteConfig.ts</code> para
-              exibir a agenda automaticamente no site publicado.
+              exibir o calendario automaticamente no site publicado.
             </p>
           </div>
         </div>

@@ -11,14 +11,14 @@ export const Layout = ({ children }: PropsWithChildren) => {
   const hostname = typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '';
   const normalizedPath = location.pathname.replace(/\/+$/, '') || '/';
   const isLinksRoute = ['/links', '/bio', '/acessos'].includes(normalizedPath);
-  const isBurgerHost = hostname === 'burger.cuiabar.com';
-  const isBurgerRoute = isBurgerHost || normalizedPath.startsWith('/burguer') || normalizedPath.startsWith('/burger');
+  const isBurgerNSmokeHost = hostname === 'burgersnsmoke.com' || hostname === 'www.burgersnsmoke.com';
+  const isBurgerNSmokeRoute = isBurgerNSmokeHost || normalizedPath === '/burger-n-smoke';
   const isReservationsRoute = normalizedPath === '/reservas';
   const isProRefeicaoHost = hostname === 'prorefeicao.cuiabar.com';
   const isProRefeicaoSurface = isProRefeicaoHost || normalizedPath === '/prorefeicao';
-  const isExperienceHubRoute = normalizedPath === '/' && !isProRefeicaoHost;
+  const isExperienceHubRoute = normalizedPath === '/' && !isProRefeicaoHost && !isBurgerNSmokeHost;
 
-  if (isLinksRoute || isBurgerRoute || isProRefeicaoSurface || isExperienceHubRoute) {
+  if (isLinksRoute || isBurgerNSmokeRoute || isProRefeicaoSurface || isExperienceHubRoute) {
     return (
       <>
         <AnalyticsTracker />

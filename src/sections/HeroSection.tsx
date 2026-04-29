@@ -19,7 +19,7 @@ export const HeroSection = () => (
         Comida brasileira servida forte — todo dia.
       </h1>
       <p className="mt-5 max-w-xl text-lg text-steel">
-        Delivery no almoço, noites com música ao vivo e operação corporativa para empresas em Campinas. Três frentes, um só padrão de casa.
+        Almoco presencial, delivery e operacao corporativa para empresas em Campinas. Tres frentes, um so padrao de casa.
       </p>
       <div className="mt-7 overflow-hidden rounded-[1.9rem] border border-[#d9b58a] bg-[linear-gradient(135deg,rgba(255,248,232,0.97),rgba(245,225,198,0.92))] p-5 shadow-[0_28px_60px_-38px_rgba(121,63,26,0.35)]">
         <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-terracotta">Almoço presencial</p>
@@ -80,7 +80,7 @@ export const HeroSection = () => (
           <div className="rounded-2xl bg-[linear-gradient(160deg,#fff6ea_0%,#f7e4d0_100%)] p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-terracotta">Ambiente próprio</p>
             <p className="mt-3 text-sm leading-relaxed text-steel">
-              Espaço familiar, clima acolhedor e estrutura preparada para almoço, encontros e noites com música ao vivo.
+              Espaco familiar, clima acolhedor e estrutura preparada para almoco, encontros e reservas da casa.
             </p>
           </div>
         </div>

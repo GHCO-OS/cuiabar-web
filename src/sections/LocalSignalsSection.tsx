@@ -9,7 +9,7 @@ export const LocalSignalsSection = () => (
       <SectionHeading
         eyebrow="Bairro e regiao"
         title="Villa Cuiabar no radar de Jardim Aurelia e Dunlop"
-        description="Paginas criadas para reforcar a associacao da casa com o bairro, o eixo da John Boyd Dunlop, reservas, espaco kids e musica ao vivo."
+        description="Paginas criadas para reforcar a associacao da casa com o bairro, o eixo da John Boyd Dunlop, reservas, espaco kids e almoco presencial."
       />
       <div className="mt-8 grid gap-4 lg:grid-cols-3">
         {localGuideList.map((guide, index) => (

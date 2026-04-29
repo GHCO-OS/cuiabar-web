@@ -1,6 +1,6 @@
 # Runbooks - indice
 
-Atualizado em: 2026-04-21
+Atualizado em: 2026-04-28
 
 ## Objetivo
 
@@ -9,6 +9,7 @@ Esta pasta agrupa runbooks e guias operacionais que antes ficavam soltos na raiz
 ## Conteudo
 
 - `BURGER-CARDAPIO-E-ASSETS.md`
+- `BURGER-N-SMOKE-SITE.md`
 - `DEPLOY-CLOUDFLARE.md`
 - `DEPLOY-RESERVAS-CLOUDFLARE.md`
 - `EMAIL-DELIVERABILITY.md`

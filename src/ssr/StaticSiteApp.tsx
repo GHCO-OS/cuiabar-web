@@ -8,11 +8,8 @@ import PedidosOnlinePage from '../pages/PedidosOnlinePage';
 import PesquisaPage from '../pages/PesquisaPage';
 import PresencialPage from '../pages/PresencialPage';
 import ReservasPage from '../pages/ReservasPage';
-import AgendaPage from '../pages/AgendaPage';
-import AgendaEventPage from '../pages/AgendaEventPage';
-import BlogSubdomainRedirectPage from '../pages/BlogSubdomainRedirectPage';
 import VagasPage from '../pages/VagasPage';
-import BurguerCuiabarPage from '../pages/BurguerCuiabarPage';
+import BurgerNSmokePage from '../pages/BurgerNSmokePage';
 import EspetariaCuiabarPage from '../pages/EspetariaCuiabarPage';
 import LinksPage from '../pages/LinksPage';
 import LocalGuidePage from '../pages/LocalGuidePage';
@@ -23,11 +20,7 @@ export const StaticSiteApp = () => (
       <Route path="/" element={<HomePage />} />
       <Route path="/presencial" element={<PresencialPage />} />
       <Route path="/expresso" element={<ExpressoPage />} />
-      <Route path="/agenda" element={<AgendaPage />} />
-      <Route path="/agenda/:eventSlug" element={<AgendaEventPage />} />
-      <Route path="/blog" element={<BlogSubdomainRedirectPage />} />
-      <Route path="/blog/:slug" element={<BlogSubdomainRedirectPage />} />
-      <Route path="/burguer" element={<BurguerCuiabarPage />} />
+      <Route path="/burger-n-smoke" element={<BurgerNSmokePage />} />
       <Route path="/espetaria" element={<EspetariaCuiabarPage />} />
       <Route path="/links" element={<LinksPage />} />
       <Route path="/menu" element={<MenuPage />} />
@@ -36,7 +29,6 @@ export const StaticSiteApp = () => (
       <Route path="/pesquisa" element={<PesquisaPage />} />
       <Route path="/reservas" element={<ReservasPage />} />
       <Route path="/restaurante-jardim-aurelia-campinas" element={<LocalGuidePage pageKey="jardimAureliaRestaurant" />} />
-      <Route path="/bar-jardim-aurelia-musica-ao-vivo" element={<LocalGuidePage pageKey="jardimAureliaBar" />} />
       <Route path="/restaurante-perto-do-enxuto-dunlop" element={<LocalGuidePage pageKey="enxutoDunlop" />} />
       <Route path="/vagas" element={<VagasPage />} />
     </Routes>

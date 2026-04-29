@@ -1,6 +1,6 @@
 import { siteConfig } from './siteConfig';
 
-export type LocalGuideKey = 'jardimAureliaRestaurant' | 'jardimAureliaBar' | 'enxutoDunlop';
+export type LocalGuideKey = 'jardimAureliaRestaurant' | 'enxutoDunlop';
 
 type LocalGuideCta = {
   label: string;
@@ -76,52 +76,6 @@ export const localGuides: Record<LocalGuideKey, LocalGuide> = {
     ctas: [
       { label: 'Reservar online', href: siteConfig.reservationPortalUrl, external: true },
       { label: 'Ver menu da casa', href: '/menu' },
-    ],
-  },
-  jardimAureliaBar: {
-    key: 'jardimAureliaBar',
-    path: '/bar-jardim-aurelia-musica-ao-vivo',
-    eyebrow: 'Bar e musica',
-    title: 'Bar no Jardim Aurelia com musica ao vivo, shows e reservas em Campinas',
-    description:
-      'Para quem busca bar no Jardim Aurelia com musica ao vivo, noites de shows, porcoes, drinks e reserva organizada, o Villa Cuiabar concentra bar completo, ambiente familiar e programacao presencial em Campinas.',
-    chips: ['Bar', 'Musicas ao vivo', 'Shows', 'Reservas'],
-    highlights: [
-      {
-        title: 'Noites com musica ao vivo e clima de encontro',
-        description: 'Sextas, sabados e domingos puxam a vocacao de bar e restaurante para quem quer jantar, beber bem e curtir a programacao ao vivo.',
-      },
-      {
-        title: 'Reservas para casal, grupos e aniversarios',
-        description: 'O portal de reservas ajuda a organizar chegada, tamanho da mesa e observacoes para encontros, comemoracoes e grupos maiores.',
-      },
-      {
-        title: 'Casa para familia e amigos',
-        description: 'Mesmo nas noites com shows, a operacao preserva o ambiente acolhedor de quem quer sair com criancas, amigos ou familia.',
-      },
-    ],
-    visitSignals: [
-      'Mencione a programacao da semana e reserve cedo para os dias com maior movimento.',
-      'O bar completo acompanha pratos, porcoes, burgers e menu principal da casa.',
-      `Bom ponto de encontro para quem esta no Jardim Aurelia, na Dunlop ou em bairros vizinhos de Campinas.`,
-    ],
-    faqs: [
-      {
-        question: 'Quando tem musica ao vivo no Villa Cuiabar?',
-        answer: 'O presencial com musica ao vivo acontece as sextas, sabados e domingos, com agenda divulgada nos canais oficiais da casa.',
-      },
-      {
-        question: 'Precisa reservar para os shows?',
-        answer: 'Nao e obrigatorio em todos os dias, mas a reserva online e a melhor forma de garantir mesa em noites mais disputadas.',
-      },
-      {
-        question: 'O ambiente serve so para bar?',
-        answer: 'Nao. O Villa Cuiabar funciona como bar e restaurante, com menu completo, bar, atendimento presencial e estrutura para familias.',
-      },
-    ],
-    ctas: [
-      { label: 'Abrir pagina de reservas', href: '/reservas' },
-      { label: 'Acompanhar agenda', href: '/' },
     ],
   },
   enxutoDunlop: {
