@@ -19,6 +19,7 @@ const burgerNSmokeBrand = {
   googleProfileUrl: burgerNSmokeJson.googleProfileUrl,
   ifoodUrl: burgerNSmokeJson.ifoodUrl,
   mapsUrl: burgerNSmokeJson.mapsUrl,
+  icon: burgerNSmokeJson.brand.mark,
 };
 const burgerNSmokeCombos = burgerNSmokeJson.combos;
 const burgerNSmokeMenuItems = burgerNSmokeJson.menuItems;
@@ -358,6 +359,7 @@ const injectRouteMetadata = (html, routePath, routeSeo, prerenderedMarkup = '') 
   const routeSiteName = routeSeo.siteName || siteName;
   const routeTwitterHandle = routeSeo.twitterHandle || twitterHandle;
   const isBurgerRoute = canonicalUrl.startsWith(burgerNSmokeBrand.origin);
+  const routeIcon = isBurgerRoute ? burgerNSmokeBrand.icon : '/favicon.png';
   const schemas = [
     buildWebPageSchema(routePath, routeSeo),
     ...buildRouteSpecificSchemas(routePath),
@@ -391,7 +393,14 @@ const injectRouteMetadata = (html, routePath, routeSeo, prerenderedMarkup = '') 
   output = upsertTag(output, /<meta\s+name="keywords"\s+content=".*?"\s*\/?>/i, `<meta name="keywords" content="${escapeHtml((routeSeo.keywords || []).join(', '))}" />`);
   output = upsertTag(output, /<meta\s+name="robots"\s+content=".*?"\s*\/?>/i, `<meta name="robots" content="${escapeHtml(robots)}" />`);
   output = upsertTag(output, /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/i, `<link rel="canonical" href="${escapeHtml(canonicalUrl)}" />`);
-  output = upsertTag(output, /<link\s+rel="apple-touch-icon"\s+href=".*?"\s*\/?>/i, '<link rel="apple-touch-icon" href="/favicon.png" />');
+  output = removeTag(output, /\s*<link[^>]*rel="icon"[^>]*>\n?/i);
+  output = removeTag(output, /\s*<link[^>]*rel="shortcut icon"[^>]*>\n?/i);
+  output = removeTag(output, /\s*<link[^>]*rel="apple-touch-icon"[^>]*>\n?/i);
+  output = output.replace(
+    '</head>',
+    () =>
+      `  <link rel="icon" href="${escapeHtml(routeIcon)}" />\n  <link rel="shortcut icon" href="${escapeHtml(routeIcon)}" />\n  <link rel="apple-touch-icon" href="${escapeHtml(routeIcon)}" />\n  </head>`,
+  );
 
   if (isBurgerRoute) {
     output = upsertTag(output, /<meta\s+name="geo\.region"\s+content=".*?"\s*\/?>/i, '<meta name="geo.region" content="BR-SP" />');

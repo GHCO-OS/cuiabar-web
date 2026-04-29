@@ -12,18 +12,24 @@ type BurgerNSmokeSeoPageProps = {
   pageKey: BurgerNSmokeSeoPageKey;
 };
 
+const smokeFavicon = burgerNSmokeBrand.mark;
+
 const BurgerNSmokeSeoPage = ({ pageKey }: BurgerNSmokeSeoPageProps) => {
   const page = burgerNSmokeSeoPages[pageKey];
   const featuredItems = burgerNSmokeMenuItems.filter((item) => page.featuredItemIds.includes(item.id));
   const relatedPages = Object.values(burgerNSmokeSeoPages).filter((item) => item.key !== pageKey);
 
-  useSeo(getRouteSeo(page.path));
+  useSeo({
+    ...getRouteSeo(page.path),
+    icon: smokeFavicon,
+    appleTouchIcon: smokeFavicon,
+  });
 
   return (
     <article className="smoke-page">
       <nav className="smoke-nav" aria-label={`Navegacao da pagina ${page.title}`}>
         <div className="smoke-shell smoke-nav-inner">
-          <a href={burgerNSmokeBrand.origin} aria-label="Abrir a home do Burger N' Smoke">
+          <a href={burgerNSmokeBrand.origin} aria-label="Abrir a home do Burger N' Smoke" className="smoke-nav-brand">
             <img src={burgerNSmokeBrand.wordmark} alt="Burger N' Smoke" className="smoke-wordmark" />
           </a>
           <div className="smoke-nav-links">
@@ -33,7 +39,7 @@ const BurgerNSmokeSeoPage = ({ pageKey }: BurgerNSmokeSeoPageProps) => {
               iFood
             </a>
           </div>
-          <a className="smoke-link-button smoke-cta" href={burgerNSmokeBrand.whatsappUrl} target="_blank" rel="noreferrer" aria-label="Pedir agora pelo WhatsApp do Burger N' Smoke">
+          <a className="smoke-link-button smoke-nav-cta" href={burgerNSmokeBrand.whatsappUrl} target="_blank" rel="noreferrer" aria-label="Pedir agora pelo WhatsApp do Burger N' Smoke">
             Pedir agora
           </a>
         </div>

@@ -18,6 +18,7 @@ import { getRouteSeo } from '../data/seo';
 import { useSeo } from '../hooks/useSeo';
 import '../styles/burger-n-smoke.css';
 const featuredItems = burgerNSmokeMenuItems.filter((item) => burgerNSmokeFeaturedIds.includes(item.id));
+const smokeFavicon = burgerNSmokeBrand.mark;
 
 const isBurgerNSmokeHost = () => {
   if (typeof window === 'undefined') {
@@ -33,31 +34,32 @@ const BurgerNSmokePage = () => {
 
   useSeo({
     ...getRouteSeo(burgerNSmokePreviewPath),
-    title: "Burger N' Smoke | Hamburgueria em Campinas para pedir a noite",
+    title: "Smoke N' Burger | Campinas",
     description:
       "Hamburgueria em Campinas com burgers autorais, smash burger, combos e pedido noturno no Jardim Aurelia. Peca pelo WhatsApp, iFood ou pelos canais oficiais da casa.",
     canonicalUrl: `${burgerNSmokeOrigin}/`,
     robots: onBrandHost ? 'index,follow,max-image-preview:large' : 'noindex,follow',
     siteName: "Burger N' Smoke",
     twitterHandle: '@burgernsmoke',
+    icon: smokeFavicon,
+    appleTouchIcon: smokeFavicon,
   });
 
   return (
     <article className="smoke-page">
       <nav className="smoke-nav" aria-label="Navegacao principal do Burger N' Smoke">
         <div className="smoke-shell smoke-nav-inner">
-          <a href="#topo" aria-label="Voltar ao topo do Burger N' Smoke">
+          <a href="#topo" aria-label="Voltar ao topo do Burger N' Smoke" className="smoke-nav-brand">
             <img src={burgerNSmokeBrand.wordmark} alt="Burger N' Smoke" className="smoke-wordmark" />
           </a>
           <div className="smoke-nav-links">
             <a href="#mais-pedidos">Mais pedidos</a>
             <a href="#combos">Combos</a>
             <a href="#cardapio">Cardapio</a>
-            <a href="#buscas-campinas">Campinas</a>
             <a href="#localizacao">Onde estamos</a>
           </div>
           <a
-            className="smoke-link-button smoke-cta"
+            className="smoke-link-button smoke-nav-cta"
             href={burgerNSmokeBrand.whatsappUrl}
             target="_blank"
             rel="noreferrer"

@@ -12,6 +12,8 @@ export type SeoConfig = {
   robots?: string;
   siteName?: string;
   twitterHandle?: string;
+  icon?: string;
+  appleTouchIcon?: string;
 };
 
 const DEFAULT_IMAGE = defaultSeoImage;
@@ -30,6 +32,8 @@ export const applySeo = ({
   robots = 'index,follow,max-image-preview:large',
   siteName = SITE_NAME,
   twitterHandle = TWITTER_HANDLE,
+  icon,
+  appleTouchIcon,
 }: SeoConfig) => {
   document.title = title;
 
@@ -83,4 +87,23 @@ export const applySeo = ({
     'content',
     image.startsWith('http') ? image : `${siteOrigin}${image.startsWith('/') ? image : `/${image}`}`,
   );
+
+  const ensureLink = (selector: string, rel: string) => {
+    let tag = document.querySelector<HTMLLinkElement>(selector);
+    if (!tag) {
+      tag = document.createElement('link');
+      tag.setAttribute('rel', rel);
+      document.head.appendChild(tag);
+    }
+    return tag;
+  };
+
+  if (icon) {
+    ensureLink('link[rel="icon"]', 'icon').setAttribute('href', icon);
+    ensureLink('link[rel="shortcut icon"]', 'shortcut icon').setAttribute('href', icon);
+  }
+
+  if (appleTouchIcon || icon) {
+    ensureLink('link[rel="apple-touch-icon"]', 'apple-touch-icon').setAttribute('href', appleTouchIcon ?? icon ?? '/favicon.png');
+  }
 };
