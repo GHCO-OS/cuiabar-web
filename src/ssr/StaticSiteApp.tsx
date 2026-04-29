@@ -10,6 +10,7 @@ import PresencialPage from '../pages/PresencialPage';
 import ReservasPage from '../pages/ReservasPage';
 import VagasPage from '../pages/VagasPage';
 import BurgerNSmokePage from '../pages/BurgerNSmokePage';
+import BurgerNSmokeSeoPage from '../pages/BurgerNSmokeSeoPage';
 import EspetariaCuiabarPage from '../pages/EspetariaCuiabarPage';
 import LinksPage from '../pages/LinksPage';
 import LocalGuidePage from '../pages/LocalGuidePage';
@@ -21,6 +22,10 @@ export const StaticSiteApp = () => (
       <Route path="/presencial" element={<PresencialPage />} />
       <Route path="/expresso" element={<ExpressoPage />} />
       <Route path="/burger-n-smoke" element={<BurgerNSmokePage />} />
+      <Route path="/hamburgueria-campinas" element={<BurgerNSmokeSeoPage pageKey="hamburgueriaCampinas" />} />
+      <Route path="/smash-burger-campinas" element={<BurgerNSmokeSeoPage pageKey="smashBurgerCampinas" />} />
+      <Route path="/burger-defumado-campinas" element={<BurgerNSmokeSeoPage pageKey="burgerDefumadoCampinas" />} />
+      <Route path="/delivery-burger-campinas" element={<BurgerNSmokeSeoPage pageKey="deliveryBurgerCampinas" />} />
       <Route path="/espetaria" element={<EspetariaCuiabarPage />} />
       <Route path="/links" element={<LinksPage />} />
       <Route path="/menu" element={<MenuPage />} />

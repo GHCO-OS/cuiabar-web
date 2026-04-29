@@ -384,6 +384,10 @@
   line-height: 0.94;
 }
 
+.smoke-section-title--wide {
+  max-width: 18ch;
+}
+
 .smoke-section-copy + .smoke-info-grid,
 .smoke-section-copy + .smoke-menu-grid {
   margin-top: 1.6rem;
@@ -552,10 +556,26 @@
   gap: 1rem;
 }
 
+.smoke-search-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
 .smoke-occasion-card,
 .smoke-review,
 .smoke-faq-item {
   padding: 1.35rem;
+}
+
+.smoke-search-card {
+  display: block;
+  padding: 1.35rem;
+}
+
+.smoke-search-card p {
+  margin-top: 0.75rem;
 }
 
 .smoke-review strong {
@@ -691,6 +711,15 @@
   margin-top: 0;
 }
 
+.smoke-section--compact {
+  padding-top: 0;
+}
+
+.smoke-faq-grid--single {
+  grid-template-columns: 1fr;
+  margin-top: 1.25rem;
+}
+
 @keyframes smoke-marquee {
   from {
     transform: translateX(0);
@@ -718,7 +747,8 @@
 
   .smoke-menu-grid,
   .smoke-review-grid,
-  .smoke-faq-grid {
+  .smoke-faq-grid,
+  .smoke-search-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -754,7 +784,8 @@
   .smoke-stat-grid,
   .smoke-menu-grid,
   .smoke-review-grid,
-  .smoke-faq-grid {
+  .smoke-faq-grid,
+  .smoke-search-grid {
     grid-template-columns: 1fr;
   }
 

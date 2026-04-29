@@ -1,0 +1,160 @@
+{
+  "pages": [
+    {
+      "key": "hamburgueriaCampinas",
+      "path": "/hamburgueria-campinas",
+      "eyebrow": "Campinas / SP",
+      "title": "Hamburgueria em Campinas | Burger N' Smoke",
+      "description": "Burger N' Smoke e a hamburgueria em Campinas para quem quer burger artesanal, smash burger, combos e pedido noturno no Jardim Aurelia.",
+      "h1": "Hamburgueria em Campinas para pedir hoje a noite",
+      "intro": "O Burger N' Smoke trabalha com burgers autorais, smash burger, combos e pedido rapido para quem procura hamburgueria em Campinas com entrega e retirada noturna.",
+      "chips": ["Hamburgueria em Campinas", "Pedido noturno", "Retirada no Jardim Aurelia"],
+      "highlights": [
+        {
+          "title": "Burger forte sem rodeio",
+          "description": "A casa trabalha com nomes curtos, montagem direta e leitura simples para o cliente chegar no pedido sem ficar travado."
+        },
+        {
+          "title": "Jardim Aurelia como base",
+          "description": "A retirada acontece em Campinas, com ponto facil de localizar para quem circula pelo eixo da John Boyd Dunlop."
+        },
+        {
+          "title": "Combos para decidir rapido",
+          "description": "Os combos ajudam quem quer resolver a noite com burger, frita e bebida em uma escolha unica."
+        }
+      ],
+      "featuredItemIds": ["o-bruto", "o-colosso"],
+      "faq": [
+        {
+          "question": "Onde fica a hamburgueria Burger N' Smoke em Campinas?",
+          "answer": "A operacao do Burger N' Smoke fica no Jardim Aurelia, em Campinas, com retirada no local e atendimento noturno."
+        },
+        {
+          "question": "Tem burger para pedir direto pelo site?",
+          "answer": "Sim. O cardapio leva direto para os canais oficiais de pedido, como WhatsApp e iFood."
+        },
+        {
+          "question": "Qual burger pedir para conhecer a casa?",
+          "answer": "O Bruto e O Colosso costumam ser bons pontos de entrada para quem quer sentir a linha principal da casa."
+        }
+      ]
+    },
+    {
+      "key": "smashBurgerCampinas",
+      "path": "/smash-burger-campinas",
+      "eyebrow": "Smash / Campinas",
+      "title": "Smash Burger em Campinas | Burger N' Smoke",
+      "description": "Peça smash burger em Campinas no Burger N' Smoke. Crosta forte, queijo na medida e pedido noturno com retirada ou delivery.",
+      "h1": "Smash burger em Campinas com crosta forte e pedido rapido",
+      "intro": "Quando a fome pede smash burger em Campinas, o Burger N' Smoke entrega crosta forte, queijo bem derretido e um pedido rapido de fechar.",
+      "chips": ["Smash burger", "Crosta forte", "Entrega em Campinas"],
+      "highlights": [
+        {
+          "title": "O Selado abre a linha smash",
+          "description": "O Selado combina queijo americano, picles, dijon e brioche tostado para quem quer um smash direto e equilibrado."
+        },
+        {
+          "title": "Montagem enxuta e leitura limpa",
+          "description": "O smash aparece com nome, foto, descricao e preco para a escolha acontecer rapido, sem excesso de distração."
+        },
+        {
+          "title": "Pedido noturno sem perder tempo",
+          "description": "A jornada foi pensada para facilitar a escolha de quem ja chega procurando um smash burger em Campinas."
+        }
+      ],
+      "featuredItemIds": ["o-selado", "o-eletrico"],
+      "faq": [
+        {
+          "question": "Qual o smash burger do Burger N' Smoke?",
+          "answer": "O Selado e a leitura mais direta da casa para quem procura um smash burger em Campinas."
+        },
+        {
+          "question": "Tem smash com toque mais intenso?",
+          "answer": "Sim. O Eletrico leva jalapeno, cream cheese picante e sriracha artesanal para quem quer calor e crosta."
+        },
+        {
+          "question": "Posso pedir smash burger para entrega?",
+          "answer": "Sim. O Burger N' Smoke atende com retirada e delivery noturno em Campinas."
+        }
+      ]
+    },
+    {
+      "key": "burgerDefumadoCampinas",
+      "path": "/burger-defumado-campinas",
+      "eyebrow": "Defumado / Campinas",
+      "title": "Burger Defumado em Campinas | Burger N' Smoke",
+      "description": "Burger defumado em Campinas com bacon crocante, molho da casa e montagem intensa. Conheca o Defumado e os burgers fortes do Burger N' Smoke.",
+      "h1": "Burger defumado em Campinas com pegada forte de noite",
+      "intro": "Para quem quer burger defumado em Campinas, o Burger N' Smoke trabalha uma linha intensa, com queijo marcante, bacon crocante e sabor de fogo alto.",
+      "chips": ["Burger defumado", "Bacon crocante", "Pedido noturno"],
+      "highlights": [
+        {
+          "title": "O Defumado puxa a assinatura",
+          "description": "Blend alto, queijo gouda, bacon crocante e maionese de alho negro seguram a identidade mais forte da casa."
+        },
+        {
+          "title": "Linha dark sem perder legibilidade",
+          "description": "O visual noturno reforca a proposta da casa, mas a leitura continua clara em mobile e desktop."
+        },
+        {
+          "title": "Boa entrada para quem quer impacto",
+          "description": "O Defumado e O Noturno funcionam bem para quem quer fugir do basico e pedir algo mais profundo."
+        }
+      ],
+      "featuredItemIds": ["o-defumado", "o-noturno"],
+      "faq": [
+        {
+          "question": "Qual burger escolher para sentir a linha defumada?",
+          "answer": "O Defumado e o primeiro nome da casa para essa vontade, com gouda, bacon e maionese de alho negro."
+        },
+        {
+          "question": "Existe outra opcao forte alem do Defumado?",
+          "answer": "Sim. O Noturno tambem entra nessa linha mais intensa, com provolone defumado, cogumelos e maionese trufada."
+        },
+        {
+          "question": "Tem retirada e delivery em Campinas?",
+          "answer": "Sim. O Burger N' Smoke atende no Jardim Aurelia com retirada e entrega noturna."
+        }
+      ]
+    },
+    {
+      "key": "deliveryBurgerCampinas",
+      "path": "/delivery-burger-campinas",
+      "eyebrow": "Delivery / Campinas",
+      "title": "Delivery de Burger em Campinas | Burger N' Smoke",
+      "description": "Peça delivery de burger em Campinas no Burger N' Smoke. Burgers autorais, combos e canais oficiais para pedir sem complicacao.",
+      "h1": "Delivery de burger em Campinas com pedido claro e canal oficial",
+      "intro": "Quem procura delivery de burger em Campinas encontra no Burger N' Smoke uma operacao noturna com burgers autorais, combos fortes e caminho claro para fechar o pedido.",
+      "chips": ["Delivery em Campinas", "WhatsApp e iFood", "Combos da noite"],
+      "highlights": [
+        {
+          "title": "Pedido em poucos cliques",
+          "description": "Burger, combo e atalhos de pedido ficam organizados para o cliente nao se perder no meio do caminho."
+        },
+        {
+          "title": "Combos ajudam a fechar a conta",
+          "description": "Os combos deixam a escolha objetiva para quem quer burger, frita e bebida em uma so decisao."
+        },
+        {
+          "title": "Retirada quando faz mais sentido",
+          "description": "A operacao tambem atende retirada no Jardim Aurelia para quem prefere buscar o pedido em Campinas."
+        }
+      ],
+      "featuredItemIds": ["o-colosso", "o-bruto"],
+      "faq": [
+        {
+          "question": "Quais canais de delivery o Burger N' Smoke usa?",
+          "answer": "A casa trabalha com WhatsApp oficial e iFood como canais principais de pedido."
+        },
+        {
+          "question": "Tem combo para pedir no delivery?",
+          "answer": "Sim. Os combos da casa ajudam a resolver o pedido completo com burger, frita e bebida."
+        },
+        {
+          "question": "Onde fica a retirada?",
+          "answer": "A retirada acontece no Jardim Aurelia, em Campinas, no mesmo ponto fisico informado nesta pagina."
+        }
+      ]
+    }
+  ]
+}

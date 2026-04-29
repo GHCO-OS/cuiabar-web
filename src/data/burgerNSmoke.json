@@ -2,6 +2,8 @@
   "origin": "https://burgersnsmoke.com",
   "previewPath": "/burger-n-smoke",
   "instagramUrl": "https://instagram.com/burgernsmoke",
+  "googleProfileUrl": "https://share.google/A72Y2fq0DMi8Yem4j",
+  "ifoodUrl": "https://www.ifood.com.br/delivery/campinas-sp/burgers-n-smoke--smash--combos-vila-proost-de-souza/14734c59-f45a-41e2-80b0-f1914971f6e1",
   "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Av.+Brigadeiro+Rafael+Tobias+de+Aguiar,+1121,+Jardim+Aurelia,+Campinas,+SP",
   "whatsappMessage": "Olá! Quero pedir no Burger N' Smoke.",
   "brand": {
@@ -14,12 +16,21 @@
     "mark": "/burger-n-smoke/branding/smoke-mark.png",
     "heroImage": "/burger-n-smoke/menu/hero-burger.jpg",
     "heroImageAlt": "Burger do Burger N' Smoke com blend alto, cheddar e fritas em fundo escuro",
-    "ogImage": "/burger-n-smoke/branding/smoke-wordmark.png",
-    "ogImageAlt": "Wordmark do Burger N' Smoke sobre fundo bordô escuro",
+    "ogImage": "/burger-n-smoke/menu/hero-burger.jpg",
+    "ogImageAlt": "Burger artesanal do Burger N' Smoke em destaque",
     "address": "Av. Brigadeiro Rafael Tobias de Aguiar, 1121 - Jardim Aurelia - Campinas/SP",
+    "phone": "(19) 3305-8878",
+    "priceRange": "R$ 30 a R$ 55",
+    "serviceArea": "Campinas",
     "serviceHours": [
       "Quarta a sábado, a partir das 18h",
       "Retirada e delivery noturno em Campinas"
+    ],
+    "openingHours": [
+      { "dayOfWeek": "Wednesday", "opens": "18:00", "closes": "23:00" },
+      { "dayOfWeek": "Thursday", "opens": "18:00", "closes": "23:00" },
+      { "dayOfWeek": "Friday", "opens": "18:00", "closes": "23:00" },
+      { "dayOfWeek": "Saturday", "opens": "18:00", "closes": "23:00" }
     ]
   },
   "quickFacts": [
@@ -44,6 +55,23 @@
     { "value": "6", "label": "Burgers autorais" },
     { "value": "3", "label": "Combos de ataque" },
     { "value": "18h+", "label": "Janela noturna" }
+  ],
+  "trustSignals": [
+    {
+      "label": "Base local",
+      "title": "Jardim Aurelia, Campinas",
+      "description": "Retirada e atendimento noturno com ponto fisico facil de achar pelo eixo da John Boyd Dunlop."
+    },
+    {
+      "label": "Canais oficiais",
+      "title": "Site, WhatsApp, iFood e Google",
+      "description": "Os canais oficiais da casa ficam alinhados para quem prefere pedir, chamar ou ver a rota sem ruido."
+    },
+    {
+      "label": "Pedido rapido",
+      "title": "Burger, combo e decisao simples",
+      "description": "A navegacao foi organizada para mostrar os burgers fortes, o preco e o caminho de pedido sem ruído."
+    }
   ],
   "menuItems": [
     {
@@ -147,27 +175,10 @@
       "description": "O Eletrico e O Noturno entram quando a vontade pede pimenta, profundidade e uma montagem mais escura."
     }
   ],
-  "reviews": [
-    {
-      "quote": "Chegou quente, estruturado e com crosta de verdade. Nao parece burger montado sem criterio.",
-      "author": "Rafael M.",
-      "source": "iFood"
-    },
-    {
-      "quote": "O Colosso faz sentido no nome. Pedido forte, bem montado e sem aquela sensacao de lanche desmontado.",
-      "author": "Camila T.",
-      "source": "99Food"
-    },
-    {
-      "quote": "Tem identidade. O sabor e a embalagem passam marca propria, nao mais um burger generico.",
-      "author": "Paulo G.",
-      "source": "Google"
-    }
-  ],
   "faq": [
     {
       "question": "Onde eu peco no Burger N' Smoke?",
-      "answer": "O caminho mais direto e chamar no WhatsApp oficial ou seguir para os canais da marca a partir do proprio site."
+      "answer": "O caminho mais direto e pedir pelo WhatsApp oficial ou pelo iFood, sempre pelos canais oficiais da casa."
     },
     {
       "question": "Quais sao os burgers mais pedidos?",
@@ -178,8 +189,8 @@
       "answer": "Sim. A operacao trabalha com retirada e delivery noturno em Campinas."
     },
     {
-      "question": "A marca tambem aparece em apps?",
-      "answer": "Sim. A ideia da landing e organizar a entrada da marca e depois apontar para os canais de pedido ativos."
+      "question": "A marca tambem aparece no Google?",
+      "answer": "Sim. O Burger N' Smoke tambem pode ser encontrado no Google para ver localizacao, telefone e rota."
     }
   ]
 }

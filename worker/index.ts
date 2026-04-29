@@ -9,9 +9,20 @@ const BURGER_ARCHIVED_HOST = 'burger.cuiabar.com';
 const BURGER_N_SMOKE_HOST = 'burgersnsmoke.com';
 const BURGER_N_SMOKE_ROOT = `https://${BURGER_N_SMOKE_HOST}/`;
 const BURGER_N_SMOKE_PREVIEW_PATH = '/burger-n-smoke';
+const BURGER_N_SMOKE_CANONICAL_PATHS = [
+  '/',
+  '/hamburgueria-campinas',
+  '/smash-burger-campinas',
+  '/burger-defumado-campinas',
+  '/delivery-burger-campinas',
+] as const;
 const MAIN_SITE_ORIGIN = 'https://cuiabar.com';
 const BURGER_N_SMOKE_ROBOTS = `User-agent: *\nAllow: /\n\nSitemap: ${BURGER_N_SMOKE_ROOT}sitemap.xml\n`;
-const BURGER_N_SMOKE_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${BURGER_N_SMOKE_ROOT}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n</urlset>\n`;
+
+const buildBurgerNSmokeCanonicalUrl = (pathname: string) =>
+  pathname === '/' ? BURGER_N_SMOKE_ROOT : `${BURGER_N_SMOKE_ROOT}${pathname.replace(/^\//, '').replace(/\/+$/, '')}/`;
+
+const BURGER_N_SMOKE_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${BURGER_N_SMOKE_CANONICAL_PATHS.map((pathname, index) => `  <url>\n    <loc>${buildBurgerNSmokeCanonicalUrl(pathname)}</loc>\n    <changefreq>${pathname === '/' ? 'weekly' : 'monthly'}</changefreq>\n    <priority>${index === 0 ? '1.0' : '0.45'}</priority>\n  </url>`).join('\n')}\n</urlset>\n`;
 
 const isEditorRequest = (url: URL) => url.hostname === 'blog.cuiabar.com' && (url.pathname === BLOG_EDITOR_PATH || url.pathname.startsWith(`${BLOG_EDITOR_PATH}/`));
 const isInternalPortalHost = (hostname: string) => hostname === 'crm.cuiabar.com' || hostname === MEUCUIABAR_HOST;
@@ -97,11 +108,32 @@ const redirectLegacyMeuCuiabarRoute = (url: URL) => {
   return Response.redirect(destination.toString(), 308);
 };
 
-const buildPublicSiteRedirect = (url: URL) => {
+const buildBurgerNSmokeRedirect = (url: URL) => {
   const normalizedPath = normalizePathname(url.pathname);
 
   if (normalizedPath === '/burger' || normalizedPath === '/burguer' || normalizedPath === '/burguer-cuiabar') {
     return BURGER_N_SMOKE_ROOT;
+  }
+
+  if (normalizedPath === BURGER_N_SMOKE_PREVIEW_PATH) {
+    return BURGER_N_SMOKE_ROOT;
+  }
+
+  if (!BURGER_N_SMOKE_CANONICAL_PATHS.includes(normalizedPath as (typeof BURGER_N_SMOKE_CANONICAL_PATHS)[number])) {
+    return null;
+  }
+
+  const destination = new URL(buildBurgerNSmokeCanonicalUrl(normalizedPath));
+  destination.search = url.search;
+  return destination.toString();
+};
+
+const buildPublicSiteRedirect = (url: URL) => {
+  const normalizedPath = normalizePathname(url.pathname);
+  const burgerRedirect = buildBurgerNSmokeRedirect(url);
+
+  if (burgerRedirect) {
+    return burgerRedirect;
   }
 
   if (normalizedPath === '/blog' || normalizedPath.startsWith('/blog/')) {

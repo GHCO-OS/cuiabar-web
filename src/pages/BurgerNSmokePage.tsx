@@ -5,15 +5,15 @@ import {
   burgerNSmokeFaq,
   burgerNSmokeFeaturedIds,
   burgerNSmokeHighlights,
-  burgerNSmokeManifesto,
   burgerNSmokeMenuItems,
   burgerNSmokeOccasions,
   burgerNSmokeOrigin,
   burgerNSmokePreviewPath,
   burgerNSmokeQuickFacts,
-  burgerNSmokeReviews,
   burgerNSmokeStats,
+  burgerNSmokeTrustSignals,
 } from '../data/burgerNSmoke';
+import { burgerNSmokeSeoPageList } from '../data/burgerNSmokeSeoPages';
 import { getRouteSeo } from '../data/seo';
 import { useSeo } from '../hooks/useSeo';
 import '../styles/burger-n-smoke.css';
@@ -33,9 +33,9 @@ const BurgerNSmokePage = () => {
 
   useSeo({
     ...getRouteSeo(burgerNSmokePreviewPath),
-    title: "Burger N' Smoke | Dark craft burgers em Campinas",
+    title: "Burger N' Smoke | Hamburgueria em Campinas para pedir a noite",
     description:
-      "Burger N' Smoke em Campinas com burgers autorais, combos e uma landing pensada para pedido rapido, leitura forte e marca propria.",
+      "Hamburgueria em Campinas com burgers autorais, smash burger, combos e pedido noturno no Jardim Aurelia. Peca pelo WhatsApp, iFood ou pelos canais oficiais da casa.",
     canonicalUrl: `${burgerNSmokeOrigin}/`,
     robots: onBrandHost ? 'index,follow,max-image-preview:large' : 'noindex,follow',
     siteName: "Burger N' Smoke",
@@ -50,12 +50,19 @@ const BurgerNSmokePage = () => {
             <img src={burgerNSmokeBrand.wordmark} alt="Burger N' Smoke" className="smoke-wordmark" />
           </a>
           <div className="smoke-nav-links">
-            <a href="#cardapio">Cardapio</a>
+            <a href="#mais-pedidos">Mais pedidos</a>
             <a href="#combos">Combos</a>
-            <a href="#manifesto">Manifesto</a>
+            <a href="#cardapio">Cardapio</a>
+            <a href="#buscas-campinas">Campinas</a>
             <a href="#localizacao">Onde estamos</a>
           </div>
-          <a className="smoke-link-button smoke-cta" href={burgerNSmokeBrand.whatsappUrl} target="_blank" rel="noreferrer">
+          <a
+            className="smoke-link-button smoke-cta"
+            href={burgerNSmokeBrand.whatsappUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Pedir agora pelo WhatsApp do Burger N' Smoke"
+          >
             Pedir agora
           </a>
         </div>
@@ -65,12 +72,12 @@ const BurgerNSmokePage = () => {
         <div className="smoke-shell smoke-hero-card">
           <Reveal className="smoke-hero-copy" as="div">
             <span className="smoke-eyebrow">
-              Dark craft burgers · {burgerNSmokeBrand.city} / {burgerNSmokeBrand.state}
+              Hamburgueria em Campinas · {burgerNSmokeBrand.city} / {burgerNSmokeBrand.state}
             </span>
-            <h1 className="smoke-display smoke-hero-title">Carne. Fogo. Fumaca.</h1>
+            <h1 className="smoke-display smoke-hero-title">Burger forte para pedir a noite.</h1>
             <p>
-              O Burger N&apos; Smoke nasce para operar com identidade propria, leitura forte e um jeito mais direto de vender burger em
-              Campinas. Blend alto, fogo alto e uma pagina que segura o pedido sem poluir a decisao.
+              Burgers autorais, smash burger, combos e pedido rapido no Jardim Aurelia. O Burger N&apos; Smoke foi desenhado para quem chega
+              com fome e quer fechar o pedido sem perder tempo.
             </p>
 
             <div className="smoke-pill-row">
@@ -82,8 +89,11 @@ const BurgerNSmokePage = () => {
             </div>
 
             <div className="smoke-actions">
-              <a className="smoke-cta" href={burgerNSmokeBrand.whatsappUrl} target="_blank" rel="noreferrer">
+              <a className="smoke-cta" href={burgerNSmokeBrand.whatsappUrl} target="_blank" rel="noreferrer" aria-label="Pedir no WhatsApp do Burger N' Smoke">
                 Pedir no WhatsApp
+              </a>
+              <a className="smoke-ghost" href={burgerNSmokeBrand.ifoodUrl} target="_blank" rel="noreferrer" aria-label="Pedir no iFood do Burger N' Smoke">
+                Pedir no iFood
               </a>
               <a className="smoke-ghost" href="#cardapio">
                 Ver cardapio
@@ -91,20 +101,25 @@ const BurgerNSmokePage = () => {
             </div>
 
             <div className="smoke-disclaimer">
-              <strong>Nova marca da hamburgueria</strong>
+              <strong>Pedido direto e localizacao clara</strong>
               <p>
-                Esta landing ja nasce separada da marca anterior e foi montada para indexacao propria, leitura rapida e consolidacao do
-                Burger N&apos; Smoke como frente independente.
+                Retirada no Jardim Aurelia, atendimento noturno e canais oficiais reunidos para quem quer pedir sem enrolacao em Campinas.
               </p>
             </div>
           </Reveal>
 
           <Reveal as="div" delay={80} className="smoke-hero-visual">
             <div className="smoke-hero-image-frame">
-              <img src={burgerNSmokeBrand.heroImage} alt={burgerNSmokeBrand.heroImageAlt} loading="eager" decoding="async" />
+              <img
+                src={burgerNSmokeBrand.heroImage}
+                alt={burgerNSmokeBrand.heroImageAlt}
+                loading="eager"
+                {...({ fetchpriority: 'high' } as Record<string, string>)}
+                decoding="async"
+              />
               <div className="smoke-hero-note">
-                <strong>Blend alto e crosta forte</strong>
-                <span>O visual da marca foi direcionado para noite, fogo e contraste, sem perder legibilidade.</span>
+                <strong>Jardim Aurelia, Campinas</strong>
+                <span>Pedido noturno com retirada, WhatsApp, iFood e rota facil para quem quer resolver rapido.</span>
               </div>
             </div>
 
@@ -120,24 +135,13 @@ const BurgerNSmokePage = () => {
         </div>
       </header>
 
-      <div className="smoke-strip" aria-hidden="true">
-        <div className="smoke-strip-track">
-          {[...burgerNSmokeManifesto, ...burgerNSmokeManifesto].map((item, index) => (
-            <span key={`${item}-${index}`} className="smoke-strip-item">
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <section className="smoke-section" id="manifesto">
+      <section className="smoke-section" id="mais-pedidos">
         <div className="smoke-shell smoke-section-grid">
           <Reveal as="section" className="smoke-panel smoke-section-copy">
-            <span className="smoke-eyebrow">Manifesto da marca</span>
-            <h2 className="smoke-display smoke-section-title">Bruto, direto e com cara de marca propria.</h2>
+            <span className="smoke-eyebrow">Mais pedidos</span>
+            <h2 className="smoke-display smoke-section-title">Os burgers que resolvem a vontade de primeira.</h2>
             <p>
-              O Burger N&apos; Smoke nao precisa resumir a operacao inteira em um bloco genérico. A frente foi desenhada para trabalhar com
-              uma oferta mais curta, mais escura e mais memoravel, com foco total em burger, combo e pedido noturno.
+              Quando a fome aperta, O Bruto, O Defumado e O Colosso puxam a fila. Sao os pedidos que mais ajudam a fechar a escolha rapido.
             </p>
 
             <div className="smoke-info-grid">
@@ -151,7 +155,7 @@ const BurgerNSmokePage = () => {
           </Reveal>
 
           <Reveal as="section" delay={90} className="smoke-panel smoke-panel--image">
-            <img src={burgerNSmokeBrand.mark} alt="Arte principal do Burger N' Smoke" loading="lazy" decoding="async" />
+            <img src={burgerNSmokeCombos[0].image} alt={burgerNSmokeCombos[0].imageAlt} loading="lazy" decoding="async" />
           </Reveal>
         </div>
       </section>
@@ -160,10 +164,9 @@ const BurgerNSmokePage = () => {
         <div className="smoke-shell">
           <Reveal as="div" className="smoke-panel smoke-section-copy">
             <span className="smoke-eyebrow">Cardapio</span>
-            <h2 className="smoke-display smoke-section-title">Os classicos da casa em leitura simples.</h2>
+            <h2 className="smoke-display smoke-section-title">Burgers autorais com foto, descricao e preco claro.</h2>
             <p>
-              A estrutura do site privilegia escaneabilidade: nome forte, descricao objetiva, preco claro e imagem recortada para mobile e
-              desktop sem perder impacto visual.
+              Fotos claras, descricao objetiva e preco na frente para o cliente bater o olho, escolher bem e seguir para o pedido.
             </p>
           </Reveal>
 
@@ -203,8 +206,11 @@ const BurgerNSmokePage = () => {
               <p>{burgerNSmokeCombos[0].description}</p>
               <span className="smoke-price">{burgerNSmokeCombos[0].price}</span>
               <div className="smoke-actions">
-                <a className="smoke-cta" href={burgerNSmokeBrand.whatsappUrl} target="_blank" rel="noreferrer">
+                <a className="smoke-cta" href={burgerNSmokeBrand.whatsappUrl} target="_blank" rel="noreferrer" aria-label={`Pedir o ${burgerNSmokeCombos[0].name} pelo WhatsApp`}>
                   Pedir este combo
+                </a>
+                <a className="smoke-ghost" href={burgerNSmokeBrand.ifoodUrl} target="_blank" rel="noreferrer" aria-label="Ver o cardápio do Burger N' Smoke no iFood">
+                  Ver no iFood
                 </a>
               </div>
             </div>
@@ -227,7 +233,7 @@ const BurgerNSmokePage = () => {
         <div className="smoke-shell">
           <Reveal as="div" className="smoke-panel smoke-section-copy">
             <span className="smoke-eyebrow">Curadoria por ocasiao</span>
-            <h2 className="smoke-display smoke-section-title">Se a fome vier com um tipo de vontade, siga por aqui.</h2>
+            <h2 className="smoke-display smoke-section-title">Menos duvida, mais pedido fechado.</h2>
             <div className="smoke-occasion-grid">
               {burgerNSmokeOccasions.map((item) => (
                 <article key={item.title} className="smoke-panel smoke-occasion-card">
@@ -240,32 +246,40 @@ const BurgerNSmokePage = () => {
         </div>
       </section>
 
-      <section className="smoke-section">
+      <section className="smoke-section" id="buscas-campinas">
         <div className="smoke-shell">
           <Reveal as="div" className="smoke-statement">
-            <span className="smoke-eyebrow">Brand statement</span>
-            <h2 className="smoke-display">Especialistas em carne, fogo e fumaca.</h2>
+            <span className="smoke-eyebrow">Descubra mais</span>
+            <h2 className="smoke-display">Jeitos diferentes de chegar no burger certo.</h2>
             <p>
-              O site foi redesenhado para vender a marca nova com mais clareza: menos dependencia da marca anterior, mais assinatura visual,
-              mais ritmo editorial e uma navegacao que deixa o pedido sempre por perto.
+              Se a fome pede smash, burger defumado ou delivery, estes atalhos levam direto para a linha da casa que mais combina com o
+              momento.
             </p>
           </Reveal>
+
+          <div className="smoke-search-grid">
+            {burgerNSmokeSeoPageList.map((item, index) => (
+              <Reveal key={item.path} as="a" delay={index * 50} href={item.path} className="smoke-panel smoke-search-card">
+                <span className="smoke-card-kicker">{item.eyebrow}</span>
+                <h3 className="smoke-display smoke-card-title">{item.title}</h3>
+                <p>{item.description}</p>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="smoke-section">
         <div className="smoke-shell">
           <Reveal as="div" className="smoke-panel smoke-section-copy">
-            <span className="smoke-eyebrow">Prova social</span>
-            <h2 className="smoke-display smoke-section-title">A marca precisa parecer segura antes da primeira mordida.</h2>
+            <span className="smoke-eyebrow">Sinais de confianca</span>
+            <h2 className="smoke-display smoke-section-title">Tudo o que o cliente precisa ver antes da primeira mordida.</h2>
             <div className="smoke-review-grid">
-              {burgerNSmokeReviews.map((item) => (
-                <article key={item.author} className="smoke-panel smoke-review">
-                  <span className="smoke-stars">★★★★★</span>
-                  <p>{item.quote}</p>
-                  <strong>
-                    {item.author} · {item.source}
-                  </strong>
+              {burgerNSmokeTrustSignals.map((item) => (
+                <article key={item.title} className="smoke-panel smoke-review">
+                  <span className="smoke-card-kicker">{item.label}</span>
+                  <h3 className="smoke-display smoke-card-title">{item.title}</h3>
+                  <p>{item.description}</p>
                 </article>
               ))}
             </div>
@@ -279,8 +293,8 @@ const BurgerNSmokePage = () => {
             <span className="smoke-eyebrow">Onde estamos</span>
             <h2 className="smoke-display smoke-section-title">Campinas, noite, retirada e delivery.</h2>
             <p>
-              A operacao do Burger N&apos; Smoke trabalha com a mesma base fisica da empresa, mas a comunicacao agora vem separada, com marca
-              propria, voz propria e pagina independente.
+              A base do Burger N&apos; Smoke fica no Jardim Aurelia e reune retirada, WhatsApp, iFood e mapa em um so lugar para facilitar o
+              pedido.
             </p>
 
             <div className="smoke-location-items">
@@ -294,19 +308,22 @@ const BurgerNSmokePage = () => {
               </div>
               <div className="smoke-location-item">
                 <strong>Canais</strong>
-                <span>WhatsApp oficial, Instagram da marca e retirada no local.</span>
+                <span>WhatsApp oficial, iFood, Instagram, Google e retirada no local.</span>
               </div>
             </div>
 
             <div className="smoke-location-actions">
-              <a className="smoke-cta" href={burgerNSmokeBrand.whatsappUrl} target="_blank" rel="noreferrer">
+              <a className="smoke-cta" href={burgerNSmokeBrand.whatsappUrl} target="_blank" rel="noreferrer" aria-label="Chamar o Burger N' Smoke no WhatsApp">
                 Chamar no WhatsApp
               </a>
-              <a className="smoke-ghost" href={burgerNSmokeBrand.instagramUrl} target="_blank" rel="noreferrer">
+              <a className="smoke-ghost" href={burgerNSmokeBrand.ifoodUrl} target="_blank" rel="noreferrer" aria-label="Abrir o iFood do Burger N' Smoke">
+                Abrir iFood
+              </a>
+              <a className="smoke-ghost" href={burgerNSmokeBrand.instagramUrl} target="_blank" rel="noreferrer" aria-label="Abrir o Instagram do Burger N' Smoke">
                 Abrir Instagram
               </a>
-              <a className="smoke-ghost" href={burgerNSmokeBrand.mapsUrl} target="_blank" rel="noreferrer">
-                Ver no mapa
+              <a className="smoke-ghost" href={burgerNSmokeBrand.googleProfileUrl} target="_blank" rel="noreferrer" aria-label="Abrir o perfil do Burger N' Smoke no Google">
+                Ver no Google
               </a>
             </div>
           </Reveal>
@@ -316,7 +333,7 @@ const BurgerNSmokePage = () => {
               <div className="smoke-map-copy">
                 <img src={burgerNSmokeBrand.wordmark} alt="Burger N' Smoke" className="smoke-wordmark" />
                 <p>
-                  A nova marca entra no ar com uma base visual mais forte, mais limpa e mais pronta para indexacao propria em Google e redes.
+                  Pedido noturno, burger autoral e canais oficiais reunidos para resolver a noite sem dar volta.
                 </p>
                 <div className="smoke-delivery-badges">
                   {featuredItems.map((item) => (
@@ -335,7 +352,7 @@ const BurgerNSmokePage = () => {
         <div className="smoke-shell">
           <Reveal as="div" className="smoke-panel smoke-section-copy">
             <span className="smoke-eyebrow">FAQ</span>
-            <h2 className="smoke-display smoke-section-title">O essencial para nao travar a decisao.</h2>
+            <h2 className="smoke-display smoke-section-title">O essencial para fechar o pedido sem travar.</h2>
             <div className="smoke-faq-grid">
               {burgerNSmokeFaq.map((item) => (
                 <article key={item.question} className="smoke-panel smoke-faq-item">
@@ -352,11 +369,14 @@ const BurgerNSmokePage = () => {
         <footer className="smoke-footer">
           <div>
             <img src={burgerNSmokeBrand.wordmark} alt="Burger N' Smoke" className="smoke-wordmark" />
-            <small>Dark craft burgers em Campinas / SP. Marca em operacao separada e com indexacao propria.</small>
+            <small>Hamburgueria em Campinas com pedido noturno, retirada no Jardim Aurelia e canais oficiais da marca.</small>
           </div>
           <div className="smoke-footer-links">
             <a href="#cardapio">Cardapio</a>
             <a href="#combos">Combos</a>
+            <a href={burgerNSmokeBrand.googleProfileUrl} target="_blank" rel="noreferrer">
+              Google
+            </a>
             <a href={burgerNSmokeBrand.instagramUrl} target="_blank" rel="noreferrer">
               Instagram
             </a>

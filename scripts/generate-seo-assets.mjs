@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import seoRoutesJson from '../src/data/seoRoutes.json' with { type: 'json' };
 import burgerNSmokeJson from '../src/data/burgerNSmoke.json' with { type: 'json' };
+import burgerNSmokeSeoPagesJson from '../src/data/burgerNSmokeSeoPages.json' with { type: 'json' };
 import menuData from '../src/data/menu.json' with { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,14 +16,23 @@ const burgerNSmokeBrand = {
   ...burgerNSmokeJson.brand,
   origin: burgerNSmokeJson.origin,
   instagramUrl: burgerNSmokeJson.instagramUrl,
+  googleProfileUrl: burgerNSmokeJson.googleProfileUrl,
+  ifoodUrl: burgerNSmokeJson.ifoodUrl,
+  mapsUrl: burgerNSmokeJson.mapsUrl,
 };
 const burgerNSmokeCombos = burgerNSmokeJson.combos;
 const burgerNSmokeMenuItems = burgerNSmokeJson.menuItems;
+const burgerNSmokeFaq = burgerNSmokeJson.faq;
+const burgerNSmokeSeoPages = burgerNSmokeSeoPagesJson.pages;
 
-if (seoConfig.routes['/burger-n-smoke']) {
-  seoConfig.routes['/burger-n-smoke'] = {
-    ...seoConfig.routes['/burger-n-smoke'],
-    image: burgerNSmokeBrand.ogImage,
+for (const routePath of ['/burger-n-smoke', ...burgerNSmokeSeoPages.map((page) => page.path)]) {
+  if (!seoConfig.routes[routePath]) {
+    continue;
+  }
+
+  seoConfig.routes[routePath] = {
+    ...seoConfig.routes[routePath],
+    image: `${burgerNSmokeBrand.origin}${burgerNSmokeBrand.ogImage}`,
     imageAlt: burgerNSmokeBrand.ogImageAlt,
     siteName: "Burger N' Smoke",
     twitterHandle: '@burgernsmoke',
@@ -37,6 +47,7 @@ const siteName = 'Villa Cuiabar';
 const twitterHandle = '@cuiabar';
 const menuSections = menuData;
 const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION?.trim();
+const burgerNSmokeRoutePaths = new Set(['/burger-n-smoke', ...burgerNSmokeSeoPages.map((page) => page.path)]);
 
 const escapeHtml = (value) =>
   String(value)
@@ -60,6 +71,16 @@ const routeLabel = (routePath, title) => {
   return title.split('|')[0].trim();
 };
 
+const isBurgerNSmokeRoute = (routePath) => burgerNSmokeRoutePaths.has(routePath);
+
+const getRouteOrigin = (routePath, routeSeo) => {
+  if (routeSeo?.canonicalUrl?.startsWith(burgerNSmokeBrand.origin) || isBurgerNSmokeRoute(routePath)) {
+    return burgerNSmokeBrand.origin;
+  }
+
+  return siteOrigin;
+};
+
 const toAbsoluteUrl = (value) => {
   if (!value) {
     return defaultImage;
@@ -81,7 +102,7 @@ const normalizeCanonicalPath = (value) => {
 };
 
 const buildCanonicalUrl = (routePath, routeSeo) =>
-  routeSeo.canonicalUrl ?? `${siteOrigin}${normalizeCanonicalPath(routeSeo.canonicalPath ?? routePath)}`;
+  routeSeo.canonicalUrl ?? `${getRouteOrigin(routePath, routeSeo)}${normalizeCanonicalPath(routeSeo.canonicalPath ?? routePath)}`;
 
 const normalizePrice = (value) => {
   if (!value) {
@@ -161,7 +182,7 @@ const buildBurgerNSmokeStructuredData = () => ({
   name: "Cardapio Burger N' Smoke",
   url: `${burgerNSmokeBrand.origin}/`,
   inLanguage: 'pt-BR',
-  description: "Landing oficial do Burger N' Smoke com burgers autorais, combos e leitura pensada para pedido rapido.",
+  description: "Cardapio do Burger N' Smoke com burgers autorais, smash burger e combos para pedido noturno em Campinas.",
   hasMenuSection: [
     {
       '@type': 'MenuSection',
@@ -187,43 +208,68 @@ const buildBurgerNSmokeStructuredData = () => ({
   ],
 });
 
-const buildBurgerNSmokeFaqStructuredData = () => ({
+const buildBurgerNSmokeRestaurantStructuredData = (url = `${burgerNSmokeBrand.origin}/`) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Restaurant',
+  name: "Burger N' Smoke",
+  description: 'Hamburgueria em Campinas com burgers autorais, smash burger, combos, retirada e delivery noturno.',
+  url,
+  image: `${burgerNSmokeBrand.origin}${burgerNSmokeBrand.ogImage}`,
+  telephone: burgerNSmokeBrand.phone,
+  priceRange: burgerNSmokeBrand.priceRange,
+  servesCuisine: ['Hamburger', 'Smash Burger', 'American'],
+  areaServed: burgerNSmokeBrand.serviceArea,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: burgerNSmokeBrand.address,
+    addressLocality: burgerNSmokeBrand.city,
+    addressRegion: burgerNSmokeBrand.state,
+    addressCountry: 'BR',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '-22.9010251',
+    longitude: '-47.0967600',
+  },
+  openingHoursSpecification: burgerNSmokeBrand.openingHours.map((slot) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: slot.dayOfWeek,
+    opens: slot.opens,
+    closes: slot.closes,
+  })),
+  sameAs: [
+    burgerNSmokeBrand.instagramUrl,
+    burgerNSmokeBrand.googleProfileUrl,
+    burgerNSmokeBrand.mapsUrl,
+    burgerNSmokeBrand.ifoodUrl,
+  ],
+  hasMenu: `${burgerNSmokeBrand.origin}/#cardapio`,
+  potentialAction: {
+    '@type': 'OrderAction',
+    target: [
+      {
+        '@type': 'EntryPoint',
+        urlTemplate: `https://wa.me/551933058878?text=${encodeURIComponent(burgerNSmokeJson.whatsappMessage)}`,
+      },
+      {
+        '@type': 'EntryPoint',
+        urlTemplate: burgerNSmokeBrand.ifoodUrl,
+      },
+    ],
+  },
+});
+
+const buildBurgerNSmokeFaqStructuredData = (entries = burgerNSmokeFaq) => ({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: "Onde eu peco no Burger N' Smoke?",
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: "O caminho mais direto e chamar no WhatsApp oficial ou seguir para os canais da marca a partir do proprio site.",
-      },
+  mainEntity: entries.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
     },
-    {
-      '@type': 'Question',
-      name: 'Quais sao os burgers mais pedidos?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'O Bruto, O Defumado e O Colosso puxam a frente para quem quer resolver a fome sem pensar demais.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Tem retirada no local?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Sim. A operacao trabalha com retirada e delivery noturno em Campinas.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'A marca tambem aparece em apps?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Sim. A ideia da landing e organizar a entrada da marca e depois apontar para os canais de pedido ativos.',
-      },
-    },
-  ],
+  })),
 });
 
 const buildRouteSpecificSchemas = (routePath) => {
@@ -232,7 +278,21 @@ const buildRouteSpecificSchemas = (routePath) => {
   }
 
   if (routePath === '/burger-n-smoke') {
-    return [buildBurgerNSmokeStructuredData(), buildBurgerNSmokeFaqStructuredData()];
+    return [
+      buildBurgerNSmokeRestaurantStructuredData(`${burgerNSmokeBrand.origin}/`),
+      buildBurgerNSmokeStructuredData(),
+      buildBurgerNSmokeFaqStructuredData(),
+    ];
+  }
+
+  const localPage = burgerNSmokeSeoPages.find((page) => page.path === routePath);
+
+  if (localPage) {
+    return [
+      buildBurgerNSmokeRestaurantStructuredData(`${burgerNSmokeBrand.origin}${normalizeCanonicalPath(routePath)}`),
+      buildBurgerNSmokeStructuredData(),
+      buildBurgerNSmokeFaqStructuredData(localPage.faq),
+    ];
   }
 
   return [];
@@ -244,6 +304,9 @@ const buildBreadcrumbSchema = (routePath, title) => {
   }
 
   const itemUrl = buildCanonicalUrl(routePath, seoConfig.routes[routePath]);
+  const burgerRoute = isBurgerNSmokeRoute(routePath);
+  const homeLabel = burgerRoute ? "Burger N' Smoke" : 'Home';
+  const homeItem = burgerRoute ? `${burgerNSmokeBrand.origin}/` : `${siteOrigin}/`;
 
   return {
     '@context': 'https://schema.org',
@@ -252,8 +315,8 @@ const buildBreadcrumbSchema = (routePath, title) => {
       {
         '@type': 'ListItem',
         position: 1,
-        name: 'Home',
-        item: `${siteOrigin}/`,
+        name: homeLabel,
+        item: homeItem,
       },
       {
         '@type': 'ListItem',
@@ -274,7 +337,7 @@ const buildWebPageSchema = (routePath, routeSeo) => ({
   inLanguage: 'pt-BR',
 });
 
-const shouldPrerenderRoute = (routePath, routeSeo) => routeSeo.includeInSitemap !== false && (!routeSeo.canonicalPath || routeSeo.canonicalPath === routePath);
+const shouldPrerenderRoute = (routePath, routeSeo) => !routeSeo.canonicalPath || routeSeo.canonicalPath === routePath;
 
 const injectPrerenderedRoot = (html, prerenderedMarkup) => {
   if (!prerenderedMarkup) {
@@ -294,6 +357,7 @@ const injectRouteMetadata = (html, routePath, routeSeo, prerenderedMarkup = '') 
   const robots = routeSeo.robots || 'index,follow,max-image-preview:large';
   const routeSiteName = routeSeo.siteName || siteName;
   const routeTwitterHandle = routeSeo.twitterHandle || twitterHandle;
+  const isBurgerRoute = canonicalUrl.startsWith(burgerNSmokeBrand.origin);
   const schemas = [
     buildWebPageSchema(routePath, routeSeo),
     ...buildRouteSpecificSchemas(routePath),
@@ -310,6 +374,8 @@ const injectRouteMetadata = (html, routePath, routeSeo, prerenderedMarkup = '') 
   output = upsertTag(output, /<meta\s+property="og:title"\s+content=".*?"\s*\/?>/i, `<meta property="og:title" content="${escapeHtml(title)}" />`);
   output = upsertTag(output, /<meta\s+property="og:description"\s+content=".*?"\s*\/?>/i, `<meta property="og:description" content="${escapeHtml(description)}" />`);
   output = upsertTag(output, /<meta\s+property="og:image"\s+content=".*?"\s*\/?>/i, `<meta property="og:image" content="${escapeHtml(image)}" />`);
+  output = upsertTag(output, /<meta\s+property="og:image:width"\s+content=".*?"\s*\/?>/i, '<meta property="og:image:width" content="1200" />');
+  output = upsertTag(output, /<meta\s+property="og:image:height"\s+content=".*?"\s*\/?>/i, '<meta property="og:image:height" content="630" />');
   output = upsertTag(output, /<meta\s+property="og:image:alt"\s+content=".*?"\s*\/?>/i, `<meta property="og:image:alt" content="${escapeHtml(imageAlt)}" />`);
   output = upsertTag(output, /<meta\s+property="og:image:secure_url"\s+content=".*?"\s*\/?>/i, `<meta property="og:image:secure_url" content="${escapeHtml(image)}" />`);
   output = upsertTag(output, /<meta\s+property="og:site_name"\s+content=".*?"\s*\/?>/i, `<meta property="og:site_name" content="${escapeHtml(routeSiteName)}" />`);
@@ -325,6 +391,14 @@ const injectRouteMetadata = (html, routePath, routeSeo, prerenderedMarkup = '') 
   output = upsertTag(output, /<meta\s+name="keywords"\s+content=".*?"\s*\/?>/i, `<meta name="keywords" content="${escapeHtml((routeSeo.keywords || []).join(', '))}" />`);
   output = upsertTag(output, /<meta\s+name="robots"\s+content=".*?"\s*\/?>/i, `<meta name="robots" content="${escapeHtml(robots)}" />`);
   output = upsertTag(output, /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/i, `<link rel="canonical" href="${escapeHtml(canonicalUrl)}" />`);
+  output = upsertTag(output, /<link\s+rel="apple-touch-icon"\s+href=".*?"\s*\/?>/i, '<link rel="apple-touch-icon" href="/favicon.png" />');
+
+  if (isBurgerRoute) {
+    output = upsertTag(output, /<meta\s+name="geo\.region"\s+content=".*?"\s*\/?>/i, '<meta name="geo.region" content="BR-SP" />');
+    output = upsertTag(output, /<meta\s+name="geo\.placename"\s+content=".*?"\s*\/?>/i, '<meta name="geo.placename" content="Campinas" />');
+    output = upsertTag(output, /<meta\s+name="geo\.position"\s+content=".*?"\s*\/?>/i, '<meta name="geo.position" content="-22.9010251;-47.0967600" />');
+    output = upsertTag(output, /<meta\s+name="ICBM"\s+content=".*?"\s*\/?>/i, '<meta name="ICBM" content="-22.9010251, -47.0967600" />');
+  }
 
   if (googleSiteVerification) {
     output = upsertTag(

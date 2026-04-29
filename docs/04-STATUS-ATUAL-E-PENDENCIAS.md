@@ -37,6 +37,7 @@ O repositório oficial é `GHCO-OS/cuiabar-web`.
 - arquitetura pública reorganizada em três frentes de entrada na raiz do site: `Presencial`, `Expresso` e `Espetaria`, com a home operacional do restaurante movida para `/presencial` e o delivery concentrado em `/expresso`
 - `Burger Cuiabar` rebaixado a projeto encerrado e arquivado por tempo indeterminado, com regra explícita de não alterar, publicar ou excluir sem autorização expressa
 - nova frente `Burger N' Smoke` implementada com dados próprios, assets próprios, SEO dedicado, preview interno em `/burger-n-smoke` e domínio oficial `https://burgersnsmoke.com/`
+- pacote de SEO local do `Burger N' Smoke` aplicado com copy comercial, schema de restaurante, rotas satélite de Campinas e sitemap próprio da marca
 - aliases legados do burger em `cuiabar.com` e o host `burger.cuiabar.com` convertidos para redirecionamento permanente da nova marca
 - correção estrutural de canonicalização nas rotas públicas do `cuiabar.com`, com `canonical` e sitemap alinhados ao formato com barra final realmente servido no Pages
 - blog público, páginas de agenda e guia local de bar com música removidos da superfície principal; a programação da casa ficou reduzida ao embed oficial do Google Calendar dentro de `/presencial`

@@ -11,8 +11,15 @@ export const Layout = ({ children }: PropsWithChildren) => {
   const hostname = typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '';
   const normalizedPath = location.pathname.replace(/\/+$/, '') || '/';
   const isLinksRoute = ['/links', '/bio', '/acessos'].includes(normalizedPath);
+  const isBurgerNSmokeStandalonePath = [
+    '/burger-n-smoke',
+    '/hamburgueria-campinas',
+    '/smash-burger-campinas',
+    '/burger-defumado-campinas',
+    '/delivery-burger-campinas',
+  ].includes(normalizedPath);
   const isBurgerNSmokeHost = hostname === 'burgersnsmoke.com' || hostname === 'www.burgersnsmoke.com';
-  const isBurgerNSmokeRoute = isBurgerNSmokeHost || normalizedPath === '/burger-n-smoke';
+  const isBurgerNSmokeRoute = isBurgerNSmokeHost || isBurgerNSmokeStandalonePath;
   const isReservationsRoute = normalizedPath === '/reservas';
   const isProRefeicaoHost = hostname === 'prorefeicao.cuiabar.com';
   const isProRefeicaoSurface = isProRefeicaoHost || normalizedPath === '/prorefeicao';

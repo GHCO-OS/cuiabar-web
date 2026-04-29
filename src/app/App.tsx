@@ -13,6 +13,7 @@ const PesquisaPage = lazy(() => import('../pages/PesquisaPage'));
 const ReservasPage = lazy(() => import('../pages/ReservasPage'));
 const VagasPage = lazy(() => import('../pages/VagasPage'));
 const BurgerNSmokePage = lazy(() => import('../pages/BurgerNSmokePage'));
+const BurgerNSmokeSeoPage = lazy(() => import('../pages/BurgerNSmokeSeoPage'));
 const EspetariaCuiabarPage = lazy(() => import('../pages/EspetariaCuiabarPage'));
 const LinksPage = lazy(() => import('../pages/LinksPage'));
 const LocalGuidePage = lazy(() => import('../pages/LocalGuidePage'));
@@ -42,6 +43,10 @@ export const App = () => (
         <Route path="/burguer-cuiabar" element={<ClientRedirect to={siteConfig.burgerNSmokeOrigin} />} />
         <Route path="/burguer" element={<ClientRedirect to={siteConfig.burgerNSmokeOrigin} />} />
         <Route path={siteConfig.burgerNSmokePreviewPath} element={<BurgerNSmokePage />} />
+        <Route path="/hamburgueria-campinas" element={<BurgerNSmokeSeoPage pageKey="hamburgueriaCampinas" />} />
+        <Route path="/smash-burger-campinas" element={<BurgerNSmokeSeoPage pageKey="smashBurgerCampinas" />} />
+        <Route path="/burger-defumado-campinas" element={<BurgerNSmokeSeoPage pageKey="burgerDefumadoCampinas" />} />
+        <Route path="/delivery-burger-campinas" element={<BurgerNSmokeSeoPage pageKey="deliveryBurgerCampinas" />} />
         <Route path="/marmita" element={<ClientRedirect to="/expresso" />} />
         <Route path="/delivery" element={<ClientRedirect to="/expresso" />} />
         <Route path="/online-ordering" element={<ClientRedirect to="/expresso" />} />

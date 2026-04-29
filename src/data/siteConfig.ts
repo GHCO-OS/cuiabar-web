@@ -38,13 +38,16 @@ export const siteConfig = {
   },
   burgerNSmokeOrderLinks: {
     direct: 'https://burgersnsmoke.com',
+    ifood:
+      'https://www.ifood.com.br/delivery/campinas-sp/burgers-n-smoke--smash--combos-vila-proost-de-souza/14734c59-f45a-41e2-80b0-f1914971f6e1',
     instagram: 'https://instagram.com/burgernsmoke',
     whatsapp:
       'https://wa.me/551933058878?text=Ol%C3%A1!%20Quero%20pedir%20no%20Burger%20N%27%20Smoke.',
   },
   burguerOrderLinks: {
     direct: 'https://burgersnsmoke.com',
-    ifood: 'https://burgersnsmoke.com',
+    ifood:
+      'https://www.ifood.com.br/delivery/campinas-sp/burgers-n-smoke--smash--combos-vila-proost-de-souza/14734c59-f45a-41e2-80b0-f1914971f6e1',
     food99: 'https://burgersnsmoke.com',
   },
   menuPageUrl: '/menu',

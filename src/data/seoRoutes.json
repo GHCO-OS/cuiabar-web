@@ -264,22 +264,95 @@
       ]
     },
     "/burger-n-smoke": {
-      "title": "Burger N' Smoke | Dark craft burgers em Campinas",
-      "description": "Landing oficial do Burger N' Smoke com burgers autorais, combos e uma proposta visual pronta para indexação própria em Campinas.",
-      "image": "https://cuiabar.com/burger-n-smoke/branding/smoke-wordmark.png",
-      "imageAlt": "Wordmark do Burger N' Smoke sobre fundo bordô escuro",
-      "type": "website",
+      "title": "Burger N' Smoke | Hamburgueria em Campinas para pedir a noite",
+      "description": "Hamburgueria em Campinas com burgers autorais, smash burger, combos e pedido noturno no Jardim Aurelia. Peca pelo WhatsApp, iFood ou pelos canais oficiais da casa.",
+      "image": "https://burgersnsmoke.com/burger-n-smoke/menu/hero-burger.jpg",
+      "imageAlt": "Burger artesanal do Burger N' Smoke em destaque",
+      "type": "restaurant",
       "changefreq": "weekly",
-      "priority": "0.4",
+      "priority": "0.6",
       "canonicalUrl": "https://burgersnsmoke.com/",
       "includeInSitemap": false,
       "keywords": [
         "Burger N' Smoke",
         "hamburgueria Campinas",
-        "dark craft burgers",
+        "smash burger Campinas",
         "burger artesanal Campinas",
         "burger noturno Campinas",
+        "delivery burger Campinas",
         "burgersnsmoke.com"
+      ],
+      "schema": []
+    },
+    "/hamburgueria-campinas": {
+      "title": "Hamburgueria em Campinas | Burger N' Smoke",
+      "description": "Burger N' Smoke e a hamburgueria em Campinas para quem quer burger artesanal, smash burger, combos e pedido noturno no Jardim Aurelia.",
+      "image": "https://burgersnsmoke.com/burger-n-smoke/menu/hero-burger.jpg",
+      "imageAlt": "Burger artesanal do Burger N' Smoke em destaque",
+      "type": "restaurant",
+      "changefreq": "monthly",
+      "priority": "0.45",
+      "canonicalUrl": "https://burgersnsmoke.com/hamburgueria-campinas/",
+      "includeInSitemap": false,
+      "keywords": [
+        "hamburgueria em Campinas",
+        "hamburgueria Campinas SP",
+        "burger artesanal Campinas",
+        "burger noturno Campinas"
+      ],
+      "schema": []
+    },
+    "/smash-burger-campinas": {
+      "title": "Smash Burger em Campinas | Burger N' Smoke",
+      "description": "Peça smash burger em Campinas no Burger N' Smoke. Crosta forte, queijo na medida e pedido noturno com retirada ou delivery.",
+      "image": "https://burgersnsmoke.com/burger-n-smoke/menu/o-selado.webp",
+      "imageAlt": "Burger O Selado do Burger N' Smoke",
+      "type": "restaurant",
+      "changefreq": "monthly",
+      "priority": "0.42",
+      "canonicalUrl": "https://burgersnsmoke.com/smash-burger-campinas/",
+      "includeInSitemap": false,
+      "keywords": [
+        "smash burger Campinas",
+        "smash burger em Campinas",
+        "burger crosta forte Campinas",
+        "pedido noturno Campinas"
+      ],
+      "schema": []
+    },
+    "/burger-defumado-campinas": {
+      "title": "Burger Defumado em Campinas | Burger N' Smoke",
+      "description": "Burger defumado em Campinas com bacon crocante, molho da casa e montagem intensa. Conheca o Defumado e os burgers fortes do Burger N' Smoke.",
+      "image": "https://burgersnsmoke.com/burger-n-smoke/menu/o-defumado.webp",
+      "imageAlt": "Burger O Defumado do Burger N' Smoke",
+      "type": "restaurant",
+      "changefreq": "monthly",
+      "priority": "0.42",
+      "canonicalUrl": "https://burgersnsmoke.com/burger-defumado-campinas/",
+      "includeInSitemap": false,
+      "keywords": [
+        "burger defumado Campinas",
+        "burger com bacon Campinas",
+        "hamburgueria artesanal Campinas",
+        "burger intenso Campinas"
+      ],
+      "schema": []
+    },
+    "/delivery-burger-campinas": {
+      "title": "Delivery de Burger em Campinas | Burger N' Smoke",
+      "description": "Peça delivery de burger em Campinas no Burger N' Smoke. Burgers autorais, combos e canais oficiais para pedir sem complicacao.",
+      "image": "https://burgersnsmoke.com/burger-n-smoke/menu/combo-smoke.png",
+      "imageAlt": "Combo do Burger N' Smoke com burger, fritas e bebida",
+      "type": "restaurant",
+      "changefreq": "monthly",
+      "priority": "0.42",
+      "canonicalUrl": "https://burgersnsmoke.com/delivery-burger-campinas/",
+      "includeInSitemap": false,
+      "keywords": [
+        "delivery burger Campinas",
+        "delivery hamburgueria Campinas",
+        "burger no iFood Campinas",
+        "pedido de burger Campinas"
       ],
       "schema": []
     },

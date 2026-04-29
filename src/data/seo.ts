@@ -1,5 +1,6 @@
 import seoRoutesJson from './seoRoutes.json';
-import { burgerNSmokeBrand, burgerNSmokeCombos, burgerNSmokeMenuItems } from './burgerNSmoke';
+import { burgerNSmokeBrand, burgerNSmokeCombos, burgerNSmokeFaq, burgerNSmokeMenuItems } from './burgerNSmoke';
+import { burgerNSmokeSeoPageList } from './burgerNSmokeSeoPages';
 
 type SchemaBlock = Record<string, unknown>;
 
@@ -62,82 +63,131 @@ const buildOffer = (priceLabel: string | undefined) => {
     : undefined;
 };
 
-const buildBurgerNSmokeRouteSchema = (): SchemaBlock[] => [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'Menu',
-    name: "Cardapio Burger N' Smoke",
-    description: "Landing oficial do Burger N' Smoke com burgers autorais, combos e leitura pensada para pedido rapido.",
-    url: `${burgerNSmokeBrand.origin}/`,
-    inLanguage: 'pt-BR',
-    hasMenuSection: [
-      {
-        '@type': 'MenuSection',
-        name: 'Burgers',
-        hasMenuItem: burgerNSmokeMenuItems.map((item) => ({
-          '@type': 'MenuItem',
-          name: item.name,
-          description: `${item.category}. ${item.description}`.trim(),
-          image: `${burgerNSmokeBrand.origin}${item.image}`,
-          offers: buildOffer(item.price),
-        })),
-      },
-      {
-        '@type': 'MenuSection',
-        name: 'Combos',
-        hasMenuItem: burgerNSmokeCombos.map((item) => ({
-          '@type': 'MenuItem',
-          name: item.name,
-          description: `${item.note}. ${item.description}`.trim(),
-          offers: buildOffer(item.price),
-        })),
-      },
-    ],
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: "Onde eu peco no Burger N' Smoke?",
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: "O caminho mais direto e chamar no WhatsApp oficial ou seguir para os canais da marca a partir do proprio site.",
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Quais sao os burgers mais pedidos?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'O Bruto, O Defumado e O Colosso puxam a frente para quem quer resolver a fome sem pensar demais.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Tem retirada no local?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Sim. A operacao trabalha com retirada e delivery noturno em Campinas.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'A marca tambem aparece em apps?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Sim. A ideia da landing e organizar a entrada da marca e depois apontar para os canais de pedido ativos.',
-        },
-      },
-    ],
-  },
-];
+const burgerNSmokeSeoPaths = new Set<string>(['/burger-n-smoke', ...burgerNSmokeSeoPageList.map((page) => page.path)]);
 
-const enrichBurgerNSmokeRoute = (route: RouteSeo | undefined): RouteSeo | undefined => {
+const buildBurgerNSmokeMenuSchema = (url: string): SchemaBlock => ({
+  '@context': 'https://schema.org',
+  '@type': 'Menu',
+  name: "Cardapio Burger N' Smoke",
+  description: "Cardapio do Burger N' Smoke com burgers autorais, smash burger e combos para pedido noturno em Campinas.",
+  url,
+  inLanguage: 'pt-BR',
+  hasMenuSection: [
+    {
+      '@type': 'MenuSection',
+      name: 'Burgers',
+      hasMenuItem: burgerNSmokeMenuItems.map((item) => ({
+        '@type': 'MenuItem',
+        name: item.name,
+        description: `${item.category}. ${item.description}`.trim(),
+        image: `${burgerNSmokeBrand.origin}${item.image}`,
+        offers: buildOffer(item.price),
+      })),
+    },
+    {
+      '@type': 'MenuSection',
+      name: 'Combos',
+      hasMenuItem: burgerNSmokeCombos.map((item) => ({
+        '@type': 'MenuItem',
+        name: item.name,
+        description: `${item.note}. ${item.description}`.trim(),
+        offers: buildOffer(item.price),
+      })),
+    },
+  ],
+});
+
+const buildBurgerNSmokeRestaurantSchema = (url: string): SchemaBlock => ({
+  '@context': 'https://schema.org',
+  '@type': 'Restaurant',
+  name: "Burger N' Smoke",
+  description: 'Hamburgueria em Campinas com burgers autorais, smash burger, combos, retirada e delivery noturno.',
+  url,
+  image: `${burgerNSmokeBrand.origin}${burgerNSmokeBrand.ogImage}`,
+  telephone: burgerNSmokeBrand.phone,
+  priceRange: burgerNSmokeBrand.priceRange,
+  servesCuisine: ['Hamburger', 'Smash Burger', 'American'],
+  areaServed: burgerNSmokeBrand.serviceArea,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: burgerNSmokeBrand.address,
+    addressLocality: burgerNSmokeBrand.city,
+    addressRegion: burgerNSmokeBrand.state,
+    addressCountry: 'BR',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '-22.9010251',
+    longitude: '-47.0967600',
+  },
+  openingHoursSpecification: burgerNSmokeBrand.openingHours.map((slot: { dayOfWeek: string; opens: string; closes: string }) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: slot.dayOfWeek,
+    opens: slot.opens,
+    closes: slot.closes,
+  })),
+  sameAs: [
+    burgerNSmokeBrand.instagramUrl,
+    burgerNSmokeBrand.googleProfileUrl,
+    burgerNSmokeBrand.mapsUrl,
+    burgerNSmokeBrand.ifoodUrl,
+  ],
+  hasMenu: `${burgerNSmokeBrand.origin}/#cardapio`,
+  potentialAction: {
+    '@type': 'OrderAction',
+    target: [
+      {
+        '@type': 'EntryPoint',
+        urlTemplate: burgerNSmokeBrand.whatsappUrl,
+      },
+      {
+        '@type': 'EntryPoint',
+        urlTemplate: burgerNSmokeBrand.ifoodUrl,
+      },
+    ],
+  },
+});
+
+const buildFaqSchema = (entries: Array<{ question: string; answer: string }>): SchemaBlock => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: entries.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
+});
+
+const buildBurgerNSmokeRouteSchema = (routePath: string, canonicalUrl: string): SchemaBlock[] => {
+  if (routePath === '/burger-n-smoke') {
+    return [
+      buildBurgerNSmokeRestaurantSchema(canonicalUrl),
+      buildBurgerNSmokeMenuSchema(canonicalUrl),
+      buildFaqSchema(burgerNSmokeFaq),
+    ];
+  }
+
+  const localPage = burgerNSmokeSeoPageList.find((page) => page.path === routePath);
+
+  if (!localPage) {
+    return [];
+  }
+
+  return [
+    buildBurgerNSmokeRestaurantSchema(canonicalUrl),
+    buildFaqSchema(localPage.faq),
+  ];
+};
+
+const enrichBurgerNSmokeRoute = (routePath: string, route: RouteSeo | undefined): RouteSeo | undefined => {
   if (!route) {
     return route;
   }
+
+  const canonicalUrl = route.canonicalUrl ?? `${burgerNSmokeBrand.origin}${normalizeCanonicalPath(routePath === '/burger-n-smoke' ? '/' : routePath)}`;
 
   return {
     ...route,
@@ -145,12 +195,14 @@ const enrichBurgerNSmokeRoute = (route: RouteSeo | undefined): RouteSeo | undefi
     imageAlt: burgerNSmokeBrand.ogImageAlt,
     siteName: "Burger N' Smoke",
     twitterHandle: '@burgernsmoke',
-    schema: buildBurgerNSmokeRouteSchema(),
+    schema: buildBurgerNSmokeRouteSchema(routePath, canonicalUrl),
   };
 };
 
-if (seoRoutes.routes['/burger-n-smoke']) {
-  seoRoutes.routes['/burger-n-smoke'] = enrichBurgerNSmokeRoute(seoRoutes.routes['/burger-n-smoke']) as RouteSeo;
+for (const routePath of burgerNSmokeSeoPaths) {
+  if (seoRoutes.routes[routePath]) {
+    seoRoutes.routes[routePath] = enrichBurgerNSmokeRoute(routePath, seoRoutes.routes[routePath]) as RouteSeo;
+  }
 }
 
 export const siteOrigin = seoRoutes.siteOrigin;
