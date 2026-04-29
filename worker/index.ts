@@ -10,6 +10,8 @@ const BURGER_N_SMOKE_HOST = 'burgersnsmoke.com';
 const BURGER_N_SMOKE_ROOT = `https://${BURGER_N_SMOKE_HOST}/`;
 const BURGER_N_SMOKE_PREVIEW_PATH = '/burger-n-smoke';
 const MAIN_SITE_ORIGIN = 'https://cuiabar.com';
+const BURGER_N_SMOKE_ROBOTS = `User-agent: *\nAllow: /\n\nSitemap: ${BURGER_N_SMOKE_ROOT}sitemap.xml\n`;
+const BURGER_N_SMOKE_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${BURGER_N_SMOKE_ROOT}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n</urlset>\n`;
 
 const isEditorRequest = (url: URL) => url.hostname === 'blog.cuiabar.com' && (url.pathname === BLOG_EDITOR_PATH || url.pathname.startsWith(`${BLOG_EDITOR_PATH}/`));
 const isInternalPortalHost = (hostname: string) => hostname === 'crm.cuiabar.com' || hostname === MEUCUIABAR_HOST;
@@ -173,6 +175,24 @@ const serveBurgerHost = async (request: Request, env: Env) => {
 
   if (url.hostname === BURGER_ARCHIVED_HOST || url.hostname === `www.${BURGER_ARCHIVED_HOST}`) {
     return Response.redirect(BURGER_N_SMOKE_ROOT, 301);
+  }
+
+  if (url.pathname === '/robots.txt') {
+    return new Response(BURGER_N_SMOKE_ROBOTS, {
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'cache-control': 'public, max-age=300',
+      },
+    });
+  }
+
+  if (url.pathname === '/sitemap.xml') {
+    return new Response(BURGER_N_SMOKE_SITEMAP, {
+      headers: {
+        'content-type': 'application/xml; charset=utf-8',
+        'cache-control': 'public, max-age=300',
+      },
+    });
   }
 
   if (url.pathname === BURGER_N_SMOKE_PREVIEW_PATH) {

@@ -15,6 +15,8 @@ const BURGER_ARCHIVED_HOST = 'burger.cuiabar.com';
 const BURGER_N_SMOKE_HOST = 'burgersnsmoke.com';
 const BURGER_N_SMOKE_ROOT = `https://${BURGER_N_SMOKE_HOST}/`;
 const BURGER_N_SMOKE_PREVIEW_PATH = '/burger-n-smoke';
+const BURGER_N_SMOKE_SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${BURGER_N_SMOKE_ROOT}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n</urlset>\n`;
+const BURGER_N_SMOKE_ROBOTS = `User-agent: *\nAllow: /\n\nSitemap: ${BURGER_N_SMOKE_ROOT}sitemap.xml\n`;
 
 const normalizePathname = (pathname) => {
   if (pathname === '/') {
@@ -74,6 +76,24 @@ export async function onRequest(context) {
 
   if (url.hostname === PROREFEICAO_HOST && normalizedPathname === '/prorefeicao') {
     return Response.redirect(`https://${PROREFEICAO_HOST}/`, 301);
+  }
+
+  if (url.hostname === BURGER_N_SMOKE_HOST && normalizedPathname === '/robots.txt') {
+    return new Response(BURGER_N_SMOKE_ROBOTS, {
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'cache-control': 'public, max-age=300',
+      },
+    });
+  }
+
+  if (url.hostname === BURGER_N_SMOKE_HOST && normalizedPathname === '/sitemap.xml') {
+    return new Response(BURGER_N_SMOKE_SITEMAP, {
+      headers: {
+        'content-type': 'application/xml; charset=utf-8',
+        'cache-control': 'public, max-age=300',
+      },
+    });
   }
 
   if (url.hostname === BURGER_N_SMOKE_HOST && normalizedPathname === BURGER_N_SMOKE_PREVIEW_PATH) {
